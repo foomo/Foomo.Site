@@ -63,16 +63,30 @@ class Module extends \Foomo\Modules\ModuleBase
 	 */
 	public static function getResources()
 	{
-		return array(
+		return [
 			\Foomo\Modules\Resource\Module::getResource('Foomo', self::VERSION),
+
+			\Foomo\Modules\Resource\Config::getResource(self::NAME, 'Foomo.Site.config'),
+
 			// get a run mode independent folder var/<runMode>/test
 			// \Foomo\Modules\Resource\Fs::getVarResource(\Foomo\Modules\Resource\Fs::TYPE_FOLDER, 'test'),
 			// and a file in it
-			// \Foomo\Modules\Resource\Fs::getVarResource(\Foomo\Modules\Resource\Fs::TYPE_File, 'test' . DIRECTORY_SEPARATOR . 'someFile'),
 			// request a cache resource
 			// \Foomo\Modules\Resource\Fs::getCacheResource(\Foomo\Modules\Resource\Fs::TYPE_FOLDER, 'navigationLeaves'),
 			// a database configuration
 			// \Foomo\Modules\Resource\Config::getResource('yourModule', 'db')
-		);
+		];
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @return \Foomo\Site\Config
+	 */
+	public static function getSiteConfig()
+	{
+		return self::getConfig(Config::NAME);
 	}
 }
