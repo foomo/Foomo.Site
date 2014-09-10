@@ -73,4 +73,16 @@ class Site
 		}
 		return $inst;
 	}
+
+	/**
+	 * @return \Foomo\ContentServer\ProxyInterface
+	 */
+	public static function getContentServerProxy()
+	{
+		static $inst;
+		if (is_null($inst)) {
+			$inst = Module::getContentServerProxyConfig()->getProxy();
+		}
+		return $inst;
+	}
 }

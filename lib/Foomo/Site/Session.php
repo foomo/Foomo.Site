@@ -38,7 +38,7 @@ class Session
 	/**
 	 * @var string
 	 */
-	private $territory;
+	private $region;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Constructor
@@ -53,8 +53,8 @@ class Session
 
 		# set default values
 		$territories = array_keys($config->allowedLocales);
-		$this->territory = $territories[0];
-		$this->language = $config->allowedLocales[$this->territory][0];
+		$this->region = $territories[0];
+		$this->language = $config->allowedLocales[$this->region][0];
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ class Session
 		$config = Module::getSiteConfig();
 		if (
 				$language != self::getLanguage() &&
-				in_array($config->allowedLocales[self::getTerritory()], $language)
+				in_array($config->allowedLocales[self::getRegion()], $language)
 		) {
 			self::getInstance(true)->language = $language;
 			self::updateLocaleChain();
@@ -94,24 +94,24 @@ class Session
 	/**
 	 * @return string
 	 */
-	public static function getTerritory()
+	public static function getRegion()
 	{
-		return self::getInstance()->territory;
+		return self::getInstance()->region;
 	}
 	/**
-	 * @param $territory
+	 * @param $region
 	 */
-	public static function setTerritory($territory)
+	public static function setRegion($region)
 	{
 		$config = Module::getSiteConfig();
 		if (
-			$territory != self::getTerritory() &&
-			isset($config->allowedLocales[$territory])
+			$region != self::getRegion() &&
+			isset($config->allowedLocales[$region])
 		) {
-			self::getInstance(true)->territory = $territory;
+			self::getInstance(true)->region = $region;
 			// check if language exists
-			if (!in_array($config->allowedLocales[$territory], self::getLanguage())) {
-				self::setLanguage($config->allowedLocales[$territory][0]);
+			if (!in_array($config->allowedLocales[$region], self::getLanguage())) {
+				self::setLanguage($config->allowedLocales[$region][0]);
 			}
 			self::updateLocaleChain();
 		}
@@ -122,16 +122,16 @@ class Session
 	 */
 	public static function getLocale()
 	{
-		return self::getTerritory() . '_' . self::getLanguage();
+		return self::getRegion() . '_' . self::getLanguage();
 	}
 	/**
-	 * @param $territory
+	 * @param $region
 	 * @param $language
 	 * @return string
 	 */
-	public static function setLocale($territory, $language)
+	public static function setLocale($region, $language)
 	{
-		self::setTerritory($territory);
+		self::setRegion($region);
 		self::setLanguage($language);
 	}
 
@@ -140,7 +140,7 @@ class Session
 	 */
 	public static function getProtocol()
 	{
-		return self::getTerritory() . '_' . self::getLanguage();
+		return self::getRegion() . '_' . self::getLanguage();
 	}
 
 	// --------------------------------------------------------------------------------------------

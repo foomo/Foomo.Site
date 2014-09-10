@@ -66,20 +66,14 @@ class Router extends \Foomo\Router
 	}
 
 	/**
-	 * @param string $region
-	 * @param string $language
 	 * @return mixed
 	 */
-	public function site($region=null, $language=null)
+	public function site()
 	{
-		$config = Module::getSiteConfig();
-
 		$url = parse_url($_SERVER['REQUEST_URI']);
-		var_dump($url);
-		exit;
 
 		// @todo: here happened some crazy stuff
-		$basePath = $url->path;
+		$basePath = $url["path"];
 
 		return \Foomo\MVC::run(\Foomo\Site::getFrontend(), $basePath);
 	}

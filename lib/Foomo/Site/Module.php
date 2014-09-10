@@ -64,9 +64,11 @@ class Module extends \Foomo\Modules\ModuleBase
 	public static function getResources()
 	{
 		return [
-			\Foomo\Modules\Resource\Module::getResource('Foomo', self::VERSION),
+			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.*'),
+			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '0.1.*'),
 
 			\Foomo\Modules\Resource\Config::getResource(self::NAME, 'Foomo.Site.config'),
+			\Foomo\Modules\Resource\Config::getResource(self::NAME, 'Foomo.ContentServer.config'),
 
 			// get a run mode independent folder var/<runMode>/test
 			// \Foomo\Modules\Resource\Fs::getVarResource(\Foomo\Modules\Resource\Fs::TYPE_FOLDER, 'test'),
@@ -88,5 +90,13 @@ class Module extends \Foomo\Modules\ModuleBase
 	public static function getSiteConfig()
 	{
 		return self::getConfig(Config::NAME);
+	}
+
+	/**
+	 * @return \Foomo\ContentServer\DomainConfig
+	 */
+	public static function getContentServerProxyConfig()
+	{
+		return self::getConfig(\Foomo\ContentServer\DomainConfig::NAME);
 	}
 }

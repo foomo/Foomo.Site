@@ -1,0 +1,2 @@
+EXCEPTION_404: "Sorry, we couldn't find the requested page."
+EXCEPTION_500: "Sorry, we encountered an error while processing your request."

@@ -17,41 +17,21 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Frontend;
-
-use Foomo\ContentServer\Vo;
+namespace Foomo\Site\Exception;
 
 /**
  * @link www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  */
-class Model
+class Content extends \Exception
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Variables
+	// ~ Constants
 	// --------------------------------------------------------------------------------------------
 
-	/**
-	 * @var Vo\Content\SiteContent
-	 */
-	protected  $siteContent;
+	const CODE_404    = 404;
+	const MESSAGE_404 = 'Error 404 Content not found';
 
-	// --------------------------------------------------------------------------------------------
-	// ~ Public methods
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * @return Vo\Content\SiteContent
-	 */
-	public function getSiteContent()
-	{
-		return $this->siteContent;
-	}
-	/**
-	 * @param Vo\Content\SiteContent $siteContent
-	 */
-	public function setSiteContent($siteContent)
-	{
-		$this->siteContent = $siteContent;
-	}
+	const CODE_403    = 403;
+	const MESSAGE_403 = 'Error 403 Forbidden';
 }
