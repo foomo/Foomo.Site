@@ -19,10 +19,9 @@
 
 namespace Foomo\Site\Frontend;
 
-use Foomo\ContentServer\Neos;
 use Foomo\Site;
+use Foomo\ContentServer\Neos;
 use Foomo\ContentServer\Vo;
-use SebastianBergmann\Exporter\Exception;
 
 /**
  * @link www.foomo.org
@@ -59,13 +58,11 @@ class Controller
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @param $uri
-	 * @throws \Exception
+	 * @param string $uri
+	 * @throws Site\Exception\Content
 	 */
 	private function runCMS($uri)
 	{
-		$config = Site\Module::getSiteConfig();
-
 		$envGroups = [];
 		$envDefaults = Vo\Requests\Content\Env\Defaults::create(
 			Site\Session::getRegion(),
@@ -79,10 +76,11 @@ class Controller
 		];
 
 		# get content
-		$content = Site::getContentServerProxy()->getContent(
-			Vo\Requests\Content::create($uri, $env)
-				->addNode('webRoot', $config->webRootId, $mimeTypes, true)
-		);
+//		$content = Site::getContentServerProxy()->getContent(
+//			Vo\Requests\Content::create($uri, $env)
+//				->addNode('webRoot', $config->webRootId, $mimeTypes, true)
+//		);
+		$content = (object) ["status" => Vo\Content\SiteContent::STATUS_NOT_FOUND];
 
 		# 404 handling before all the rest is done
 		if ($content->status === Vo\Content\SiteContent::STATUS_NOT_FOUND) {
@@ -94,17 +92,5 @@ class Controller
 
 		# set content
 		$this->model->setSiteContent($content);
-
-
-		//handle landingpage redirects
-//		$this->handleLandingpage();
-
-		//update the last visited gender
-//		$this->updateLastVisitedGender();
-
-		//seo stuff
-//		SEO::processSiteContent($this->model->siteContent);
-
-//		Timer::stop(__METHOD__);
 	}
 }
