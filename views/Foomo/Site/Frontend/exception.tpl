@@ -1,10 +1,7 @@
 <?php
 /* @var $view \Foomo\MVC\View */
 /* @var $exception \Exception */
-
-if ($exception instanceof \Foomo\Site\Exception\Content) {
-	$content = $view->partial('exception/' . $exception->getCode(), ['exception' => $exception]);
-} else {
-	$content = $view->partial('exception/500', ['exception' => $exception]);
-}
-echo $view->partial('body', ['content' => $content]);
+?>
+<h1>Hi, I am an empty frontend in Module Foomo.Site, namespace Foomo\Site\Frontend</h1>
+<h2><?= $exception->getCode(); ?> | <?= $exception->getMessage(); ?></h2>
+<p>Please implement me!</p>

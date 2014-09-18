@@ -1,5 +1,6 @@
 <?php
-/* @var $model \Foomo\Site\Frontend\Model */
 /* @var $view \Foomo\MVC\View */
-
-echo $view->partial('body', ['content' => false]);
+/* @var $model \Foomo\Site\Frontend\Model */
+?>
+<h1>Hi, I am an empty frontend in Module Foomo.Site, namespace Foomo\Site\Frontend</h1>
+<p>Please implement me!</p>
