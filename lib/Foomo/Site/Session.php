@@ -22,10 +22,10 @@ namespace Foomo\Site;
 use Foomo\Translation;
 
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  */
-class Session
+class Session implements SessionInterface
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Variables
@@ -34,11 +34,11 @@ class Session
 	/**
 	 * @var string
 	 */
-	private $language;
+	private $region;
 	/**
 	 * @var string
 	 */
-	private $region;
+	private $language;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Constructor
@@ -52,9 +52,9 @@ class Session
 		$config = Module::getSiteConfig();
 
 		# set default values
-		$territories = array_keys($config->allowedLocales);
+		$territories = array_keys($config->locales);
 		$this->region = $territories[0];
-		$this->language = $config->allowedLocales[$this->region][0];
+		$this->language = $config->locales[$this->region][0];
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -62,33 +62,11 @@ class Session
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 *
+	 * Start session
 	 */
 	public static function boot()
 	{
-		self::getInstance();
-	}
-
-	/**
-	 * @return string
-	 */
-	public static function getLanguage()
-	{
-		return self::getInstance()->language;
-	}
-	/**
-	 * @param $language
-	 */
-	public static function setLanguage($language)
-	{
-		$config = Module::getSiteConfig();
-		if (
-				$language != self::getLanguage() &&
-				in_array($config->allowedLocales[self::getRegion()], $language)
-		) {
-			self::getInstance(true)->language = $language;
-			self::updateLocaleChain();
-		}
+		static::getInstance();
 	}
 
 	/**
@@ -96,24 +74,48 @@ class Session
 	 */
 	public static function getRegion()
 	{
-		return self::getInstance()->region;
+		return static::getInstance()->region;
 	}
+
 	/**
-	 * @param $region
+	 * @param string $region
 	 */
 	public static function setRegion($region)
 	{
 		$config = Module::getSiteConfig();
 		if (
-			$region != self::getRegion() &&
-			isset($config->allowedLocales[$region])
+			$region != static::getRegion() &&
+			isset($config->locales[$region])
 		) {
-			self::getInstance(true)->region = $region;
+			static::getInstance(true)->region = $region;
 			// check if language exists
-			if (!in_array($config->allowedLocales[$region], self::getLanguage())) {
-				self::setLanguage($config->allowedLocales[$region][0]);
+			if (!in_array($config->locales[$region], static::getLanguage())) {
+				static::setLanguage($config->locales[$region][0]);
 			}
-			self::updateLocaleChain();
+			static::updateLocaleChain();
+		}
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getLanguage()
+	{
+		return static::getInstance()->language;
+	}
+
+	/**
+	 * @param string $language
+	 */
+	public static function setLanguage($language)
+	{
+		$config = Module::getSiteConfig();
+		if (
+			$language != static::getLanguage() &&
+			in_array($config->locales[static::getRegion()], $language)
+		) {
+			static::getInstance(true)->language = $language;
+			static::updateLocaleChain();
 		}
 	}
 
@@ -122,25 +124,18 @@ class Session
 	 */
 	public static function getLocale()
 	{
-		return self::getRegion() . '_' . self::getLanguage();
+		return strtolower(static::getRegion()) . '_' . strtoupper(static::getLanguage());
 	}
+
 	/**
-	 * @param $region
-	 * @param $language
+	 * @param string $region
+	 * @param string $language
 	 * @return string
 	 */
 	public static function setLocale($region, $language)
 	{
-		self::setRegion($region);
-		self::setLanguage($language);
-	}
-
-	/**
-	 * @return string
-	 */
-	public static function getProtocol()
-	{
-		return self::getRegion() . '_' . self::getLanguage();
+		static::setRegion($region);
+		static::setLanguage($language);
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -149,21 +144,21 @@ class Session
 
 	/**
 	 * @param bool $write
-	 * @return self
+	 * @return static
 	 */
-	private static function getInstance($write=false)
+	protected static function getInstance($write = false)
 	{
 		if ($write) {
 			\Foomo\Session::lockAndLoad();
 		}
-		return \Foomo\Session::getClassInstance(__CLASS__);
+		return \Foomo\Session::getClassInstance(get_called_class());
 	}
 
 	/**
-	 *
+	 * Update the default translation locale chain
 	 */
-	private static function updateLocaleChain()
+	protected static function updateLocaleChain()
 	{
-		Translation::setDefaultLocaleChain([self::getLocale()]);
+		Translation::setDefaultLocaleChain([static::getLocale()]);
 	}
 }
