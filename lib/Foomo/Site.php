@@ -20,7 +20,6 @@
 namespace Foomo;
 
 use Foomo\Router\MVC\URLHandler;
-use Foomo\Site\Module;
 
 /**
  * @link www.foomo.org
@@ -33,11 +32,13 @@ class Site
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * Initialize session & run router
+	 *
 	 * @return mixed
 	 */
 	public static function run()
 	{
-		$config = Module::getSiteConfig();
+		$config = Site\Module::getSiteConfig();
 
 		/* @var $routerClass \Foomo\Router */
 		$routerClass = $config->getClass("router");
@@ -48,11 +49,12 @@ class Site
 		call_user_func($sessionClass . "::boot");
 
 		# setup url handler
+		// @todo: clarify this for me please
 		URLHandler::exposeClassId(false);
 		URLHandler::strictParameterHandling(false);
 
-		# setup mvc
-		# hide the script - you might need mod rewrite
+		# setup mvc | hide the script - you might need mod rewrite
+		// @todo: clarify this for me please
 		\Foomo\MVC::hideScript(true);
 
 		# create and execute router
@@ -61,13 +63,15 @@ class Site
 	}
 
 	/**
+	 * Returns the configured site frontend
+	 *
 	 * @return \Foomo\Site\Frontend
 	 */
 	public static function getFrontend()
 	{
 		static $inst;
 		if (is_null($inst)) {
-			$config = Module::getSiteConfig();
+			$config = Site\Module::getSiteConfig();
 			$class = $config->getClass("frontend");
 			$inst = new $class();
 		}
@@ -75,13 +79,25 @@ class Site
 	}
 
 	/**
+	 * Returns the configured site session class name
+	 *
+	 * @return string|\Foomo\Site\SessionInterface
+	 */
+	public static function getSession()
+	{
+		return Site\Module::getSiteConfig()->getClass("session");
+	}
+
+	/**
+	 * Returns the configured site content server proxy
+	 *
 	 * @return \Foomo\ContentServer\ProxyInterface
 	 */
 	public static function getContentServerProxy()
 	{
 		static $inst;
 		if (is_null($inst)) {
-			$inst = Module::getContentServerProxyConfig()->getProxy();
+			$inst = Site\Module::getSiteContentServerProxyConfig()->getProxy();
 		}
 		return $inst;
 	}
