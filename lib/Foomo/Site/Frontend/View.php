@@ -65,4 +65,24 @@ class View extends \Foomo\MVC\View
 			$this->model->getContent()->URI
 		);
 	}
+
+	/**
+	 * Returns a partial with the given partial data i.e.
+	 *
+	 * $partial = 'my/partial';
+	 * $partial = ['my/partial', ['foo' => 'bar']];
+	 * $partial = ['my/partial', ['foo' => 'bar'], 'ClassName'];
+	 *
+	 * @param string|array $partial
+	 * @return string
+	 */
+	public function subPartial($partial)
+	{
+		$partial = (array) $partial;
+		return $this->partial(
+			$partial[0],
+			(isset($partial[1])) ? $partial[1] : [],
+			(isset($partial[2])) ? $partial[2] : ''
+		);
+	}
 }
