@@ -24,6 +24,7 @@ use Foomo\Config\AbstractConfig;
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 class DomainConfig extends AbstractConfig
 {
