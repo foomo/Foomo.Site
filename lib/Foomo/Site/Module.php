@@ -19,9 +19,12 @@
 
 namespace Foomo\Site;
 
+use Foomo\Modules\Manager;
+
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 class Module extends \Foomo\Modules\ModuleBase
 {
@@ -29,11 +32,8 @@ class Module extends \Foomo\Modules\ModuleBase
 	// ~ Constants
 	//---------------------------------------------------------------------------------------------
 
-	/**
-	 * the name of this module
-	 *
-	 */
-	const NAME = 'Foomo.Site';
+	const NAME    = 'Foomo.Site';
+	const VERSION = '1.0.0';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
@@ -63,21 +63,39 @@ class Module extends \Foomo\Modules\ModuleBase
 	 */
 	public static function getResources()
 	{
-		return [
+		# default resources
+		$resources = [
 			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.*'),
+			\Foomo\Modules\Resource\Module::getResource('Foomo.Media', '0.3.*'),
 			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '0.1.*'),
-
-			\Foomo\Modules\Resource\Config::getResource(self::NAME, 'Foomo.Site.config'),
-			\Foomo\Modules\Resource\Config::getResource(self::NAME, 'Foomo.ContentServer.config'),
-
-			// get a run mode independent folder var/<runMode>/test
-			// \Foomo\Modules\Resource\Fs::getVarResource(\Foomo\Modules\Resource\Fs::TYPE_FOLDER, 'test'),
-			// and a file in it
-			// request a cache resource
-			// \Foomo\Modules\Resource\Fs::getCacheResource(\Foomo\Modules\Resource\Fs::TYPE_FOLDER, 'navigationLeaves'),
-			// a database configuration
-			// \Foomo\Modules\Resource\Config::getResource('yourModule', 'db')
 		];
+
+		# resources when enabled
+		if (Manager::isEnabled(self::NAME)) {
+
+			# resources for root module
+			if (Manager::isEnabled(self::getRootModule())) {
+				/* @var $siteConfigResource \Foomo\Modules\Resource\Config */
+				$resources = array_merge(
+					[
+						# site module configs
+						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.ContentServer.config'),
+						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.config'),
+					],
+					$resources
+				);
+
+				# check for adapter resources
+				if ($siteConfigResource->resourceValid()) {
+					$siteConfig = self::getSiteConfig();
+					foreach ($siteConfig->adapters as $adapter) {
+						$resources = array_merge($adapter::getModuleResources(), $resources);
+					}
+				}
+			}
+		}
+
+		return $resources;
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -85,18 +103,50 @@ class Module extends \Foomo\Modules\ModuleBase
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @return \Foomo\Site\Config
+	 * @return \Foomo\Site\DomainConfig
 	 */
 	public static function getSiteConfig()
 	{
-		return self::getConfig(Config::NAME);
+		return self::getRootModuleConfig(DomainConfig::NAME);
 	}
 
 	/**
 	 * @return \Foomo\ContentServer\DomainConfig
 	 */
-	public static function getContentServerProxyConfig()
+	public static function getSiteContentServerProxyConfig()
 	{
-		return self::getConfig(\Foomo\ContentServer\DomainConfig::NAME);
+		return self::getRootModuleConfig(\Foomo\ContentServer\DomainConfig::NAME);
+	}
+
+	/**
+	 * Returns the implementing site module name
+	 *
+	 * @return string
+	 */
+	public static function getRootModule()
+	{
+		return \Foomo\Modules\Manager::getDocumentRootModule();
+	}
+
+	/**
+	 * Returns the implementing site module class name
+	 *
+	 * @return string|\Foomo\Modules\ModuleBase
+	 */
+	public static function getRootModuleClass()
+	{
+		return \Foomo\Modules\Manager::getModuleClassByName(static::getRootModule());
+	}
+
+	/**
+	 * Return a config for the implementing site module
+	 *
+	 * @param string $name
+	 * @param string $domain
+	 * @return \Foomo\Config\AbstractConfig
+	 */
+	public static function getRootModuleConfig($name, $domain = '')
+	{
+		return \Foomo\Config::getConf(self::getRootModule(), $name, $domain);
 	}
 }
