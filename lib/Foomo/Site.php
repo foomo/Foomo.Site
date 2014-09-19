@@ -107,20 +107,6 @@ class Site
 	}
 
 	/**
-	 * Returns the configured site content server proxy
-	 *
-	 * @return \Foomo\ContentServer\ProxyInterface
-	 */
-	public static function getContentServerProxy()
-	{
-		static $inst;
-		if (is_null($inst)) {
-			$inst = Site\Module::getSiteContentServerProxyConfig()->getProxy();
-		}
-		return $inst;
-	}
-
-	/**
 	 * @param string $name
 	 * @return bool|Site\AdapterInterface
 	 */
