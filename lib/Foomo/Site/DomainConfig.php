@@ -62,7 +62,7 @@ class DomainConfig extends AbstractConfig
 	/**
 	 * Map of nodeIds
 	 *
-	 * @var string[string]
+	 * @var array
 	 */
 	public $nodeIds = [
 		'default' => '',
@@ -73,7 +73,7 @@ class DomainConfig extends AbstractConfig
 	/**
 	 * Map of navigation request
 	 *
-	 * @var string[string]
+	 * @var array
 	 */
 	public $navigations = [
 		'main'   => [
@@ -95,7 +95,7 @@ class DomainConfig extends AbstractConfig
 	/**
 	 * Map of email addresses
 	 *
-	 * @var string[string]
+	 * @var array
 	 */
 	public $emails = [
 		'debug' => '',
@@ -112,7 +112,7 @@ class DomainConfig extends AbstractConfig
 	/**
 	 * Map of classes
 	 *
-	 * @var string[string]
+	 * @var array
 	 */
 	public $classes = [
 		"router"   => "\\Foomo\\Site\\Router",
