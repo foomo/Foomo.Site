@@ -38,7 +38,8 @@ class DomainConfig extends AbstractConfig
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * The first is used as the default, when initializing the session
+	 * List of allowed regions and their languages
+	 * Note: The first region & language is used as the default
 	 *
 	 * @var array[string][string]
 	 */
@@ -46,48 +47,71 @@ class DomainConfig extends AbstractConfig
 		'ch' => ['de']
 	];
 	/**
-	 * @var array[string]string
+	 * List of allowed groups
+	 *
+	 * @var string[]
 	 */
-	public $contentIds = [
+	public $groups = [];
+	/**
+	 * List of allowed states
+	 *
+	 * @var string[]
+	 */
+	public $states = [];
+	/**
+	 * Map of nodeIds
+	 *
+	 * @var string[string]
+	 */
+	public $nodeIds = [
 		'default' => '',
 		'404'     => '',
 		'403'     => '',
 		'500'     => '',
 	];
 	/**
-	 * @var array[string]string
+	 * Map of navigation request
+	 *
+	 * @var string[string]
 	 */
 	public $navigations = [
 		'main'   => [
-			'id'       => '',
-			'mimeType' => [],
-			'expand'   => true,
+			'id'        => '',
+			'mimeTypes' => [],
+			'expand'    => true,
 		],
 		'meta'   => [
-			'id'       => '',
-			'mimeType' => [],
-			'expand'   => true,
+			'id'        => '',
+			'mimeTypes' => [],
+			'expand'    => true,
 		],
 		'footer' => [
-			'id'       => '',
-			'mimeType' => [],
-			'expand'   => true,
+			'id'        => '',
+			'mimeTypes' => [],
+			'expand'    => true,
 		],
 	];
 	/**
-	 * @var array[string]string
+	 * Map of email addresses
+	 *
+	 * @var string[string]
 	 */
 	public $emails = [
+		'debug' => '',
 		'contact' => '',
 	];
 	/**
+	 * List of enabled adapters
+	 *
 	 * @var \Foomo\Site\AdapterInterface[]
 	 */
 	public $adapters = [
 		'Foomo\\Site\\Adapter\\Neos'
 	];
 	/**
-	 * @var array[string]string
+	 * Map of classes
+	 *
+	 * @var string[string]
 	 */
 	public $classes = [
 		"router"   => "\\Foomo\\Site\\Router",
@@ -100,6 +124,8 @@ class DomainConfig extends AbstractConfig
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * Returns first configured region
+	 *
 	 * @return string
 	 */
 	public function getDefaultRegion()
@@ -108,6 +134,8 @@ class DomainConfig extends AbstractConfig
 	}
 
 	/**
+	 * Returns first configured region's language
+	 *
 	 * @return string
 	 */
 	public function getDefaultLanguage()
@@ -116,6 +144,8 @@ class DomainConfig extends AbstractConfig
 	}
 
 	/**
+	 * Returns first configured locale
+	 *
 	 * @return string
 	 */
 	public function getDefaultLocale()
@@ -124,19 +154,21 @@ class DomainConfig extends AbstractConfig
 	}
 
 	/**
-	 * @param $id
+	 * Return a configured nodeId
+	 *
+	 * @param string $id
 	 * @return string
 	 */
-	public function getContentId($id)
+	public function getNodeId($id)
 	{
-		if (!isset($this->contentIds[$id])) {
-			trigger_error("ContentId '$id'' does not exist!", E_USER_ERROR);
+		if (!isset($this->nodeIds[$id])) {
+			trigger_error("NodeId '$id'' does not exist!", E_USER_ERROR);
 		}
-		return $this->contentIds[$id];
+		return $this->nodeIds[$id];
 	}
 
 	/**
-	 * @param $id
+	 * @param string $id
 	 * @return string
 	 */
 	public function getNavigation($id)
@@ -148,7 +180,7 @@ class DomainConfig extends AbstractConfig
 	}
 
 	/**
-	 * @param $id
+	 * @param string $id
 	 * @return string
 	 */
 	public function getEmail($id)
@@ -160,7 +192,7 @@ class DomainConfig extends AbstractConfig
 	}
 
 	/**
-	 * @param $id
+	 * @param string $id
 	 * @return string
 	 */
 	public function getClass($id)
@@ -169,5 +201,61 @@ class DomainConfig extends AbstractConfig
 			trigger_error("Class '$id'' does not exist!", E_USER_ERROR);
 		}
 		return $this->classes[$id];
+	}
+
+	/**
+	 * Validates value against the configuration
+	 *
+	 * @param string $region
+	 * @return bool
+	 */
+	public function isValidRegion($region)
+	{
+		return (isset($this->locales[$region]));
+	}
+
+	/**
+	 * Validates value against the configuration
+	 *
+	 * @param string $region
+	 * @param string $language
+	 * @return bool
+	 */
+	public function isValidLanguage($region, $language)
+	{
+		return in_array($this->locales[$region], $language);
+	}
+
+	/**
+	 * Validates value against the configuration
+	 *
+	 * @param string $state
+	 * @return bool
+	 */
+	public function isValidState($state)
+	{
+		return in_array($state, $this->states);
+	}
+
+	/**
+	 * Validates value against the configuration
+	 *
+	 * @param string $group
+	 * @return bool
+	 */
+	public function isValidGroup($group)
+	{
+		return in_array($group, $this->groups);
+	}
+
+	/**
+	 * Validates value against the configuration
+	 *
+	 * @param string[] $groups
+	 * @return bool
+	 */
+	public function areValidGroups($groups)
+	{
+		return (count(array_diff($groups, $this->groups)) == 0);
 	}
 }
