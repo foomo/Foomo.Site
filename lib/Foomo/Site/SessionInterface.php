@@ -20,8 +20,9 @@
 namespace Foomo\Site;
 
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 interface SessionInterface
 {
@@ -33,16 +34,39 @@ interface SessionInterface
 	 * Start session
 	 */
 	static function boot();
+
 	/**
+	 * Current language i.e. `en`
+	 *
 	 * @return string
 	 */
 	static function getLanguage();
+
 	/**
+	 * Current region i.e. `us`
+	 *
 	 * @return string
 	 */
 	static function getRegion();
+
 	/**
+	 * Current locale i.e. `en_US`
+	 *
 	 * @return string
 	 */
 	static function getLocale();
+
+	/**
+	 * Current groups i.e. `['www', 'registered']`
+	 *
+	 * @return string[]
+	 */
+	static function getGroups();
+
+	/**
+	 * Current state i.e. `debug`
+	 *
+	 * @return string
+	 */
+	static function getState();
 }

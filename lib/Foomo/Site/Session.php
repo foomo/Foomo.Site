@@ -24,6 +24,7 @@ use Foomo\Translation;
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 class Session implements SessionInterface
 {
@@ -39,6 +40,14 @@ class Session implements SessionInterface
 	 * @var string
 	 */
 	private $language;
+	/**
+	 * @var string[]
+	 */
+	private $groups = [];
+	/**
+	 * @var string
+	 */
+	private $state;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Constructor
@@ -49,12 +58,10 @@ class Session implements SessionInterface
 	 */
 	public function __construct()
 	{
-		$config = Module::getSiteConfig();
-
 		# set default values
-		$territories = array_keys($config->locales);
-		$this->region = $territories[0];
-		$this->language = $config->locales[$this->region][0];
+		$config = Module::getSiteConfig();
+		$this->region = $config->getDefaultRegion();
+		$this->language = $config->getDefaultLanguage();
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -62,14 +69,17 @@ class Session implements SessionInterface
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Start session
+	 * @inheritdoc
 	 */
 	public static function boot()
 	{
 		static::getInstance();
+		static::updateLocaleChain();
 	}
 
 	/**
+	 * @inheritdoc
+	 *
 	 * @return string
 	 */
 	public static function getRegion()
@@ -82,21 +92,24 @@ class Session implements SessionInterface
 	 */
 	public static function setRegion($region)
 	{
-		$config = Module::getSiteConfig();
-		if (
-			$region != static::getRegion() &&
-			isset($config->locales[$region])
-		) {
-			static::getInstance(true)->region = $region;
-			// check if language exists
-			if (!in_array($config->locales[$region], static::getLanguage())) {
-				static::setLanguage($config->locales[$region][0]);
+		if ($region != static::getRegion()) {
+			$config = Module::getSiteConfig();
+			if ($config->isValidRegion($region)) {
+				static::getInstance(true)->region = $region;
+				// check if language exists
+				if (!in_array($config->locales[$region], static::getLanguage())) {
+					static::setLanguage($config->locales[$region][0]);
+				}
+				static::updateLocaleChain();
+			} else {
+				trigger_error("Invalid region: $region", E_USER_WARNING);
 			}
-			static::updateLocaleChain();
 		}
 	}
 
 	/**
+	 * @inheritdoc
+	 *
 	 * @return string
 	 */
 	public static function getLanguage()
@@ -109,17 +122,21 @@ class Session implements SessionInterface
 	 */
 	public static function setLanguage($language)
 	{
-		$config = Module::getSiteConfig();
-		if (
-			$language != static::getLanguage() &&
-			in_array($config->locales[static::getRegion()], $language)
-		) {
-			static::getInstance(true)->language = $language;
-			static::updateLocaleChain();
+		if ($language != static::getLanguage()) {
+			$config = Module::getSiteConfig();
+
+			if ($config->isValidLanguage(static::getRegion(), $language)) {
+				static::getInstance(true)->language = $language;
+				static::updateLocaleChain();
+			} else {
+				trigger_error("Invalid language: $language", E_USER_WARNING);
+			}
 		}
 	}
 
 	/**
+	 * @inheritdoc
+	 *
 	 * @return string
 	 */
 	public static function getLocale()
@@ -138,12 +155,62 @@ class Session implements SessionInterface
 		static::setLanguage($language);
 	}
 
+	/**
+	 * @inheritdoc
+	 *
+	 * @return string[]
+	 */
+	public static function getGroups()
+	{
+		return static::getInstance()->groups;
+	}
+
+	/**
+	 * @param string[] $groups
+	 */
+	public static function setGroups($groups)
+	{
+		if (count(array_diff($groups, static::getGroups())) > 0) {
+			$config = Module::getSiteConfig();
+			if ($config->areValidGroups($groups)) {
+				static::getInstance(true)->groups = array_unique($groups);
+			} else {
+				trigger_error("Invalid groups: " . join(', ', $groups), E_USER_WARNING);
+			}
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 *
+	 * @return string
+	 */
+	public static function getState()
+	{
+		return static::getInstance()->state;
+	}
+
+	/**
+	 * @param string $state
+	 */
+	public static function setState($state)
+	{
+		if ($state != static::getState()) {
+			$config = Module::getSiteConfig();
+			if ($config->isValidState($state)) {
+				static::getInstance(true)->state = $state;
+			} else {
+				trigger_error("Invalid state: $state", E_USER_WARNING);
+			}
+		}
+	}
+
 	// --------------------------------------------------------------------------------------------
 	// ~ Private static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @param bool $write
+	 * @param bool $write return session in write mode
 	 * @return static
 	 */
 	protected static function getInstance($write = false)
@@ -159,6 +226,6 @@ class Session implements SessionInterface
 	 */
 	protected static function updateLocaleChain()
 	{
-		Translation::setDefaultLocaleChain([static::getLocale()]);
+		Translation::setDefaultLocaleChain([static::getLocale(), static::getLanguage()]);
 	}
 }
