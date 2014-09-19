@@ -22,8 +22,9 @@ namespace Foomo;
 use Foomo\Router\MVC\URLHandler;
 
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 class Site
 {
@@ -34,19 +35,15 @@ class Site
 	/**
 	 * Initialize session & run router
 	 *
+	 * @todo: Should the urlhandler, session and mvc thing moved out of here?
+	 *
 	 * @return mixed
 	 */
 	public static function run()
 	{
-		$config = Site\Module::getSiteConfig();
-
-		/* @var $routerClass \Foomo\Router */
-		$routerClass = $config->getClass("router");
-		/* @var $sessionClass \Foomo\Site\Session */
-		$sessionClass = $config->getClass("session");
-
 		# boot session
-		call_user_func($sessionClass . "::boot");
+		$session = static::getSession();
+		$session::boot();
 
 		# setup url handler
 		// @todo: clarify this for me please
@@ -58,8 +55,29 @@ class Site
 		\Foomo\MVC::hideScript(true);
 
 		# create and execute router
-		$router = new $routerClass();
-		return $router->execute();
+		return static::getRouter()->execute();
+	}
+
+	/**
+	 * @return Site\DomainConfig
+	 */
+	public static function getConfig()
+	{
+		return Site\Module::getSiteConfig();
+	}
+
+	/**
+	 * @return \Foomo\Router
+	 */
+	public static function getRouter()
+	{
+		static $inst;
+		if (is_null($inst)) {
+			$config = static::getConfig();
+			$class = $config->getClass("router");
+			$inst = new $class();
+		}
+		return $inst;
 	}
 
 	/**
@@ -71,7 +89,7 @@ class Site
 	{
 		static $inst;
 		if (is_null($inst)) {
-			$config = Site\Module::getSiteConfig();
+			$config = static::getConfig();
 			$class = $config->getClass("frontend");
 			$inst = new $class();
 		}
@@ -85,7 +103,7 @@ class Site
 	 */
 	public static function getSession()
 	{
-		return Site\Module::getSiteConfig()->getClass("session");
+		return static::getConfig()->getClass("session");
 	}
 
 	/**
@@ -100,5 +118,20 @@ class Site
 			$inst = Site\Module::getSiteContentServerProxyConfig()->getProxy();
 		}
 		return $inst;
+	}
+
+	/**
+	 * @param string $name
+	 * @return bool|Site\AdapterInterface
+	 */
+	public static function getAdapter($name)
+	{
+		$config = static::getConfig();
+		foreach ($config->adapters as $adapter) {
+			if ($name == $adapter::getName()) {
+				return $adapter;
+			}
+		}
+		return false;
 	}
 }
