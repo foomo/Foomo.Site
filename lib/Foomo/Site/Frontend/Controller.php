@@ -20,12 +20,12 @@
 namespace Foomo\Site\Frontend;
 
 use Foomo\Site;
-use Foomo\ContentServer\Neos;
 use Foomo\ContentServer\Vo;
 
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 class Controller
 {
@@ -39,58 +39,25 @@ class Controller
 	public $model;
 
 	// --------------------------------------------------------------------------------------------
-	// ~ Public methods
+	// ~ Public action methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @throws \Exception
+	 * Simple default action handler
+	 *
+	 * @throws Site\Exception\HTTPException
 	 */
 	public function actionDefault()
 	{
 		$url = parse_url($_SERVER['REQUEST_URI']);
+		$content = Site\ContentServer\Client::getContent($url["path"]);
 
-		// @todo: here happened some crazy stuff
-		$this->runCMS(rtrim($url["path"], "/"));
-	}
-
-	// --------------------------------------------------------------------------------------------
-	// ~ Private methods
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * @param string $uri
-	 * @throws Site\Exception\Content
-	 */
-	private function runCMS($uri)
-	{
-		$envGroups = [];
-		$envDefaults = Vo\Requests\Content\Env\Defaults::create(
-			Site\Session::getRegion(),
-			Site\Session::getLanguage()
-		);
-		$env = Vo\Requests\Content\Env::create($envDefaults, $envGroups);
-
-		$mimeTypes = [
-			Neos\MimeType::MIME_SITE_CATEGORY,
-			Neos\MimeType::MIME_SITE_EXTERNAL,
-		];
-
-		# get content
-//		$content = Site::getContentServerProxy()->getContent(
-//			Vo\Requests\Content::create($uri, $env)
-//				->addNode('webRoot', $config->webRootId, $mimeTypes, true)
-//		);
-		$content = (object) ["status" => Vo\Content\SiteContent::STATUS_NOT_FOUND];
-
-		# 404 handling before all the rest is done
-		if ($content->status === Vo\Content\SiteContent::STATUS_NOT_FOUND) {
-			throw new Site\Exception\Content(
-				Site\Exception\Content::MESSAGE_404,
-				Site\Exception\Content::CODE_404
-			);
+		# handle status
+		if ($content->status !== Vo\Content\SiteContent::STATUS_OK) {
+			throw new Site\Exception\HTTPException($content->status);
 		}
 
-		# set content
-		$this->model->setSiteContent($content);
+		# set model's content
+		$this->model->setContent($content);
 	}
 }
