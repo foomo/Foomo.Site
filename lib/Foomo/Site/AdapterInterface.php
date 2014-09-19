@@ -52,9 +52,15 @@ interface AdapterInterface
 	static function getSubRoutes();
 
 	/**
-	 * Return the client class that retrieves/renders content
+	 * Returns a node's content from the remote content server
 	 *
-	 * @return \Foomo\Site\Adapter\ClientInterface
+	 * @param string   $nodeId
+	 * @param string   $region
+	 * @param string   $language
+	 * @param string[] $groups
+	 * @param string   $state
+	 * @param string   $baseURL
+	 * @return string
 	 */
-	static function getClient();
+	static function getContent($nodeId, $region, $language, $groups, $state, $baseURL);
 }
