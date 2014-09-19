@@ -20,10 +20,13 @@
 namespace Foomo\Site\Frontend;
 
 use Foomo\ContentServer\Vo;
+use Foomo\Site;
+use Foomo\Site\Adapter\Neos;
 
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 class Model
 {
@@ -34,7 +37,7 @@ class Model
 	/**
 	 * @var Vo\Content\SiteContent
 	 */
-	protected  $siteContent;
+	protected $content;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public methods
@@ -43,15 +46,26 @@ class Model
 	/**
 	 * @return Vo\Content\SiteContent
 	 */
-	public function getSiteContent()
+	public function getContent()
 	{
-		return $this->siteContent;
+		return $this->content;
 	}
+
 	/**
-	 * @param Vo\Content\SiteContent $siteContent
+	 * Returns the current content's handler id
+	 *
+	 * @return string
 	 */
-	public function setSiteContent($siteContent)
+	public function getContentHandlerId()
 	{
-		$this->siteContent = $siteContent;
+		return explode('/', $this->getContent()->handler)[0];
+	}
+
+	/**
+	 * @param Vo\Content\SiteContent $content
+	 */
+	public function setContent($content)
+	{
+		$this->content = $content;
 	}
 }
