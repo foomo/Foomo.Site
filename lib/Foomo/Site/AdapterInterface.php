@@ -45,6 +45,13 @@ interface AdapterInterface
 	static function getModuleResources();
 
 	/**
+	 * Returns the adapters domain config
+	 *
+	 * @return \Foomo\Site\Adapter\DomainConfig
+	 */
+	static function getAdapterConfig();
+
+	/**
 	 * Returns list of sub routes
 	 *
 	 * @return \Foomo\Site\Adapter\Neos\SubRouter[]
