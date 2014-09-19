@@ -20,11 +20,11 @@
 namespace Foomo\Site;
 
 use Foomo\Config;
-use Foomo\MVC\URLHandler;
 
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 class Router extends \Foomo\Router
 {
@@ -39,42 +39,48 @@ class Router extends \Foomo\Router
 	{
 		parent::__construct();
 
-		$this->addRoutes([
-			'/robots.txt'	=> 'robots',
-			'/*'          => 'site',
-		]);
+		$config = Module::getSiteConfig();
+
+		# add adapter sub routes
+		foreach ($config->adapters as $adapter) {
+			$this->addRoutes($adapter::getSubRoutes());
+		}
+
+		# add default routes
+		$this->addRoutes(
+			[
+				'/robots.txt' => 'robots',
+				'/*'          => 'index',
+			]
+		);
 	}
 
 	// --------------------------------------------------------------------------------------------
-	// ~ Public methods
+	// ~ Public route methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * Default route
 	 *
+	 * @return string
+	 */
+	public function index()
+	{
+		$url = parse_url($_SERVER['REQUEST_URI']);
+		return \Foomo\MVC::run(\Foomo\Site::getFrontend(), $url["path"]);
+	}
+
+	/**
+	 * Simple robots.txt route
 	 */
 	public function robots()
 	{
 		\Foomo\Session::disable();
 		header('Content-Type: text/plain');
 		echo 'User-agent: *' . PHP_EOL;
-		if (Config::isProductionMode()) {
-			echo 'Sitemap: /sitemap.xml' . PHP_EOL;
-		} else {
+		if (!Config::isProductionMode()) {
 			echo 'Disallow: /' . PHP_EOL;
 		}
 		exit;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function site()
-	{
-		$url = parse_url($_SERVER['REQUEST_URI']);
-
-		// @todo: here happened some crazy stuff
-		$basePath = $url["path"];
-
-		return \Foomo\MVC::run(\Foomo\Site::getFrontend(), $basePath);
 	}
 }
