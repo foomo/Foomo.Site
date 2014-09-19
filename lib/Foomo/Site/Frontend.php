@@ -22,8 +22,9 @@ namespace Foomo\Site;
 use Foomo\MVC\AbstractApp;
 
 /**
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
 class Frontend extends AbstractApp
 {
@@ -39,4 +40,10 @@ class Frontend extends AbstractApp
 	 * @var Frontend\Controller
 	 */
 	public $controller;
+	/**
+	 * @todo: this shouldn't be needed to set
+	 *
+	 * @var Frontend\View
+	 */
+	public $view = '\\Foomo\\Site\\Frontend\\View';
 }
