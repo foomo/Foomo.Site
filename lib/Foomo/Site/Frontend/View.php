@@ -53,10 +53,8 @@ class View extends \Foomo\MVC\View
 		# retrieve adapter for current content
 		$adapter = Site::getAdapter($this->model->getContentHandlerId());
 
-		# get adapter's client
-		$client = $adapter::getClient();
-
-		return $client::get(
+		# get content
+		return $adapter::getContent(
 			$this->model->getContent()->item->id,
 			$session::getRegion(),
 			$session::getLanguage(),
