@@ -52,7 +52,7 @@ interface AdapterInterface
 	static function getSubRoutes();
 
 	/**
-	 * Return class that retrieves content
+	 * Return the client class that retrieves/renders content
 	 *
 	 * @return \Foomo\Site\Adapter\ClientInterface
 	 */
