@@ -23,6 +23,8 @@ use Foomo\Site\Adapter\Media;
 use Foomo\Site\Adapter\Neos;
 
 /**
+ * @todo check image & asset route
+ *
  * @link www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  */
@@ -47,7 +49,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 		$this->addRoutes([
 //			'/asset/:assetId/:filename' => 'asset',
-			'/image/:type/:nodeId' => 'image',
+			'/image/:type/:hash' => 'image',
 			'/*' => 'error',
 		]);
 	}
@@ -87,19 +89,22 @@ class SubRouter extends \Foomo\Site\SubRouter
 //	}
 
 	/**
+	 * @todo: is there a way not to hardcode 'neos'?
+	 *
 	 * @param string $type
 	 * @param string $nodeId
 	 */
 	public function image($type, $nodeId)
 	{
 		$config = Neos::getAdapterConfig();
-		// @todo: is there a way not to hardcode 'full'?
-		if (!Media::serve($config, $nodeId, 'full', $type)) {
+		if (!Media::serve($config, $nodeId, 'neos', $type)) {
 			$this->error();
 		};
 	}
 
 	/**
+	 * Returns the route for handling images
+	 *
 	 * @param string $type
 	 * @param string $nodeId
 	 * @return string

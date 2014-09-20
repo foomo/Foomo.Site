@@ -88,7 +88,7 @@ class Content
 	 * @internal
 	 * Foomo\Cache\CacheResourceDescription
 	 *
-	 * @todo: reanble caching
+	 * @todo: reenable caching
 	 * @todo: what about region, language, groups, state ...?
 	 *
 	 * @param string   $nodeId
@@ -203,13 +203,12 @@ class Content
 	 */
 	private static function replaceImages($html)
 	{
-		return preg_replace_callback(
-			'/\<img([^\>]*)data-src="([^"]*)"([^\>]*)src="([^"]*)"([^\>]*)\>/',
-			function ($hit) {
-				$imageUri = Neos\SubRouter::getImageUri('full', $hit[2]);
-				return '<img' . $hit[1] . $hit[3] . ' src="' . $imageUri . '"' . $hit[5] . '>';
-			}, $html
-		);
+		$pattern = '/\<img([^\>]*)data-src="([^"]*)"([^\>]*)src="([^"]*)"([^\>]*)\>/';
+		$callback = function ($matches) {
+			$imageUri = Neos\SubRouter::getImageUri('full', $matches[2]);
+			return '<img' . $matches[1] . $matches[3] . ' src="' . $imageUri . '"' . $matches[5] . '>';
+		};
+		return preg_replace_callback($pattern, $callback, $html);
 	}
 
 	/**
