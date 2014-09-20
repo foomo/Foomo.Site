@@ -66,7 +66,7 @@ class SubRouter extends \Foomo\Router
 	 */
 	protected static function getUri($path)
 	{
-		return static::$prefix . '/' . $path;
+		return static::$prefix . $path;
 	}
 
 	// --------------------------------------------------------------------------------------------

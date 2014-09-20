@@ -38,6 +38,10 @@ class Model
 	 * @var Vo\Content\SiteContent
 	 */
 	protected $content;
+	/**
+	 * @var string HTML
+	 */
+	protected $contentRendering;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public methods
@@ -63,9 +67,61 @@ class Model
 
 	/**
 	 * @param Vo\Content\SiteContent $content
+	 * @return $this
 	 */
 	public function setContent($content)
 	{
 		$this->content = $content;
+		return $this;
+	}
+
+	/**
+	 * Note: The content needs to be rendered "before" the
+	 * view because otherwise we can't throw exceptions...
+	 *
+	 * @todo: would prefere this to be in the View...
+	 *
+	 * @throws Site\Exception\HTTPException
+	 */
+	public function renderContent()
+	{
+		$session = Site::getSession();
+
+		# retrieve adapter for current content
+		$handlerId = $this->getContentHandlerId();
+		$adapter = Site::getAdapter($handlerId);
+
+		if ($adapter === false) {
+			throw new Site\Exception\HTTPException(500, "Unknown content handler: $handlerId");
+		}
+
+		# get content
+		$rendering = $adapter::getContent(
+			$this->getContent()->item->id,
+			$session::getRegion(),
+			$session::getLanguage(),
+			$session::getGroups(),
+			$session::getState(),
+			$this->getContent()->URI
+		);
+
+		# validate rendering
+		if (empty($rendering)) {
+			throw new Site\Exception\HTTPException(500, "Content couldn't be rendered");
+		}
+
+		$this->contentRendering = $rendering;
+	}
+
+	/**
+	 * @return string
+	 * @throws Site\Exception\HTTPException
+	 */
+	public function getContentRendering()
+	{
+		if (is_null($this->contentRendering)) {
+			$this->renderContent();
+		}
+		return $this->contentRendering;
 	}
 }

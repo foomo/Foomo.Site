@@ -42,29 +42,6 @@ class View extends \Foomo\MVC\View
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns rendered content by the client mapped by the content handler id
-	 *
-	 * @return string
-	 */
-	public function renderContent()
-	{
-		$session = Site::getSession();
-
-		# retrieve adapter for current content
-		$adapter = Site::getAdapter($this->model->getContentHandlerId());
-
-		# get content
-		return $adapter::getContent(
-			$this->model->getContent()->item->id,
-			$session::getRegion(),
-			$session::getLanguage(),
-			$session::getGroups(),
-			$session::getState(),
-			$this->model->getContent()->URI
-		);
-	}
-
-	/**
 	 * Returns a partial with the given partial data i.e.
 	 *
 	 * $partial = 'my/partial';
