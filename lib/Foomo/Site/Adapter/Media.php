@@ -39,7 +39,7 @@ class Media
 	 * Serves media from the remote content server by loading it to the
 	 * local file system and serving it through the foomo media image server
 	 *
-	 * @param DomainConfig $config the adapter config
+	 * @param DomainConfig $config
 	 * @param string       $nodeId
 	 * @param string       $layout
 	 * @param string       $type
@@ -48,15 +48,16 @@ class Media
 	 */
 	public static function serve($config, $nodeId, $layout, $type, $ruleSet = null)
 	{
-		$file = static::getLocalFile($nodeId);
+		$filename = static::getFilename($nodeId);
 
-		if (!file_exists($file)) {
+		# load remote file if it doesn't exist
+		if (!file_exists($filename)) {
 			$url = $config->getPathUrl('media') . '/' . $nodeId;
-			$file = static::loadRemoteFile($url, $file);
+			$filename = static::loadRemoteFile($url, $filename);
 		}
 
-		if ($file) {
-			Server::serve($file, $layout, $type, $ruleSet);
+		if ($filename) {
+			Server::serve($filename, $layout, $type, $ruleSet);
 			return true;
 		} else {
 			return false;
@@ -66,13 +67,13 @@ class Media
 	/**
 	 * Returns the local file name
 	 *
-	 * @param string $nodeId
+	 * @param string $hash
 	 * @return string
 	 */
-	public static function getLocalFile($nodeId)
+	public static function getFilename($hash)
 	{
 		$module = Module::getRootModuleClass();
-		return $module::getVarDir('media/neos') . DIRECTORY_SEPARATOR . $nodeId;
+		return $module::getVarDir('media') . DIRECTORY_SEPARATOR . $hash;
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -88,7 +89,7 @@ class Media
 	 */
 	private static function loadRemoteFile($url, $filename)
 	{
-		$content = file_get_contents($url);
+		$content = @file_get_contents($url);
 		if ($content) {
 			file_put_contents($filename, $content);
 			return $filename;
