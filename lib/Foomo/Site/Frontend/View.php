@@ -42,6 +42,16 @@ class View extends \Foomo\MVC\View
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * Returns the model's content rendering
+	 *
+	 * @return string
+	 */
+	public function getContent()
+	{
+		return $this->model->getContentRendering();
+	}
+
+	/**
 	 * Returns a partial with the given partial data i.e.
 	 *
 	 * $partial = 'my/partial';

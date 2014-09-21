@@ -110,7 +110,7 @@ class DomainConfig extends AbstractConfig
 		'Foomo\\Site\\Adapter\\Neos'
 	];
 	/**
-	 * Map of classes
+	 * Map of class names to use
 	 *
 	 * @var array
 	 */
@@ -119,6 +119,12 @@ class DomainConfig extends AbstractConfig
 		"session"  => "\\Foomo\\Site\\Session",
 		"frontend" => "\\Foomo\\Site\\Frontend",
 	];
+	/**
+	 * List of enabled sub router classes
+	 *
+	 * @var \Foomo\Site\SubRouter[]
+	 */
+	public $subRouters = [];
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public methods

@@ -41,6 +41,15 @@ class Router extends \Foomo\Router
 
 		$config = Module::getSiteConfig();
 
+		# add configured sub routes
+		foreach ($config->subRouters as $subRouter) {
+			$this->addRoutes(
+				[
+					$subRouter::$prefix => $subRouter::getSubRoute()
+				]
+			);
+		}
+
 		# add adapter sub routes
 		foreach ($config->adapters as $adapter) {
 			$this->addRoutes($adapter::getSubRoutes());
