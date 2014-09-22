@@ -41,9 +41,7 @@ class Frontend extends AbstractApp
 	 */
 	public $controller;
 	/**
-	 * @todo: this shouldn't be needed to set
-	 *
 	 * @var Frontend\View
 	 */
-	public $view = '\\Foomo\\Site\\Frontend\\View';
+	public $view;
 }
