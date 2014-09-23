@@ -19,46 +19,19 @@
 
 namespace Foomo\Site\Adapter;
 
-use Foomo\Site;
-use Foomo\ContentServer\Vo;
-
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-class Neos extends AbstractBase
+interface ClientInterface
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @inheritdoc
-	 *
-	 * @return string
-	 */
-	public static function getName()
-	{
-		return 'neos';
-	}
-
-	/**
-	 * @inheritdoc
-	 *
-	 * @return \Foomo\Site\Adapter\Neos\SubRouter[]
-	 */
-	public static function getSubRoutes()
-	{
-		$routes = [];
-		foreach (static::getAdapterConfig()->subRouters as $subRouter) {
-			$routes[$subRouter::$prefix] = $subRouter::getSubRoute();
-		}
-		return $routes;
-	}
-
-	/**
-	 * @inheritdoc
+	 * Return content from the remote server
 	 *
 	 * @param string   $nodeId
 	 * @param string   $region
@@ -66,10 +39,5 @@ class Neos extends AbstractBase
 	 * @param string   $baseURL
 	 * @return string
 	 */
-	public static function getContent($nodeId, $region, $language, $baseURL)
-	{
-		/* @var $client ClientInterface */
-		$client = static::getAdapterConfig()->getClass('client');
-		return $client::get($nodeId, $region, $language, $baseURL);
-	}
+	static function get($nodeId, $region, $language, $baseURL);
 }

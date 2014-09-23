@@ -63,6 +63,14 @@ class DomainConfig extends AbstractConfig
 	public $subRouters = [
 		'Foomo\\Site\\Adapter\\MyAdapter\\SubRouter'
 	];
+	/**
+	 * List of classes
+	 *
+	 * @var string[]
+	 */
+	public $classes = [
+		'client' => 'Foomo\\Site\\Adapter\\MyAdapter\\Client'
+	];
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public methods
@@ -91,5 +99,19 @@ class DomainConfig extends AbstractConfig
 	public function getPathUrl($id)
 	{
 		return $this->server . $this->getPath($id);
+	}
+
+	/**
+	 * Returns a configured class
+	 *
+	 * @param string $id
+	 * @return string
+	 */
+	public function getClass($id)
+	{
+		if (!isset($this->classes[$id])) {
+			trigger_error("Unknown class '$id'", E_USER_ERROR);
+		}
+		return $this->classes[$id];
 	}
 }
