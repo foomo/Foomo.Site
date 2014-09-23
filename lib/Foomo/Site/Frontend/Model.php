@@ -79,8 +79,6 @@ class Model
 	 * Note: The content needs to be rendered "before" the
 	 * view because otherwise we can't throw exceptions...
 	 *
-	 * @todo: would prefere this to be in the View...
-	 *
 	 * @throws Site\Exception\HTTPException
 	 */
 	public function renderContent()
@@ -96,12 +94,11 @@ class Model
 		}
 
 		# get content
+		// @todo: what about groups & state!?
 		$rendering = $adapter::getContent(
 			$this->getContent()->item->id,
 			$session::getRegion(),
 			$session::getLanguage(),
-			$session::getGroups(),
-			$session::getState(),
 			$this->getContent()->URI
 		);
 
