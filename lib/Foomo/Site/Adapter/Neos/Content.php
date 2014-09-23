@@ -41,14 +41,12 @@ class Content
 	 * @param string   $nodeId
 	 * @param string   $region
 	 * @param string   $language
-	 * @param string[] $groups
-	 * @param string   $state
 	 * @param string   $baseURL
 	 * @return string
 	 */
-	public static function get($nodeId, $region, $language, $groups, $state, $baseURL)
+	public static function get($nodeId, $region, $language, $baseURL)
 	{
-		$json = self::load($nodeId, $region, $language, $groups, $state);
+		$json = self::load($nodeId, $region, $language);
 
 		if (empty($json)) {
 			// @todo: shouldn't we throw an exception here?
@@ -60,7 +58,6 @@ class Content
 		} else {
 			$html = self::parse($json, $baseURL);
 			$html = self::replaceImages($html);
-			$html = self::replaceLinks($html, $region, $language);
 			return $html;
 		}
 	}
@@ -75,13 +72,11 @@ class Content
 	 * @param string   $nodeId
 	 * @param string   $region
 	 * @param string   $language
-	 * @param string[] $groups
-	 * @param string   $state
 	 * @return string
 	 */
-	private static function load($nodeId, $region, $language, $groups, $state)
+	private static function load($nodeId, $region, $language)
 	{
-		return Cache\Proxy::call(__CLASS__, 'cachedLoad', [$nodeId, $region, $language, $groups, $state]);
+		return Cache\Proxy::call(__CLASS__, 'cachedLoad', [$nodeId, $region, $language]);
 	}
 
 	/**
@@ -89,16 +84,14 @@ class Content
 	 * Foomo\Cache\CacheResourceDescription
 	 *
 	 * @todo: reenable caching
-	 * @todo: what about region, language, groups, state ...?
+	 * @todo: add locale region, language?
 	 *
 	 * @param string   $nodeId
 	 * @param string   $region
 	 * @param string   $language
-	 * @param string[] $groups
-	 * @param string   $state
 	 * @return string
 	 */
-	public static function cachedLoad($nodeId, $region, $language, $groups, $state)
+	public static function cachedLoad($nodeId, $region, $language)
 	{
 		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $nodeId;
 		return json_decode(file_get_contents($url));
@@ -142,7 +135,7 @@ class Content
 		$classNames = [];
 		foreach ($doc->getElementsByTagName('app') as $appEl) {
 			$appElements[] = $appEl;
-			$classNames[] = $appEl->getAttribute('data-creation-app-class-name');
+			$classNames[] = $appEl->getAttribute('data-foomo-app-class-name');
 		}
 
 		$appCounter = 0;
@@ -155,7 +148,7 @@ class Content
 			# render apps
 			$key = '<!-- replace-foomo-app-' . ($appCounter++) . ' -->';
 			$appReplacements[$key] = self::renderContentApp(
-				$appEl->getAttribute('data-creation-app-class-name'),
+				$appEl->getAttribute('data-foomo-app-class-name'),
 				$appData,
 				$baseURL
 			);
@@ -209,18 +202,5 @@ class Content
 			return '<img' . $matches[1] . $matches[3] . ' src="' . $imageUri . '"' . $matches[5] . '>';
 		};
 		return preg_replace_callback($pattern, $callback, $html);
-	}
-
-	/**
-	 * @todo: implement default link handling
-	 *
-	 * @param string $html
-	 * @param string $region
-	 * @param string $language
-	 * @return string
-	 */
-	private static function replaceLinks($html, $region, $language)
-	{
-		return $html;
 	}
 }
