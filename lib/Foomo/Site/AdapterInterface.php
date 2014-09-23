@@ -64,10 +64,8 @@ interface AdapterInterface
 	 * @param string   $nodeId
 	 * @param string   $region
 	 * @param string   $language
-	 * @param string[] $groups
-	 * @param string   $state
 	 * @param string   $baseURL
 	 * @return string
 	 */
-	static function getContent($nodeId, $region, $language, $groups, $state, $baseURL);
+	static function getContent($nodeId, $region, $language, $baseURL);
 }
