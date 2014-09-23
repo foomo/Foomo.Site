@@ -36,13 +36,6 @@ abstract class AbstractBase implements Site\AdapterInterface
 	/**
 	 * @inheritdoc
 	 *
-	 * @return string
-	 */
-	abstract static function getName();
-
-	/**
-	 * @inheritdoc
-	 *
 	 * @return \Foomo\Modules\Resource[]
 	 */
 	public static function getModuleResources()
@@ -65,24 +58,4 @@ abstract class AbstractBase implements Site\AdapterInterface
 	{
 		return Site\Module::getRootModuleConfig(DomainConfig::NAME, static::getName());
 	}
-
-	/**
-	 * @inheritdoc
-	 *
-	 * @return \Foomo\Site\Adapter\Neos\SubRouter[]
-	 */
-	abstract static function getSubRoutes();
-
-	/**
-	 * @inheritdoc
-	 *
-	 * @param string   $nodeId
-	 * @param string   $region
-	 * @param string   $language
-	 * @param string[] $groups
-	 * @param string   $state
-	 * @param string   $baseURL
-	 * @return string
-	 */
-	abstract static function getContent($nodeId, $region, $language, $groups, $state, $baseURL);
 }
