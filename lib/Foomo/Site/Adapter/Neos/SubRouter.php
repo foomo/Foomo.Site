@@ -19,13 +19,16 @@
 
 namespace Foomo\Site\Adapter\Neos;
 
+use Foomo\Media\Image;
+use Foomo\Site\Cache;
 use Foomo\Site\Adapter\Media;
 use Foomo\Site\Adapter\Neos;
+use Foomo\Utils;
 
 /**
- * @todo check image & asset route
+ * @todo    check image & asset route
  *
- * @link www.foomo.org
+ * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  */
 class SubRouter extends \Foomo\Site\SubRouter
@@ -47,49 +50,41 @@ class SubRouter extends \Foomo\Site\SubRouter
 	{
 		parent::__construct();
 
-		$this->addRoutes([
-//			'/asset/:assetId/:filename' => 'asset',
-			'/image/:type/:hash' => 'image',
-			'/*' => 'error',
-		]);
+		$this->addRoutes(
+			[
+				'/asset/:nodeId/:filename' => 'asset',
+				'/image/:type/:nodeId'      => 'image',
+				'/*'                        => 'error',
+			]
+		);
 	}
 
 	// --------------------------------------------------------------------------------------------
-	// ~ Public methods
+	// ~ Public route methods
 	// --------------------------------------------------------------------------------------------
 
-//	/**
-//	 * output asset content
-//	 *
-//	 * @param string $assetId
-//	 * @param string $filename
-//	 */
-//	public function asset($assetId, $filename)
-//	{
-//		/* @var $config Config */
-//		$config = Module::getConfig(Config::NAME);
-//		$asset = file_get_contents($config->getPathtUrl('media') . '/' . $assetId);
-//
-//		if ($asset) {
-//			header('Content-Description: File Transfer');
-//			header('Content-Type: application/octet-stream');
-//			header('Content-Disposition: attachment; filename='.$filename);
-//			header('Content-Transfer-Encoding: binary');
-//			header('Expires: 0');
-//			header('Cache-Control: must-revalidate');
-//			header('Pragma: public');
-//			header('Content-Length: ' . strlen($asset));
-//			ob_clean();
-//			flush();
-//			echo $asset;
-//			exit;
-//		} else {
-//			$this->error();
-//		}
-//	}
+	/**
+	 * Server assets i.e. pdf, zip
+	 *
+	 * @param string $nodeId
+	 * @param string $filename
+	 */
+	public function asset($nodeId, $filename)
+	{
+		$config = Neos::getAdapterConfig();
+		$url = $config->getPathUrl('asset') . '/' . $nodeId;
+		$cacheFilename = Cache::getFilename($nodeId, $url);
+
+		if ($cacheFilename) {
+			Utils::streamFile($cacheFilename, $filename, 'application/octet-stream', true);
+		} else {
+			$this->error();
+		}
+	}
 
 	/**
 	 * @todo: is there a way not to hardcode 'neos'?
+	 * Serve responsive images
 	 *
 	 * @param string $type
 	 * @param string $nodeId
@@ -97,9 +92,30 @@ class SubRouter extends \Foomo\Site\SubRouter
 	public function image($type, $nodeId)
 	{
 		$config = Neos::getAdapterConfig();
-		if (!Media::serve($config, $nodeId, 'neos', $type)) {
+		$url = $config->getPathUrl('image') . '/' . $nodeId;
+		$cacheFilename = Cache::getFilename($nodeId, $url, 'neos');
+
+		if ($cacheFilename) {
+			Image\Server::serve($cacheFilename, 'neos', $type);
+		} else {
 			$this->error();
-		};
+		}
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the route for handling assets
+	 *
+	 * @param string $nodeId
+	 * @param string $filename
+	 * @return string
+	 */
+	public static function getAssetUri($nodeId, $filename)
+	{
+		return static::getUri('/asset/' . $nodeId . '/' . $filename);
 	}
 
 	/**
