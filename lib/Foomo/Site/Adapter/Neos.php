@@ -63,13 +63,11 @@ class Neos extends AbstractBase
 	 * @param string   $nodeId
 	 * @param string   $region
 	 * @param string   $language
-	 * @param string[] $groups
-	 * @param string   $state
 	 * @param string   $baseURL
 	 * @return string
 	 */
-	public static function getContent($nodeId, $region, $language, $groups, $state, $baseURL)
+	public static function getContent($nodeId, $region, $language, $baseURL)
 	{
-		return Site\Adapter\Neos\Content::get($nodeId, $region, $language, $groups, $state, $baseURL);
+		return Site\Adapter\Neos\Content::get($nodeId, $region, $language, $baseURL);
 	}
 }
