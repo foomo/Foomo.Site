@@ -17,63 +17,52 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Adapter;
-
-use Foomo\Media\Image\Adaptive;
-use Foomo\Media\Image\Adaptive\RuleSet;
-use Foomo\Media\Image\Server;
-use Foomo\Site\Module;
+namespace Foomo\Site;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-class Media
+class Cache
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Serves media from the remote content server by loading it to the
-	 * local file system and serving it through the foomo media image server
+	 * Returns the local filename for the given source node id and url
 	 *
-	 * @param DomainConfig $config
-	 * @param string       $nodeId
-	 * @param string       $layout
-	 * @param string       $type
-	 * @param RuleSet      $ruleSet
-	 * @return bool
+	 * @param string $nodeId Source node id
+	 * @param string $url    Source url
+	 * @param string $type   Source type
+	 * @return bool|string
 	 */
-	public static function serve($config, $nodeId, $layout, $type, $ruleSet = null)
-	{
-		$filename = static::getFilename($nodeId);
-
-		# load remote file if it doesn't exist
-		if (!file_exists($filename)) {
-			$url = $config->getPathUrl('media') . '/' . $nodeId;
-			$filename = static::loadRemoteFile($url, $filename);
-		}
-
-		if ($filename) {
-			Server::serve($filename, $layout, $type, $ruleSet);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Returns the local file name
-	 *
-	 * @param string $hash
-	 * @return string
-	 */
-	public static function getFilename($hash)
+	public static function getFilename($nodeId, $url, $type='files')
 	{
 		$module = Module::getRootModuleClass();
-		return $module::getVarDir('media') . DIRECTORY_SEPARATOR . $hash;
+		$filename = $module::getCacheDir($type) . DIRECTORY_SEPARATOR . $nodeId;
+
+
+		if (file_exists($filename)) {
+			# get file headers
+			$headers = get_headers($url, 1);
+
+			# check if file exists on the source
+			if ($headers && strstr($headers[0], '200') !== false && isset($headers['Last-Modified'])) {
+				$dt = new \DateTime($headers['Last-Modified']);
+				if ($dt->getTimestamp() > filemtime($filename)) {
+					return static::loadRemoteFile($url, $filename);
+				} else {
+					return $filename;
+				}
+			} else {
+				// @todo: do we want to serve files that are not on the source?
+				return $filename;
+			}
+		} else {
+			return static::loadRemoteFile($url, $filename);
+		}
 	}
 
 	// --------------------------------------------------------------------------------------------
