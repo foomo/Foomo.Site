@@ -51,7 +51,7 @@ class DomainConfig extends AbstractConfig
 	 */
 	public $paths = [
 		'image'      => '/contentserver/image',
-		'assets'     => '/contentserver/asset',
+		'asset'      => '/contentserver/asset',
 		'content'    => '/contentserver/export',
 		'repository' => '/contentserver/export',
 	];
