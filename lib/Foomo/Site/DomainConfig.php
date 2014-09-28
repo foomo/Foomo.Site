@@ -98,7 +98,7 @@ class DomainConfig extends AbstractConfig
 	 * @var array
 	 */
 	public $emails = [
-		'debug' => '',
+		'debug'   => '',
 		'contact' => '',
 	];
 	/**
@@ -131,33 +131,71 @@ class DomainConfig extends AbstractConfig
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * Returns list of configures regions
+	 *
+	 * @return string[]
+	 */
+	public function getRegions()
+	{
+		return array_keys($this->locales);
+	}
+
+	/**
+	 * Returns list of configures languages for the given region
+	 *
+	 * @param string $region
+	 * @return string[]
+	 */
+	public function getLanguages($region)
+	{
+		if (!$this->isValidRegion($region)) {
+			trigger_error("Invalid region: '$region'", E_USER_ERROR);
+		}
+		return $this->locales[$region];
+	}
+
+	/**
 	 * Returns first configured region
 	 *
 	 * @return string
 	 */
 	public function getDefaultRegion()
 	{
-		return array_keys($this->locales)[0];
+		return $this->getRegions()[0];
 	}
 
 	/**
 	 * Returns first configured region's language
 	 *
+	 * @param string $region
 	 * @return string
 	 */
-	public function getDefaultLanguage()
+	public function getDefaultLanguage($region = null)
 	{
-		return $this->locales[$this->getDefaultRegion()][0];
+		if (is_null($region)) {
+			$region = $this->getDefaultRegion();
+		}
+		if (!$this->isValidRegion($region)) {
+			trigger_error("Invalid region: '$region'", E_USER_ERROR);
+		}
+		return $this->locales[$region][0];
 	}
 
 	/**
 	 * Returns first configured locale
 	 *
+	 * @param string $region
 	 * @return string
 	 */
-	public function getDefaultLocale()
+	public function getDefaultLocale($region = null)
 	{
-		return $this->getDefaultRegion() . '_' . strtoupper($this->getDefaultLanguage());
+		if (is_null($region)) {
+			$region = $this->getDefaultRegion();
+		}
+		if (!$this->isValidRegion($region)) {
+			trigger_error("Invalid region: '$region'", E_USER_ERROR);
+		}
+		return $region . '_' . strtoupper($this->getDefaultLanguage($region));
 	}
 
 	/**
@@ -230,7 +268,7 @@ class DomainConfig extends AbstractConfig
 	 */
 	public function isValidLanguage($region, $language)
 	{
-		return in_array($this->locales[$region], $language);
+		return in_array($language, $this->locales[$region]);
 	}
 
 	/**

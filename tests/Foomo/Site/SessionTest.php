@@ -50,21 +50,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 	/**
 	 *
 	 */
-	public function testGetLanguage()
-	{
-		$session = Site::getSession();
-		$config = Module::getSiteConfig();
-
-		$this->assertEquals(
-			$config->getDefaultLanguage(),
-			$session::getLanguage(),
-			"default language does not match"
-		);
-	}
-
-	/**
-	 *
-	 */
 	public function testGetRegion()
 	{
 		$session = Site::getSession();
@@ -80,6 +65,21 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 	/**
 	 *
 	 */
+	public function testGetLanguage()
+	{
+		$session = Site::getSession();
+		$config = Module::getSiteConfig();
+
+		$this->assertEquals(
+			$config->getDefaultLanguage(),
+			$session::getLanguage(),
+			"default language does not match"
+		);
+	}
+
+	/**
+	 *
+	 */
 	public function testGetLocale()
 	{
 		$session = Site::getSession();
@@ -89,6 +89,24 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 			$config->getDefaultLocale(),
 			$session::getLocale(),
 			"default locale does not match"
+		);
+	}
+
+	/**
+	 *
+	 */
+	public function testSetRegion()
+	{
+		$session = Site::getSession();
+		$config = Module::getSiteConfig();
+		$region = $config->getRegions()[1];
+
+		$session::setRegion($region);
+
+		$this->assertEquals(
+			$region,
+			$session::getRegion(),
+			"default region does not match"
 		);
 	}
 }

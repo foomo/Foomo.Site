@@ -92,18 +92,16 @@ class Session implements SessionInterface
 	 */
 	public static function setRegion($region)
 	{
-		if ($region != static::getRegion()) {
-			$config = Module::getSiteConfig();
-			if ($config->isValidRegion($region)) {
-				static::getInstance(true)->region = $region;
-				// check if language exists
-				if (!in_array($config->locales[$region], static::getLanguage())) {
-					static::setLanguage($config->locales[$region][0]);
-				}
-				static::updateLocaleChain();
-			} else {
-				trigger_error("Invalid region: $region", E_USER_WARNING);
+		$config = Module::getSiteConfig();
+		if ($config->isValidRegion($region)) {
+			static::getInstance(true)->region = $region;
+			// check if language exists
+			if (!$config->isValidLanguage($region, static::getLanguage())) {
+				static::setLanguage($config->getDefaultLanguage($region));
 			}
+			static::updateLocaleChain();
+		} else {
+			trigger_error("Invalid region: $region", E_USER_WARNING);
 		}
 	}
 

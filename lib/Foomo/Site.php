@@ -35,8 +35,6 @@ class Site
 	/**
 	 * Initialize session & run router
 	 *
-	 * @todo: Should the urlhandler, session and mvc thing moved out of here?
-	 *
 	 * @return mixed
 	 */
 	public static function run()
@@ -46,12 +44,10 @@ class Site
 		$session::boot();
 
 		# setup url handler
-		// @todo: clarify this for me please
 		URLHandler::exposeClassId(false);
 		URLHandler::strictParameterHandling(false);
 
 		# setup mvc | hide the script - you might need mod rewrite
-		// @todo: clarify this for me please
 		\Foomo\MVC::hideScript(true);
 
 		# create and execute router

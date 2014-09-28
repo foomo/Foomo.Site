@@ -54,7 +54,7 @@ class Controller
 
 		# handle status
 		if ($content->status !== Vo\Content\SiteContent::STATUS_OK) {
-			throw new Site\Exception\HTTPException($content->status);
+			throw new Site\Exception\HTTPException($content->status, 'Content server client result not OK!');
 		}
 
 		# set model's content

@@ -17,73 +17,35 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site;
+namespace Foomo\TestRunner;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
- * @author  franklin
+ * @author  franklin <franklin@weareinteractive.com>
  */
-interface SessionInterface
+class Utils
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Start session
-	 */
-	static function boot();
-
-	/**
-	 * Current language i.e. `en`
+	 * Get a private or protected method for testing/documentation purposes.
+	 * How to use for MyClass->foo():
+	 *      $cls = new MyClass();
+	 *      $foo = PHPUnitUtil::getPrivateMethod($cls, 'foo');
+	 *      $foo->invoke($cls, $...);
 	 *
-	 * @return string
+	 * @param object $obj  The instantiated instance of your class
+	 * @param string $name The name of your private/protected method
+	 * @return \ReflectionMethod The method you asked for
 	 */
-	static function getLanguage();
-
-	/**
-	 * Current region i.e. `us`
-	 *
-	 * @return string
-	 */
-	static function getRegion();
-
-	/**
-	 * @param string $region
-	 */
-	static function setRegion($region);
-
-	/**
-	 * Current locale i.e. `en_US`
-	 *
-	 * @return string
-	 */
-	static function getLocale();
-
-	/**
-	 * @param string $language
-	 */
-	static function setLanguage($language);
-
-	/**
-	 * @param string $region
-	 * @param string $language
-	 * @return string
-	 */
-	static function setLocale($region, $language);
-
-	/**
-	 * Current groups i.e. `['www', 'registered']`
-	 *
-	 * @return string[]
-	 */
-	static function getGroups();
-
-	/**
-	 * Current state i.e. `debug`
-	 *
-	 * @return string
-	 */
-	static function getState();
+	public static function getPrivateMethod($obj, $name)
+	{
+		$class = new \ReflectionClass($obj);
+		$method = $class->getMethod($name);
+		$method->setAccessible(true);
+		return $method;
+	}
 }
