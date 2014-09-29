@@ -79,7 +79,7 @@ class Router extends \Foomo\Router
 		$url = parse_url($_SERVER['REQUEST_URI']);
 		#$baseUrl = $this->parseLocale($url["path"]);
 
-		$locale = \Foomo\Site\Utils\URI::getLocale($url["path"]);
+		$locale = \Foomo\Site\Utils\Uri::getLocale($url["path"]);
 
 		var_dump($locale);
 

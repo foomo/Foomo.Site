@@ -45,7 +45,8 @@ class DomainConfig extends AbstractConfig
 	 * @var array[string][string]
 	 */
 	public $locales = [
-		'ch' => ['de']
+		'de' => ['de'],
+		'eu' => ['en', 'de']
 	];
 	/**
 	 * List of allowed groups

@@ -27,7 +27,7 @@ use Foomo\ContentServer\Vo;
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-class URI
+class Uri
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
