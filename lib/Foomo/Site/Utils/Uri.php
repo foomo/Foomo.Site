@@ -49,7 +49,7 @@ class Uri
 	 * @param string $uri
 	 * @return array
 	 */
-	public static function getLocale($uri)
+	public static function parseLocale($uri)
 	{
 		$config = Site::getConfig();
 		$session = Site::getSession();
@@ -78,5 +78,29 @@ class Uri
 			$path = '';
 		}
 		return compact('region', 'language', 'path', 'uri');
+	}
+
+	/**
+	 * @param string $uri
+	 * @return string
+	 */
+	public static function shortenLocale($uri)
+	{
+		$config = Site::getConfig();
+		$locale = self::parseLocale($uri);
+
+		if (
+			$locale['region'] == $config->getDefaultRegion() &&
+			$locale['language'] == $config->getDefaultLanguage($locale['region'])
+		) {
+			return $locale['uri'];
+		} else if (
+			$locale['region'] != $config->getDefaultRegion() &&
+			$locale['language'] == $config->getDefaultLanguage($locale['region'])
+		) {
+			return '/' . $locale['region'] . $locale['uri'];
+		} else {
+			return '/' . $locale['region'] . '-' . $locale['language'] . $locale['uri'];
+		}
 	}
 }

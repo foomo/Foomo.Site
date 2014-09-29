@@ -43,7 +43,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 	/**
 	 *
 	 */
-	public function testGetLocale()
+	public function testParseLocale()
 	{
 		$this->assertEquals(
 			[
@@ -52,7 +52,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '',
 				'uri'      => ''
 			],
-			Uri::getLocale('')
+			Uri::parseLocale('')
 		);
 		$this->assertEquals(
 			[
@@ -61,14 +61,14 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '',
 				'uri'      => '/'
 			],
-			Uri::getLocale('/')
+			Uri::parseLocale('/')
 		);
 	}
 
 	/**
 	 *
 	 */
-	public function testGetLocaleWithDefaultRegion()
+	public function testParseLocaleWithDefaultRegion()
 	{
 		$this->assertEquals(
 			[
@@ -77,7 +77,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/de',
 				'uri'      => ''
 			],
-			Uri::getLocale('/de')
+			Uri::parseLocale('/de')
 		);
 		$this->assertEquals(
 			[
@@ -86,7 +86,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/de',
 				'uri'      => '/'
 			],
-			Uri::getLocale('/de/')
+			Uri::parseLocale('/de/')
 		);
 		$this->assertEquals(
 			[
@@ -95,14 +95,14 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/de',
 				'uri'      => '/some/path'
 			],
-			Uri::getLocale('/de/some/path')
+			Uri::parseLocale('/de/some/path')
 		);
 	}
 
 	/**
 	 *
 	 */
-	public function testGetLocaleWithRegion()
+	public function testParseLocaleWithRegion()
 	{
 		$this->assertEquals(
 			[
@@ -111,7 +111,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/eu',
 				'uri'      => ''
 			],
-			Uri::getLocale('/eu')
+			Uri::parseLocale('/eu')
 		);
 		$this->assertEquals(
 			[
@@ -120,7 +120,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/eu',
 				'uri'      => '/'
 			],
-			Uri::getLocale('/eu/')
+			Uri::parseLocale('/eu/')
 		);
 		$this->assertEquals(
 			[
@@ -129,14 +129,14 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/eu',
 				'uri'      => '/some/path'
 			],
-			Uri::getLocale('/eu/some/path')
+			Uri::parseLocale('/eu/some/path')
 		);
 	}
 
 	/**
 	 *
 	 */
-	public function testGetLocaleWithDefaultLocale()
+	public function testParseLocaleWithDefaultLocale()
 	{
 		$this->assertEquals(
 			[
@@ -145,7 +145,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/de-de',
 				'uri'      => ''
 			],
-			Uri::getLocale('/de-de')
+			Uri::parseLocale('/de-de')
 		);
 		$this->assertEquals(
 			[
@@ -154,7 +154,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/de-de',
 				'uri'      => '/'
 			],
-			Uri::getLocale('/de-de/')
+			Uri::parseLocale('/de-de/')
 		);
 		$this->assertEquals(
 			[
@@ -163,14 +163,14 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/de-de',
 				'uri'      => '/some/path'
 			],
-			Uri::getLocale('/de-de/some/path')
+			Uri::parseLocale('/de-de/some/path')
 		);
 	}
 
 	/**
 	 *
 	 */
-	public function testGetLocaleWithLocale()
+	public function testParseLocaleWithLocale()
 	{
 		$this->assertEquals(
 			[
@@ -179,7 +179,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/eu-de',
 				'uri'      => ''
 			],
-			Uri::getLocale('/eu-de')
+			Uri::parseLocale('/eu-de')
 		);
 		$this->assertEquals(
 			[
@@ -188,7 +188,7 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/eu-de',
 				'uri'      => '/'
 			],
-			Uri::getLocale('/eu-de/')
+			Uri::parseLocale('/eu-de/')
 		);
 		$this->assertEquals(
 			[
@@ -197,7 +197,34 @@ class UriTest extends \PHPUnit_Framework_TestCase
 				'path'     => '/eu-de',
 				'uri'      => '/some/path'
 			],
-			Uri::getLocale('/eu-de/some/path')
+			Uri::parseLocale('/eu-de/some/path')
 		);
+	}
+
+	/**
+	 *
+	 */
+	public function testShortenLocaleWithDefaultLocale()
+	{
+		$this->assertEquals('/',  Uri::shortenLocale('/de-de/'));
+		$this->assertEquals('/some/path',  Uri::shortenLocale('/de-de/some/path'));
+	}
+
+	/**
+	 *
+	 */
+	public function testShortenLocaleWithDefaultLanguage()
+	{
+		$this->assertEquals('/eu/',  Uri::shortenLocale('/eu-en/'));
+		$this->assertEquals('/eu/some/path',  Uri::shortenLocale('/eu-en/some/path'));
+	}
+
+	/**
+	 *
+	 */
+	public function testShortenLocale()
+	{
+		$this->assertEquals('/eu-de/',  Uri::shortenLocale('/eu-de/'));
+		$this->assertEquals('/eu-de/some/path',  Uri::shortenLocale('/eu-de/some/path'));
 	}
 }

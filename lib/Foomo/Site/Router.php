@@ -77,18 +77,7 @@ class Router extends \Foomo\Router
 	public function site()
 	{
 		$url = parse_url($_SERVER['REQUEST_URI']);
-		#$baseUrl = $this->parseLocale($url["path"]);
-
-		$locale = \Foomo\Site\Utils\Uri::getLocale($url["path"]);
-
-		var_dump($locale);
-
-		#var_dump(\Foomo\Site\Utils\URI::getLocale($url["path"]));exit;
-
-		// @todo: is there a better way?
-		//$_SERVER['REQUEST_URI'] = $locale['uri'];
-		//var_dump($_SERVER['REQUEST_URI']);
-
+		$locale = \Foomo\Site\Utils\Uri::parseLocale($url["path"]);
 		return \Foomo\MVC::run(\Foomo\Site::getFrontend(), $locale['path']);
 	}
 
