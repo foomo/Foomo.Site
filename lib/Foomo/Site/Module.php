@@ -107,7 +107,7 @@ class Module extends \Foomo\Modules\ModuleBase
 	 */
 	public static function getSiteConfig()
 	{
-		return self::getRootModuleConfig(DomainConfig::NAME);
+		 return self::getRootModuleConfig('Foomo.Site.config');
 	}
 
 	/**
