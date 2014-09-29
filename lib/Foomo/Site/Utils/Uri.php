@@ -81,6 +81,11 @@ class Uri
 	}
 
 	/**
+	 * Returns a shortend uri for default regions/language i.e.
+	 *
+	 * /de-de -> /
+	 * /eu-en -> /eu
+	 *
 	 * @param string $uri
 	 * @return string
 	 */
