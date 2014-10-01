@@ -66,6 +66,31 @@ class Model
 	}
 
 	/**
+	 * @param bool $full
+	 * @return Vo\Content\Item[]
+	 */
+	public function getContentPath($full = false)
+	{
+		if ($full) {
+			return array_merge(
+				[$this->getContent()->item],
+				$this->getContent()->path
+			);
+		} else {
+			return $this->getContent()->path;
+		}
+	}
+
+	/**
+	 * @param string $id
+	 * @return Vo\Content\Node
+	 */
+	public function getContentNode($id)
+	{
+		return $this->getContent()->nodes[$id];
+	}
+
+	/**
 	 * @param Vo\Content\SiteContent $content
 	 * @return $this
 	 */

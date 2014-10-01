@@ -19,6 +19,7 @@
 
 namespace Foomo\Site\Frontend;
 
+use Foomo\ContentServer\Vo\Content\Item;
 use Foomo\ContentServer\Vo\Content\Node;
 use Foomo\Site;
 
@@ -59,9 +60,9 @@ class Menu
 	//---------------------------------------------------------------------------------------------
 
 	/**
-	 * @param Node     $node
-	 * @param string[] $path
-	 * @param int      $depth
+	 * @param Node   $node
+	 * @param Item[] $path
+	 * @param int    $depth
 	 * @return string
 	 */
 	public static function render($node, $path = [], $depth = 0)
@@ -75,10 +76,10 @@ class Menu
 
 	/**
 	 *
-	 * @param Node     $node
-	 * @param string[] $path
-	 * @param int      $depth
-	 * @param int      $level
+	 * @param Node   $node
+	 * @param Item[] $path
+	 * @param int    $depth
+	 * @param int    $level
 	 * @return string
 	 */
 	protected static function renderNode($node, array $path, $depth, $level)
@@ -91,7 +92,8 @@ class Menu
 				continue;
 			}
 
-			$active = (\in_array($node->item->id, $path));
+			$active = (\in_array($node->item, $path));
+
 			$ret .= static::renderMenuItemOpen($childNode, $path, $level);
 			$ret .= static::renderMenuItem($childNode, $path, $level);
 			if (
@@ -123,9 +125,9 @@ class Menu
 	}
 
 	/**
-	 * @param Node     $node
-	 * @param string[] $path
-	 * @param integer  $level
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
 	 * @return string
 	 */
 	protected static function renderMenuOpen($node, array $path, $level)
@@ -134,39 +136,42 @@ class Menu
 	}
 
 	/**
-	 * @param Node     $node
-	 * @param string[] $path
-	 * @param integer  $level
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
 	 * @return string
 	 */
 	protected static function renderMenuItemOpen($node, array $path, $level)
 	{
-		$active = (\in_array($node->id, $path));
+		$active = (\in_array($node->item, $path));
 		return ($active) ? '<li class="item active">' . PHP_EOL : '<li class="item">' . PHP_EOL;
 	}
 
 	/**
-	 * @param Node     $node
-	 * @param string[] $path
-	 * @param integer  $level
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
 	 * @return string
 	 */
 	protected static function renderMenuItem($node, array $path, $level)
 	{
-		//$active = (\in_array($repoNode->id, $path));
-		//$linkId = Utils\RepoNode::getLinkId($repoNode);
-		//if (!is_null($linkId)) {}
-		//$linkRepoNode = ($linkRepoNode->triggersLeaf) ? $linkRepoNode->triggersLeaf : $linkRepoNode;
-		//$url = (\is_null($linkRepoNode)) ? '#' : $linkRepoNode->envUrl();
-		$uri = $node->item->URI;
-		$name = $node->item->name;
-		return '<a href="' . $uri . '" title="' . $name . '">' . $name . '</a>' . PHP_EOL;
+		$classes = [];
+
+		if (\in_array($node->item, $path)) {
+			$classes[] = 'active';
+		}
+
+		return '<a
+			class="' . implode(' ', $classes) . '"
+			href="' . $node->item->URI . '"
+			title="' . htmlentities($node->item->name) . '"
+			>' .htmlentities($node->item->name) . '</a>' . PHP_EOL;
 	}
 
 	/**
-	 * @param Node     $node
-	 * @param string[] $path
-	 * @param integer  $level
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
 	 * @return string
 	 */
 	protected static function renderMenuItemClose($node, array $path, $level)
@@ -175,9 +180,9 @@ class Menu
 	}
 
 	/**
-	 * @param Node     $node
-	 * @param string[] $path
-	 * @param integer  $level
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
 	 * @return string
 	 */
 	protected static function renderMenuClose($node, array $path, $level)
