@@ -19,6 +19,7 @@
 
 namespace Foomo\Site;
 
+use Foomo\Frontend\ToolboxConfig\MenuEntry;
 use Foomo\Modules\Manager;
 
 /**
@@ -26,7 +27,7 @@ use Foomo\Modules\Manager;
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-class Module extends \Foomo\Modules\ModuleBase
+class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\ToolboxInterface
 {
 	//---------------------------------------------------------------------------------------------
 	// ~ Constants
@@ -98,6 +99,22 @@ class Module extends \Foomo\Modules\ModuleBase
 		return $resources;
 	}
 
+	//---------------------------------------------------------------------------------------------
+	// ~ Toolbox interface methods
+	//---------------------------------------------------------------------------------------------
+
+	/**
+	 * @internal
+	 * @return MenuEntry[]
+	 */
+	public static function getMenu()
+	{
+		return [
+			MenuEntry::create('Root.Site', 'Site', self::NAME, 'Foomo.Site.Toolbox'),
+			MenuEntry::create('Root.Site.ContentServer', 'Content Server', self::NAME, 'Foomo.Site.Toolbox.ContentServer'),
+		];
+	}
+
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
@@ -107,7 +124,7 @@ class Module extends \Foomo\Modules\ModuleBase
 	 */
 	public static function getSiteConfig()
 	{
-		 return self::getRootModuleConfig('Foomo.Site.config');
+		return self::getRootModuleConfig('Foomo.Site.config');
 	}
 
 	/**
