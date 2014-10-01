@@ -22,6 +22,7 @@ namespace Foomo\Site\Toolbox\ContentServer\Frontend;
 use Foomo\ContentServer\Vo\Content\RepoNode;
 use Foomo\Cache\Persistence\Expr;
 use Foomo\Cache\Manager;
+use Foomo\Site;
 
 /**
  * @link    www.foomo.org
@@ -54,7 +55,7 @@ class Model
 	 */
 	public function setLocale($region, $language)
 	{
-		$config = \OuiSet::getSiteConfig();
+		$config = Site::getConfig();
 
 		if (is_null($region) || !$config->isValidRegion($region)) {
 			$region = $config->getDefaultRegion();

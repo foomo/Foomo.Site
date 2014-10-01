@@ -10,7 +10,7 @@
       onchange="window.location.href=$(this).val();return false;"
       >
       <option value=""><?= $model->language . '_' . strtoupper($model->region); ?></option>
-      <? foreach (\OuiSet::getSiteConfig()->locales as $region => $languages): ?>
+      <? foreach (\Foomo\Site::getConfig()->locales as $region => $languages): ?>
         <? foreach ($languages as $language): ?>
           <? if ($language == $model->language && $region == $model->region) { continue; } ?>
           <option value="<?= $view->url('default', [$region, $language]) ?>">
