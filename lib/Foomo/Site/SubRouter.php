@@ -46,12 +46,12 @@ class SubRouter extends \Foomo\Router
 
 	/**
 	 * Simple error handling route
-	 *
-	 * @throws Site\Exception\HTTPException
 	 */
 	public function error()
 	{
-		throw new Site\Exception\HTTPException(404);
+		header("HTTP/1.0 404 Not Found");
+		echo 'file not found';
+		exit;
 	}
 
 	// --------------------------------------------------------------------------------------------
