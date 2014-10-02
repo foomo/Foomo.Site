@@ -19,6 +19,7 @@
 
 namespace Foomo\Site\Frontend;
 
+use Foomo\HTMLDocument;
 use Foomo\Site;
 
 /**
@@ -69,5 +70,35 @@ class View extends \Foomo\MVC\View
 			(isset($partial[1])) ? $partial[1] : [],
 			(isset($partial[2])) ? $partial[2] : ''
 		);
+	}
+
+	/**
+	 * @param array $variables
+	 * @return string
+	 */
+	public function render($variables = [])
+	{
+		if ($this->partial == '') {
+			$this->renderHead(
+				HTMLDocument::getInstance(),
+				(!\Foomo\Config::isProductionMode())
+			);
+		}
+		return parent::render($variables);
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Protected methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * Setup your HTML Document with all head data
+	 * so we can send it off the browser for optimized page speed
+	 *
+	 * @param HTMLDocument $HTMLDoc
+	 * @param bool         $debug
+	 */
+	protected function renderHead(HTMLDocument $HTMLDoc, $debug)
+	{
 	}
 }

@@ -24,6 +24,8 @@ use Foomo\ContentServer\Vo\Content\Node;
 use Foomo\Site;
 
 /**
+ * @todo    does `hidden` work as expected so we don't need to ignore stuff here?
+ *
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
@@ -50,10 +52,6 @@ class Menu
 	 * @var string[]
 	 */
 	protected static $ignorePatterns = [];
-	/**
-	 * @var string[]
-	 */
-	protected static $ignoreMimeTypes = [];
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Public static methods
@@ -115,10 +113,8 @@ class Menu
 	 */
 	protected static function isVisible($node)
 	{
-		//if (!$childRepoNode->isOnline()) continue;
 		return (
 			in_array($node->item->id, static::$ignoreIds) ||
-			//in_array($node->mimeType, static::$ignoreMimeTypes) ||
 			in_array($node->item->name, static::$ignoreNames) ||
 			preg_match('/(' . implode('|', static::$ignorePatterns) . ')/i', $node->item->name) > 0
 		);
@@ -165,7 +161,7 @@ class Menu
 			class="' . implode(' ', $classes) . '"
 			href="' . $node->item->URI . '"
 			title="' . htmlentities($node->item->name) . '"
-			>' .htmlentities($node->item->name) . '</a>' . PHP_EOL;
+			>' . htmlentities($node->item->name) . '</a>' . PHP_EOL;
 	}
 
 	/**
