@@ -112,6 +112,7 @@ class Model
 
 		# retrieve adapter for current content
 		$handlerId = $this->getContentHandlerId();
+
 		$adapter = Site::getAdapter($handlerId);
 
 		if ($adapter === false) {
