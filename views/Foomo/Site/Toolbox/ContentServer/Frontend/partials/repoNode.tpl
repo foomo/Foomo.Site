@@ -47,16 +47,6 @@ $mimeTypes = [
 			<?= $repoNode->URIs->$region->$language ?>
 		</a>
 	</td>
-	<td>
-		<? if ($model->isNeosCacheable($repoNode)): $cached = $model->isCached($repoNode); ?>
-			<span
-				style="color:<?= (!$cached) ? '#e74c3c' : '#27ae60'; ?>"
-				title="<?= (!$cached) ? 'Not cached' : 'Cached on: ' . date('d.m.Y H:i:s', $cached) ?>"
-				class="fa fa-save"
-				></span>
-		<? endif; ?>
-	</td>
-
 	<?
 	//and now some recursion for all the child nodes
 	if (count($repoNode->index) > 0) {

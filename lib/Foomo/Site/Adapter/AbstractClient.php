@@ -5,12 +5,12 @@
  *
  * The foomo Opensource Framework is free software: you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public License as
- * published  by the Free Software Foundation, either version 3 of the
+ * published  by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
  * The foomo Opensource Framework is distributed in the hope that it will
  * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
@@ -19,35 +19,29 @@
 
 namespace Foomo\Site\Adapter;
 
+use Foomo\Cache;
+use Foomo\Site\Adapter\Neos;
+
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-interface ClientInterface
+abstract class AbstractClient
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Protected static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Return content from the remote server
-	 *
-	 * @param string   $nodeId
-	 * @param string   $region
-	 * @param string   $language
-	 * @param string   $baseURL
-	 * @return string
-	 */
-	static function get($nodeId, $region, $language, $baseURL);
-
-	/**
-	 * @internal
-	 * @Foomo\Cache\CacheResourceDescription
+	 * Load content from the remote content server
 	 *
 	 * @param string   $nodeId
 	 * @param string[] $env
 	 * @return string
 	 */
-	static function cachedLoad($nodeId, $env);
+	protected static function load($nodeId, $env = [])
+	{
+		return Cache\Proxy::call(get_called_class(), 'cachedLoad', [$nodeId, $env]);
+	}
 }

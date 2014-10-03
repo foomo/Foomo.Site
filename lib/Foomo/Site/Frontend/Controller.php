@@ -52,12 +52,14 @@ class Controller
 		$url = parse_url($_SERVER['REQUEST_URI']);
 		$content = Site\ContentServer\Client::getContent($url["path"]);
 
+		# set content
+		$this->model->setContent($content);
+
 		# handle status
-		if ($content->status !== Vo\Content\SiteContent::STATUS_OK) {
+		if ($content->status == Vo\Content\SiteContent::STATUS_OK) {
+			$this->model->renderContent();
+		} else {
 			throw new Site\Exception\HTTPException($content->status, 'Content server client result not OK!');
 		}
-
-		# set model's content
-		$this->model->setContent($content);
 	}
 }

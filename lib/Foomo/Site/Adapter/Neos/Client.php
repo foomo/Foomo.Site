@@ -20,6 +20,7 @@
 namespace Foomo\Site\Adapter\Neos;
 
 use Foomo\Cache;
+use Foomo\Site\Adapter\AbstractClient;
 use Foomo\Site\Adapter\ClientInterface;
 use Foomo\Site\Adapter\Neos;
 use Foomo\Site\Exception\HTTPException;
@@ -30,7 +31,7 @@ use Foomo\Site\Module;
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-class Client implements ClientInterface
+class Client extends AbstractClient implements ClientInterface
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
@@ -38,17 +39,11 @@ class Client implements ClientInterface
 
 	/**
 	 * @inheritdoc
-	 *
-	 * @param string   $nodeId
-	 * @param string   $region
-	 * @param string   $language
-	 * @param string   $baseURL
-	 * @return string
-	 * @throws HTTPException
 	 */
 	public static function get($nodeId, $region, $language, $baseURL)
 	{
-		$json = self::load($nodeId, $region, $language);
+		# load
+		$json = self::load($nodeId);
 
 		if (!empty($json)) {
 			$html = self::parse($json, $baseURL);
@@ -60,40 +55,23 @@ class Client implements ClientInterface
 		}
 	}
 
-	// --------------------------------------------------------------------------------------------
-	// ~ Protected static methods
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * Load content from the remote content server
-	 *
-	 * @param string   $nodeId
-	 * @param string   $region
-	 * @param string   $language
-	 * @return string
-	 */
-	protected static function load($nodeId, $region, $language)
-	{
-		return Cache\Proxy::call(__CLASS__, 'cachedLoad', [$nodeId, $region, $language]);
-	}
-
 	/**
 	 * @internal
-	 * Foomo\Cache\CacheResourceDescription
-	 *
-	 * @todo: reenable caching
-	 * @todo: add locale region, language?
+	 * @Foomo\Cache\CacheResourceDescription
 	 *
 	 * @param string   $nodeId
-	 * @param string   $region
-	 * @param string   $language
+	 * @param string[] $env
 	 * @return string
 	 */
-	public static function cachedLoad($nodeId, $region, $language)
+	public static function cachedLoad($nodeId, $env)
 	{
 		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $nodeId;
 		return json_decode(file_get_contents($url));
 	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Protected static methods
+	// --------------------------------------------------------------------------------------------
 
 	/**
 	 * @param $json

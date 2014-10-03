@@ -18,7 +18,6 @@
 			<th>Name</th>
 			<th>Handler</th>
 			<th>Url</th>
-			<th></th>
 		</tr>
 		</thead>
 		<tbody>

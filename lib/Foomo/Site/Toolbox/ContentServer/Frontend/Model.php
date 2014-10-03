@@ -78,24 +78,4 @@ class Model
 	{
 		return \Foomo\Site\Module::getSiteContentServerProxyConfig()->getProxy()->getRepo();
 	}
-
-	/**
-	 * @param RepoNode $repoNode
-	 * @return bool
-	 */
-	public function isNeosCacheable($repoNode)
-	{
-		return (substr($repoNode->handler, 0, '4') != 'shop');
-	}
-
-	/**
-	 * @todo: reimplement
-	 *
-	 * @param RepoNode $repoNode
-	 * @return bool
-	 */
-	public function isCached($repoNode)
-	{
-		return false;
-	}
 }

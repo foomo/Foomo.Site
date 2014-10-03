@@ -128,7 +128,7 @@ class Menu
 	 */
 	protected static function renderMenuOpen($node, array $path, $level)
 	{
-		return ($level == 0) ? '<ul class="menu">' . PHP_EOL : '<ul class="submenu">' . PHP_EOL;
+		return '<ul>' . PHP_EOL;
 	}
 
 	/**
@@ -140,7 +140,7 @@ class Menu
 	protected static function renderMenuItemOpen($node, array $path, $level)
 	{
 		$active = (\in_array($node->item, $path));
-		return ($active) ? '<li class="item active">' . PHP_EOL : '<li class="item">' . PHP_EOL;
+		return ($active) ? '<li class="active">' . PHP_EOL : '<li>' . PHP_EOL;
 	}
 
 	/**
