@@ -172,10 +172,21 @@ class Client extends AbstractClient implements ClientInterface
 	 */
 	protected static function replaceImages($html)
 	{
-		$pattern = '/\<img([^\>]*)data-type="([^"]*)"([^\>]*)data-src="([^"]*)"([^\>]*)src="([^"]*)"([^\>]*)\>/';
+		$pattern = '/\<img' .
+			'([^\>]*)data-type="([^"]*)"' .
+			'([^\>]*)data-time="([^"]*)"' .
+			'([^\>]*)data-src="([^"]*)"' .
+			'([^\>]*)src="([^"]*)"' .
+			'([^\>]*)\>/';
 		$callback = function ($matches) {
-			$imageUri = Neos\SubRouter::getImageUri($matches[2], $matches[4]);
-			return '<img' . $matches[1] . ' src="' . $imageUri . '"' . $matches[5] . $matches[7] . '>';
+			$imageUri = Neos\SubRouter::getImageUri($matches[2], $matches[6]) . '/' . $matches[4];
+			return '<img' . $matches[1] . ' ' .
+				$matches[3] . ' ' .
+				$matches[5] .
+				' src="' . $imageUri .
+				'"' . $matches[7] .
+				$matches[9] .
+				'>';
 		};
 		return preg_replace_callback($pattern, $callback, $html);
 	}
