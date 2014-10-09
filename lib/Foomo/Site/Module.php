@@ -65,15 +65,14 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	public static function getResources()
 	{
 		# default resources
-		$resources = [
+		$resources = array(
 			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.4.*'),
 			\Foomo\Modules\Resource\Module::getResource('Foomo.Media', '0.3.*'),
 			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '0.2.*'),
-		];
+		);
 
 		# resources when enabled
 		if (Manager::isEnabled(self::NAME)) {
-
 			# resources for root module
 			if (Manager::isEnabled(self::getRootModule())) {
 				/* @var $siteConfigResource \Foomo\Modules\Resource\Config */
@@ -89,8 +88,10 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 				# check for adapter resources
 				if ($siteConfigResource->resourceValid()) {
 					$siteConfig = self::getSiteConfig();
-					foreach ($siteConfig->adapters as $adapter) {
-						$resources = array_merge($adapter::getModuleResources(), $resources);
+					if (!is_null($siteConfig)) {
+						foreach ($siteConfig->adapters as $adapter) {
+							$resources = array_merge($adapter::getModuleResources(), $resources);
+						}
 					}
 				}
 			}
@@ -124,7 +125,11 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	 */
 	public static function getSiteConfig()
 	{
-		return self::getRootModuleConfig('Foomo.Site.config');
+		if (class_exists('\Foomo\Site\DomainConfig')) {
+			return self::getRootModuleConfig('Foomo.Site.config');
+		} else {
+			return null;
+		}
 	}
 
 	/**
