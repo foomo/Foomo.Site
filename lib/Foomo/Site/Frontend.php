@@ -20,6 +20,7 @@
 namespace Foomo\Site;
 
 use Foomo\MVC\AbstractApp;
+use Foomo\Translation;
 
 /**
  * @link    www.foomo.org
@@ -44,4 +45,23 @@ class Frontend extends AbstractApp
 	 * @var Frontend\View
 	 */
 	public $view;
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @return \Foomo\Translation
+	 */
+	public function getTranslation()
+	{
+		static $translation;
+		if (is_null($translation)) {
+			$translation = Translation::getModuleTranslation(
+				Module::getRootModule(),
+				Module::getSiteConfig()->getClass('frontend')
+			);
+		}
+		return $translation;
+	}
 }
