@@ -20,9 +20,9 @@
 namespace Foomo\Site\Adapter\Neos;
 
 use Foomo\Media\Image;
-use Foomo\Site\Cache;
 use Foomo\Site\Adapter\Media;
 use Foomo\Site\Adapter\Neos;
+use Foomo\Site\Cache;
 use Foomo\Utils;
 
 /**
@@ -52,15 +52,44 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 		$this->addRoutes(
 			[
-				'/asset/:nodeId/:filename' => 'asset',
-				'/image/:type/:nodeId'      => 'image',
-				'/*'                        => 'error',
+				'/asset/:nodeId/:filename'   => 'asset',
+				'/image/:type/:nodeId/:time' => 'image',
+				'/image/:type/:nodeId'       => 'image',
+				'/*'                         => 'error',
 			]
 		);
 	}
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public route methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the route for handling assets
+	 *
+	 * @param string $nodeId
+	 * @param string $filename
+	 * @return string
+	 */
+	public static function getAssetUri($nodeId, $filename)
+	{
+		return static::getUri('/asset/' . $nodeId . '/' . $filename);
+	}
+
+	/**
+	 * Returns the route for handling images
+	 *
+	 * @param string $type
+	 * @param string $nodeId
+	 * @return string
+	 */
+	public static function getImageUri($type, $nodeId)
+	{
+		return static::getUri('/image/' . $type . '/' . $nodeId);
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
@@ -88,45 +117,18 @@ class SubRouter extends \Foomo\Site\SubRouter
 	 *
 	 * @param string $type
 	 * @param string $nodeId
+	 * @param string $time
 	 */
-	public function image($type, $nodeId)
+	public function image($type, $nodeId, $time = null)
 	{
 		$config = Neos::getAdapterConfig();
 		$url = $config->getPathUrl('image') . '/' . $nodeId;
-		$cacheFilename = Cache::getFilename($nodeId, $url, 'neos');
+		$cacheFilename = Cache::getFilename($nodeId, $url, 'neos', (int) $time);
 
 		if ($cacheFilename) {
 			Image\Server::serve($cacheFilename, 'neos', $type);
 		} else {
 			$this->error();
 		}
-	}
-
-	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the route for handling assets
-	 *
-	 * @param string $nodeId
-	 * @param string $filename
-	 * @return string
-	 */
-	public static function getAssetUri($nodeId, $filename)
-	{
-		return static::getUri('/asset/' . $nodeId . '/' . $filename);
-	}
-
-	/**
-	 * Returns the route for handling images
-	 *
-	 * @param string $type
-	 * @param string $nodeId
-	 * @return string
-	 */
-	public static function getImageUri($type, $nodeId)
-	{
-		return static::getUri('/image/' . $type . '/' . $nodeId);
 	}
 }

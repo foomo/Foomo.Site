@@ -39,6 +39,12 @@ class DomainConfig extends AbstractConfig
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * Canonical domain name
+	 *
+	 * @var string
+	 */
+	public $domain = 'http://www.mydomain.com';
+	/**
 	 * List of allowed regions and their languages
 	 * Note: The first region & language is used as the default
 	 *

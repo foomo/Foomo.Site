@@ -48,24 +48,6 @@ class Model
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @return Vo\Content\SiteContent
-	 */
-	public function getContent()
-	{
-		return $this->content;
-	}
-
-	/**
-	 * Returns the current content's handler id
-	 *
-	 * @return string
-	 */
-	public function getContentHandlerId()
-	{
-		return explode('/', $this->getContent()->handler)[0];
-	}
-
-	/**
 	 * @param bool $full
 	 * @return Vo\Content\Item[]
 	 */
@@ -82,12 +64,11 @@ class Model
 	}
 
 	/**
-	 * @param string $id
-	 * @return Vo\Content\Node
+	 * @return Vo\Content\SiteContent
 	 */
-	public function getContentNode($id)
+	public function getContent()
 	{
-		return $this->getContent()->nodes[$id];
+		return $this->content;
 	}
 
 	/**
@@ -98,6 +79,56 @@ class Model
 	{
 		$this->content = $content;
 		return $this;
+	}
+
+	/**
+	 * @param string $property
+	 * @param string $region
+	 * @param string $language
+	 * @return null|mixed
+	 */
+	public function getContentData($property, $region = null, $language = null)
+	{
+		$session = Site::getSession();
+
+		if (is_null($region)) {
+			$region = $session::getRegion();
+		}
+
+		if (is_null($language)) {
+			$language = $session::getLanguage();
+		}
+
+		if (
+			isset($this->getContent()->data->$region) &&
+			isset($this->getContent()->data->$region->$language) &&
+			isset($this->getContent()->data->$region->$language->$property)
+		) {
+			return $this->getContent()->data->$region->$language->$property;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * @param string $id
+	 * @return Vo\Content\Node
+	 */
+	public function getContentNode($id)
+	{
+		return $this->getContent()->nodes[$id];
+	}
+
+	/**
+	 * @return string
+	 * @throws Site\Exception\HTTPException
+	 */
+	public function getContentRendering()
+	{
+		if (is_null($this->contentRendering)) {
+			$this->renderContent();
+		}
+		return $this->contentRendering;
 	}
 
 	/**
@@ -137,14 +168,12 @@ class Model
 	}
 
 	/**
+	 * Returns the current content's handler id
+	 *
 	 * @return string
-	 * @throws Site\Exception\HTTPException
 	 */
-	public function getContentRendering()
+	public function getContentHandlerId()
 	{
-		if (is_null($this->contentRendering)) {
-			$this->renderContent();
-		}
-		return $this->contentRendering;
+		return explode('/', $this->getContent()->handler)[0];
 	}
 }

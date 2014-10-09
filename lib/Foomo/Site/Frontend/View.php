@@ -78,6 +78,7 @@ class View extends \Foomo\MVC\View
 	 */
 	public function render($variables = [])
 	{
+		# check if we are a partial or not
 		if ($this->partial == '') {
 			$this->renderHead(
 				HTMLDocument::getInstance(),

@@ -36,28 +36,29 @@ class Cache
 	 * @param string $nodeId Source node id
 	 * @param string $url    Source url
 	 * @param string $type   Source type
+	 * @param int    $time   Last modification timestamp
 	 * @return bool|string
 	 */
-	public static function getFilename($nodeId, $url, $type='files')
+	public static function getFilename($nodeId, $url, $type = 'files', $time = 0)
 	{
 		$module = Module::getRootModuleClass();
 		$filename = $module::getCacheDir($type) . DIRECTORY_SEPARATOR . $nodeId;
 
-
 		if (file_exists($filename)) {
-			# get file headers
-			$headers = get_headers($url, 1);
+
+			if ($time == 0) {
+				# get file headers
+				$headers = get_headers($url, 1);
+				if ($headers && strstr($headers[0], '200') !== false && isset($headers['Last-Modified'])) {
+					$dt = new \DateTime($headers['Last-Modified']);
+					$time = $dt->getTimestamp();
+				}
+			}
 
 			# check if file exists on the source
-			if ($headers && strstr($headers[0], '200') !== false && isset($headers['Last-Modified'])) {
-				$dt = new \DateTime($headers['Last-Modified']);
-				if ($dt->getTimestamp() > filemtime($filename)) {
-					return static::loadRemoteFile($url, $filename);
-				} else {
-					return $filename;
-				}
+			if ($time > filemtime($filename)) {
+				return static::loadRemoteFile($url, $filename);
 			} else {
-				// @todo: do we want to serve files that are not on the source?
 				return $filename;
 			}
 		} else {
