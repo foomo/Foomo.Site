@@ -172,23 +172,33 @@ class Client extends AbstractClient implements ClientInterface
 	 */
 	protected static function replaceImages($html)
 	{
-		$pattern = '/\<img' .
-			'([^\>]*)data-type="([^"]*)"' .
-			'([^\>]*)data-time="([^"]*)"' .
-			'([^\>]*)data-src="([^"]*)"' .
-			'([^\>]*)src="([^"]*)"' .
-			'([^\>]*)\>/';
-		$callback = function ($matches) {
-			$imageUri = Neos\SubRouter::getImageUri($matches[2], $matches[6]) . '/' . $matches[4];
-			return '<img' . $matches[1] . ' ' .
-				$matches[3] . ' ' .
-				$matches[5] .
-				' src="' . $imageUri .
-				'"' . $matches[7] .
-				$matches[9] .
-				'>';
-		};
-		return preg_replace_callback($pattern, $callback, $html);
+		$dom = new \DOMDocument;
+		# prevents html5 error outputs
+		@$dom->loadHTML($html);
+
+		/* @var $image \DOMElement */
+		foreach ($dom->getElementsByTagName("img") as $image) {
+			# get media server type
+			$type = $image->getAttribute('data-type');
+			$image->removeAttribute('data-type');
+			# get last modified timestamp
+			$time = $image->getAttribute('data-time');
+			$image->removeAttribute('data-time');
+			# get node id
+			$nodeId = $image->getAttribute('data-src');
+			$image->removeAttribute('data-src');
+			# remove dimensions
+			$image->removeAttribute('height');
+			$image->removeAttribute('width');
+			# get local uri
+			$uri = Neos\SubRouter::getImageUri($type, $nodeId);
+			if ($time) {
+				$uri .= '/' . $time;
+			}
+			$image->setAttribute('src', $uri);
+		}
+
+		return $dom->saveHTML();
 	}
 
 	/**
