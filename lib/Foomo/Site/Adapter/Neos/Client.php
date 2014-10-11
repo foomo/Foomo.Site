@@ -42,16 +42,72 @@ class Client extends AbstractClient implements ClientInterface
 	 */
 	public static function get($nodeId, $region, $language, $baseURL)
 	{
-		# load
-		$json = self::load($nodeId);
+		if (!empty($html = self::load($nodeId, ['region' => $region, 'language' => $language]))) {
+			$doc = self::getDOMDocument($html);
 
-		if (!empty($json)) {
-			$html = self::parse($json, $baseURL);
-			$html = self::replaceLinks($html, $region, $language);
-			$html = self::replaceImages($html);
-			return $html;
+			# replace apps
+			self::replaceApps($doc, $baseURL);
+
+			return $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
 		} else {
 			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
+		}
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Protected static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @param \DOMDocument $doc
+	 * @param string       $baseURL
+	 */
+	protected static function replaceApps(\DOMDocument $doc, $baseURL)
+	{
+		$oldNodes = [];
+		$newNodes = [];
+
+		# render apps and create nodes
+		foreach ($doc->getElementsByTagName('app') as $element) {
+			/* @var $element \DOMElement */
+			$appDoc = new \DOMDocument();
+
+			# get class name
+			$appClassName = $element->getAttribute('class');
+
+			# find & retrieve app data
+			$appData = (object) [];
+			foreach ($element->getElementsByTagName('script') as $script) {
+				/* @var $script \DOMElement */
+				if ($script->hasAttribute('rel') && $script->getAttribute('rel') == 'app-data') {
+					$appData = json_decode($script->textContent);
+					$script->parentNode->removeChild($script);
+					break;
+				}
+			}
+
+			# retrieve inner app html
+			$appData->html = self::getInnerHtml($doc, $element);
+
+			# render app
+			$appHtml = self::renderApp($appClassName, $appData, $baseURL);
+
+			$appDoc->loadHTML('<div>' . $appHtml . '</div>');
+			$appNode = $appDoc->getElementsByTagName('div')->item(0);
+			$appNode = $doc->importNode($appNode, true);
+
+			# add nodes
+			$oldNodes[] = $element;
+			$newNodes[] = $appNode;
+		}
+
+		# replace in dom
+		foreach ($oldNodes as $key => $oldNode) {
+			$fragment = $doc->createDocumentFragment();
+			while ($newNodes[$key]->childNodes->length > 0) {
+				$fragment->appendChild($newNodes[$key]->childNodes->item(0));
+			}
+			$oldNode->parentNode->replaceChild($fragment, $oldNode);
 		}
 	}
 
@@ -66,118 +122,24 @@ class Client extends AbstractClient implements ClientInterface
 	public static function cachedLoad($nodeId, $env)
 	{
 		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $nodeId;
-		return json_decode(file_get_contents($url));
+		$json = json_decode(file_get_contents($url));
+		$doc = self::getDOMDocument($json->html);
+
+		# replace images & links
+		self::replaceImages($doc);
+		self::replaceLinks($doc, $env['region'], $env['language']);
+
+		return $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
 	}
 
-	// --------------------------------------------------------------------------------------------
-	// ~ Protected static methods
-	// --------------------------------------------------------------------------------------------
-
 	/**
-	 * @param $json
-	 * @param $baseURL
+	 * @param \DOMDocument $doc
 	 * @return mixed
 	 */
-	protected static function parse($json, $baseURL)
+	protected static function replaceImages(\DOMDocument $doc)
 	{
-		$doc = new \DOMDocument();
-		libxml_use_internal_errors(true);
-		$doc->loadHTML('<?xml encoding="UTF-8">' . $json->html);
-		foreach (libxml_get_errors() as $xmlError) {
-			/* @var $xmlError \libXMLError */
-			if ($xmlError->code == 801 && strpos($xmlError->message, ' app ') !== false) {
-				continue;
-			} else {
-				$errorLevel = E_USER_NOTICE;
-				switch ($xmlError->level) {
-					case LIBXML_ERR_FATAL:
-						$errorLevel = E_USER_ERROR;
-						break;
-					case LIBXML_ERR_WARNING:
-					case LIBXML_ERR_ERROR:
-						$errorLevel = E_USER_WARNING;
-						break;
-				}
-				if ($errorLevel == E_USER_ERROR) {
-					// @todo: shouldn't we throw exceptions here too so we can handle it properly?
-					trigger_error("libxml threw up: " . var_export($xmlError, true) . ' for html ' . $json->html, $errorLevel);
-				}
-			}
-		}
-		libxml_clear_errors();
-		libxml_use_internal_errors(false);
-		$appElements = [];
-
-		$classNames = [];
-		foreach ($doc->getElementsByTagName('app') as $appEl) {
-			$appElements[] = $appEl;
-			$classNames[] = $appEl->getAttribute('data-foomo-app-class-name');
-		}
-
-		$appCounter = 0;
-		$appReplacements = [];
-
-		foreach ($appElements as $appEl) {
-			/* @var $appEl DOMElement */
-			$appDoc = new \DOMDocument();
-			$appData = json_decode($appEl->getElementsByTagName('script')->item(0)->textContent);
-			# render apps
-			$key = '<!-- replace-foomo-app-' . ($appCounter++) . ' -->';
-			$appReplacements[$key] = self::renderContentApp(
-				$appEl->getAttribute('data-foomo-app-class-name'),
-				$appData,
-				$baseURL
-			);
-			$appDoc->loadHTML('<?xml encoding="UTF-8"><div>' . $key . '</div>');
-			$appNode = $appDoc->getElementsByTagName('div')->item(0);
-			$appNode = $doc->importNode($appNode, true);
-			$appEl->parentNode->replaceChild($appNode, $appEl);
-		}
-
-		$html = str_replace(
-			array_keys($appReplacements),
-			array_values($appReplacements),
-			$doc->saveHTML($doc->getElementsByTagName('div')->item(0))
-		);
-		return $html;
-	}
-
-	/**
-	 * @param string $appClassName
-	 * @param mixed  $appData
-	 * @param string $baseURL
-	 *
-	 * @return string
-	 */
-	protected static function renderContentApp($appClassName, $appData, $baseURL)
-	{
-		$clientClassName = $appClassName;
-		$clientClassNameMVC = $clientClassName . '\\Frontend';
-		if (class_exists($clientClassName)) {
-			return call_user_func_array([$clientClassName, 'run'], [$appData, $baseURL]);
-		} else if (class_exists($clientClassNameMVC)) {
-			return call_user_func_array([$clientClassNameMVC, 'run'], [$appData, $baseURL]);
-		} else {
-			//@todo: run mode specific error handling and error triggering
-			trigger_error("Could not find app $appClassName", E_USER_WARNING);
-			return '<h1>No App found ' . $appClassName . ' =&gt; ' . $clientClassName . '</h1>';
-		}
-	}
-
-	/**
-	 * @todo: is there a way not to set full?
-	 *
-	 * @param string $html
-	 * @return mixed
-	 */
-	protected static function replaceImages($html)
-	{
-		$dom = new \DOMDocument;
-		# prevents html5 error outputs
-		@$dom->loadHTML($html);
-
 		/* @var $image \DOMElement */
-		foreach ($dom->getElementsByTagName("img") as $image) {
+		foreach ($doc->getElementsByTagName("img") as $image) {
 			# get media server type
 			$type = $image->getAttribute('data-type');
 			$image->removeAttribute('data-type');
@@ -197,44 +159,39 @@ class Client extends AbstractClient implements ClientInterface
 			}
 			$image->setAttribute('src', $uri);
 		}
-
-		return $dom->saveHTML();
 	}
 
 	/**
-	 * @param string $html
-	 * @param string $region
-	 * @param string $language
+	 * @param \DOMDocument $doc
+	 * @param string       $region
+	 * @param string       $language
 	 *
 	 * @return string
 	 */
-	protected static function replaceLinks($html, $region, $language)
+	protected static function replaceLinks(\DOMDocument $doc, $region, $language)
 	{
-		$prefix = 'neos';
-		$matches = array();
-		$pattern = '/href="' . $prefix .':\/\/([^"]+)"/i';
-		preg_match_all($pattern, $html, $matches);
-		$linkIdsToBeResolved = $matches[1];
+		$ids = [];
+		$elements = [];
 
-		$linkIdsToBeResolved = array_flip(array_flip($linkIdsToBeResolved));
-		//hot fix to erase array keys ... key gaps kill the content server ;)
-		sort($linkIdsToBeResolved);
-		if(count($linkIdsToBeResolved) > 0) {
-			$uris = Module::getSiteContentServerProxyConfig()->getProxy()->getURIs($region, $language, $linkIdsToBeResolved);
-			$search = array();
-			$replace = array();
-
-			foreach ($uris as $id => $uri) {
-				$search[] = $prefix . '://' . $id;
-				if (!empty($uri)) {
-					$replace[] = $uri;
-				} else {
-					$replace[] = '#';
-				}
+		# collect all ids
+		foreach ($doc->getElementsByTagName('a') as $element) {
+			/* @var $element \DOMElement */
+			$href = $element->getAttribute('href');
+			if (substr($href, 0, 7) == 'neos://') {
+				$ids = array_unique(array_merge($ids, [substr($href, 7)]));
+				$elements[] = $element;
 			}
-			$html = str_replace($search, $replace, $html);
 		}
 
-		return $html;
+		if (!empty($ids)) {
+			# retrieve uris
+			$uris = Module::getSiteContentServerProxyConfig()->getProxy()->getURIs($region, $language, $ids);
+
+			# replace hrefs
+			foreach ($elements as $element) {
+				$href = $element->getAttribute('href');
+				$element->setAttribute('href', $uris->{substr($href, 7)});
+			}
+		}
 	}
 }

@@ -21,6 +21,7 @@ namespace Foomo\Site\Adapter;
 
 use Foomo\Cache;
 use Foomo\Site\Adapter\Neos;
+use Foomo\Site\Exception\HTTPException;
 
 /**
  * @link    www.foomo.org
@@ -43,5 +44,69 @@ abstract class AbstractClient
 	protected static function load($nodeId, $env = [])
 	{
 		return Cache\Proxy::call(get_called_class(), 'cachedLoad', [$nodeId, $env]);
+	}
+
+	/**
+	 * @param string $html
+	 * @return \DOMDocument
+	 * @throws HTTPException
+	 */
+	protected static function getDOMDocument($html)
+	{
+		$doc = new \DOMDocument();
+		libxml_use_internal_errors(true);
+		$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+		/* @var $xmlError \libXMLError */
+		foreach (libxml_get_errors() as $xmlError) {
+			if (
+				$xmlError->level == LIBXML_ERR_ERROR &&
+				!in_array(
+					$xmlError->code,
+					[
+						801, // XML_HTML_UNKNOWN_TAG
+						68, // XML_HTML_UNKNOWN_TAG
+					]
+				)
+			) {
+				throw new HTTPException(500, $xmlError->message);
+			}
+		}
+		libxml_clear_errors();
+		libxml_use_internal_errors(false);
+		return $doc;
+	}
+
+	/**
+	 * @param string $className
+	 * @param mixed  $data
+	 * @param string $baseURL
+	 * @return string
+	 */
+	protected static function renderApp($className, $data, $baseURL)
+	{
+		$classes = [
+			$className,
+			$className . '\\Frontend',
+		];
+		foreach ($classes as $class) {
+			if (class_exists($class)) {
+				return call_user_func_array([$class, 'run'], [$data, $baseURL]);
+			}
+		}
+		return '<pre>No App found for: ' . $className . '</pre>';
+	}
+
+	/**
+	 * @param \DOMDocument $doc
+	 * @param \DOMNode     $node
+	 * @return string
+	 */
+	protected static function getInnerHtml(\DOMDocument $doc, \DOMNode $node)
+	{
+		$html = '';
+		foreach ($node->childNodes as $childNode) {
+			$html .= $doc->saveHTML($childNode);
+		}
+		return $html;
 	}
 }
