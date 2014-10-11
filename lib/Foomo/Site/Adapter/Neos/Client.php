@@ -76,11 +76,11 @@ class Client extends AbstractClient implements ClientInterface
 			$appClassName = $element->getAttribute('class');
 
 			# find & retrieve app data
-			$appData = (object) [];
+			$appData = new \stdClass();
 			foreach ($element->getElementsByTagName('script') as $script) {
 				/* @var $script \DOMElement */
 				if ($script->hasAttribute('rel') && $script->getAttribute('rel') == 'app-data') {
-					$appData = json_decode($script->textContent);
+					$appData = (object) json_decode($script->textContent);
 					$script->parentNode->removeChild($script);
 					break;
 				}
