@@ -116,7 +116,11 @@ class Model
 	 */
 	public function getContentNode($id)
 	{
-		return $this->getContent()->nodes[$id];
+		if (is_array($this->getContent()->nodes)) {
+			return $this->getContent()->nodes[$id];
+		} else {
+			return $this->getContent()->nodes->{$id};
+		}
 	}
 
 	/**
