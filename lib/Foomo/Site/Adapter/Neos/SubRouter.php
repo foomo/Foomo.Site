@@ -112,7 +112,6 @@ class SubRouter extends \Foomo\Site\SubRouter
 	}
 
 	/**
-	 * @todo: is there a way not to hardcode 'neos'?
 	 * Serve responsive images
 	 *
 	 * @param string $type
