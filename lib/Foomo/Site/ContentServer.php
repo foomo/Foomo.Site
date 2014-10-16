@@ -20,7 +20,7 @@
 namespace Foomo\Site;
 
 use Foomo\ContentServer\Vo\Content\RepoNode;
-use Foomo\SimpleData\VoMapper;
+use Foomo\Site\ContentServer\NodeIterator;
 use Foomo\Site;
 
 /**
@@ -66,13 +66,7 @@ class ContentServer implements ContentServerInterface
 	 */
 	protected static function getRepoNode($url)
 	{
-		$rawNodes = json_decode(file_get_contents($url));
-		$nodes = [];
-		foreach ($rawNodes as $dimension => $rawNode) {
-			$nodes[$dimension] = VoMapper::map($rawNode, new RepoNode);
-		}
-		/* @var $repoNode RepoNode */
-		return $nodes;
+		return json_decode(file_get_contents($url));
 	}
 
 	/**
@@ -81,11 +75,11 @@ class ContentServer implements ContentServerInterface
 	 * @param string   $dimension
 	 * @param RepoNode $repoNode
 	 */
-	protected static function iterateNode($dimension, RepoNode $repoNode)
+	protected static function iterateNode($dimension, $repoNode)
 	{
 		static::validateNode($dimension, $repoNode);
 		# iterate child nodes
-		foreach ($repoNode as $childRepoNode) {
+		foreach (NodeIterator::getIterator($repoNode) as $childRepoNode) {
 			static::iterateNode($dimension, $childRepoNode);
 		}
 	}

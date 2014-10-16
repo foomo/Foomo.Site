@@ -62,7 +62,7 @@ class DomainConfig extends AbstractConfig
 	 * @var \Foomo\Site\SubRouter[]
 	 */
 	public $subRouters = [
-		'Foomo\\Site\\Adapter\\MyAdapter\\SubRouter'
+		'Foomo\\Site\\Adapter\\Neos\\SubRouter'
 	];
 	/**
 	 * List of classes
@@ -70,7 +70,7 @@ class DomainConfig extends AbstractConfig
 	 * @var string[]
 	 */
 	public $classes = [
-		'client' => 'Foomo\\Site\\Adapter\\MyAdapter\\Client'
+		'client' => 'Foomo\\Site\\Adapter\\Neos\\Client'
 	];
 
 	// --------------------------------------------------------------------------------------------

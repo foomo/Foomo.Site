@@ -35,8 +35,6 @@ class Neos extends AbstractBase
 
 	/**
 	 * @inheritdoc
-	 *
-	 * @return string
 	 */
 	public static function getName()
 	{
