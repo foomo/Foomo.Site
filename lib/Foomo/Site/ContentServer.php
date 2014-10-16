@@ -62,7 +62,7 @@ class ContentServer implements ContentServerInterface
 	 * Return the repo node from a remote server
 	 *
 	 * @param string $url
-	 * @return RepoNode[]
+	 * @return mixed
 	 */
 	protected static function getRepoNode($url)
 	{
@@ -73,7 +73,7 @@ class ContentServer implements ContentServerInterface
 	 * Iterates over the repo node
 	 *
 	 * @param string   $dimension
-	 * @param RepoNode $repoNode
+	 * @param mixed $repoNode
 	 */
 	protected static function iterateNode($dimension, $repoNode)
 	{
@@ -87,8 +87,8 @@ class ContentServer implements ContentServerInterface
 	/**
 	 * Validate and modify the node
 	 *
-	 * @param $dimension
-	 * @param $repoNode
+	 * @param string $dimension
+	 * @param mixed $repoNode
 	 */
 	protected static function validateNode($dimension, $repoNode)
 	{
