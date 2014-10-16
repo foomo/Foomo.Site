@@ -19,7 +19,7 @@ $buttons = [
 					[
 						'url'        => $action,
 						'name'       => $name,
-						'parameters' => [$model->region, $model->language],
+						'parameters' => [$model->dimension],
 					],
 					'Foomo\\Frontend'
 				); ?>

@@ -40,9 +40,9 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function get($nodeId, $region, $language, $baseURL)
+	public static function get($dimension, $nodeId, $baseURL)
 	{
-		if (!empty($html = self::load($nodeId, ['region' => $region, 'language' => $language]))) {
+		if (!empty($html = self::load($dimension, $nodeId))) {
 			$doc = self::getDOMDocument($html);
 
 			# replace apps
@@ -115,19 +115,19 @@ class Client extends AbstractClient implements ClientInterface
 	 * @internal
 	 * @Foomo\Cache\CacheResourceDescription
 	 *
-	 * @param string   $nodeId
-	 * @param string[] $env
+	 * @param string $dimension
+	 * @param string $nodeId
 	 * @return string
 	 */
-	public static function cachedLoad($nodeId, $env)
+	public static function cachedLoad($dimension, $nodeId)
 	{
-		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $nodeId;
+		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
 		$json = json_decode(file_get_contents($url));
 		$doc = self::getDOMDocument($json->html);
 
 		# replace images & links
 		self::replaceImages($doc);
-		self::replaceLinks($doc, $env['region'], $env['language']);
+		self::replaceLinks($dimension, $doc);
 
 		return $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
 	}
@@ -162,13 +162,12 @@ class Client extends AbstractClient implements ClientInterface
 	}
 
 	/**
+	 * @param string       $dimension
 	 * @param \DOMDocument $doc
-	 * @param string       $region
-	 * @param string       $language
 	 *
 	 * @return string
 	 */
-	protected static function replaceLinks(\DOMDocument $doc, $region, $language)
+	protected static function replaceLinks($dimension, \DOMDocument $doc)
 	{
 		$ids = [];
 		$elements = [];
@@ -185,7 +184,7 @@ class Client extends AbstractClient implements ClientInterface
 
 		if (!empty($ids)) {
 			# retrieve uris
-			$uris = Module::getSiteContentServerProxyConfig()->getProxy()->getURIs($region, $language, $ids);
+			$uris = Module::getSiteContentServerProxyConfig()->getProxy()->getURIs($dimension, $ids);
 
 			# replace hrefs
 			foreach ($elements as $element) {

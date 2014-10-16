@@ -17,54 +17,43 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site;
+namespace Foomo\Site\Env;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-interface AdapterInterface
+trait DataTrait
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Variables
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Return the name of the adapter i.e. `neos`
-	 *
-	 * @return string
+	 * @var mixed
 	 */
-	static function getName();
+	protected $data = [];
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public methods
+	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns list of resources required for the root module
-	 *
-	 * @return \Foomo\Modules\Resource[]
+	 * @param string $key
+	 * @return mixed
 	 */
-	static function getModuleResources();
+	public static function getData($key)
+	{
+		return self::getInstance()->data[$key];
+	}
 
 	/**
-	 * Returns the adapters domain config
-	 *
-	 * @return \Foomo\Site\Adapter\DomainConfig
+	 * @param string $key
+	 * @param mixed $value
 	 */
-	static function getAdapterConfig();
-
-	/**
-	 * Returns list of sub routes
-	 *
-	 * @return \Foomo\Site\Adapter\Neos\SubRouter[]
-	 */
-	static function getSubRoutes();
-
-	/**
-	 * Returns a node's content from the remote content server
-	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @param string $baseURL
-	 * @return string
-	 */
-	static function getContent($dimension, $nodeId, $baseURL);
+	public static function setData($key, $value)
+	{
+		self::getInstance(true)->data[$key] = $value;
+	}
 }

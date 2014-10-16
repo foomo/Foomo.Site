@@ -24,54 +24,16 @@ namespace Foomo\Site;
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-interface SessionInterface
+interface EnvInterface
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Start session
+	 * Start env
 	 */
 	static function boot();
-
-	/**
-	 * Current language i.e. `en`
-	 *
-	 * @return string
-	 */
-	static function getLanguage();
-
-	/**
-	 * Current region i.e. `us`
-	 *
-	 * @return string
-	 */
-	static function getRegion();
-
-	/**
-	 * @param string $region
-	 */
-	static function setRegion($region);
-
-	/**
-	 * Current locale i.e. `en_US`
-	 *
-	 * @return string
-	 */
-	static function getLocale();
-
-	/**
-	 * @param string $language
-	 */
-	static function setLanguage($language);
-
-	/**
-	 * @param string $region
-	 * @param string $language
-	 * @return string
-	 */
-	static function setLocale($region, $language);
 
 	/**
 	 * Current groups i.e. `['www', 'registered']`
@@ -79,11 +41,4 @@ interface SessionInterface
 	 * @return string[]
 	 */
 	static function getGroups();
-
-	/**
-	 * Current state i.e. `debug`
-	 *
-	 * @return string
-	 */
-	static function getState();
 }

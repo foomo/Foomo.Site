@@ -19,8 +19,8 @@
 
 namespace Foomo\Site\ContentServer;
 
-use Foomo\Site;
 use Foomo\ContentServer\Vo;
+use Foomo\Site;
 
 /**
  * @link    www.foomo.org
@@ -36,27 +36,21 @@ class Client
 	/**
 	 * Returns content from the configured content server
 	 *
-	 * @param string $uri
+	 * @param string   $uri
+	 * @param string[] $dimensions
+	 * @param array    $data
 	 * @return Vo\Content\SiteContent
 	 */
-	public static function getContent($uri)
+	public static function getContent($uri, array $dimensions, array $data = [])
 	{
+		$env = Site::getEnv();
 		$config = Site::getConfig();
-		$session = Site::getSession();
 
 		# create request env
-		$env = Vo\Requests\Content\Env::create(
-		# default env
-			Vo\Requests\Content\Env\Defaults::create(
-				$session::getRegion(),
-				$session::getLanguage()
-			),
-			$session::getGroups()
-		);
-		$env->state = $session::getState();
+		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups(), $data);
 
 		# create request
-		$request = Vo\Requests\Content::create($uri, $env);
+		$request = Vo\Requests\Content::create($uri, $contentEnv);
 
 		# append request nodes
 		foreach ($config->navigations as $id => $navigation) {

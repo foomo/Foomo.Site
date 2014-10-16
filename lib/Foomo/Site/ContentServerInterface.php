@@ -17,36 +17,19 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Adapter;
+namespace Foomo\Site;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-interface ClientInterface
+interface ContentServerInterface
 {
-	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
-	// --------------------------------------------------------------------------------------------
-
 	/**
-	 * Return content from the remote server
+	 * Export repo node for this site
 	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @param string $baseURL
-	 * @return string
+	 * @return bool|mixed
 	 */
-	static function get($dimension, $nodeId, $baseURL);
-
-	/**
-	 * @internal
-	 * @Foomo\Cache\CacheResourceDescription
-	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @return string
-	 */
-	static function cachedLoad($dimension, $nodeId);
+	static function export();
 }

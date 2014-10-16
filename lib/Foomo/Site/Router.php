@@ -76,9 +76,7 @@ class Router extends \Foomo\Router
 	 */
 	public function site()
 	{
-		$url = parse_url($_SERVER['REQUEST_URI']);
-		$locale = \Foomo\Site\Utils\Uri::parseLocale($url["path"]);
-		return \Foomo\MVC::run(\Foomo\Site::getFrontend(), $locale['path']);
+		return \Foomo\MVC::run(\Foomo\Site::getFrontend());
 	}
 
 	/**
@@ -93,55 +91,5 @@ class Router extends \Foomo\Router
 			echo 'Disallow: /' . PHP_EOL;
 		}
 		exit;
-	}
-
-	// --------------------------------------------------------------------------------------------
-	// ~ Protected methods
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * Checks for locale pattern like:
-	 *
-	 * /ch-fr/
-	 * /ch-fr
-	 * /ch/
-	 * /ch
-	 * /
-	 *
-	 * @param string $path
-	 * @return string
-	 */
-	protected function parseLocale($path)
-	{
-		$baseUrl = '';
-		$region = false;
-		$language = false;
-
-		$config = Site::getConfig();
-		$session = Site::getSession();
-
-		# parse locale
-		if (preg_match('/^\/(?P<region>[a-z]{2})-(?P<language>[a-z]{2})(\/|$)/', $path, $matches)) {
-			$region = $matches['region'];
-			$language = $matches['language'];
-			$baseUrl = substr($path, 0, 6);
-		} else if (preg_match('/^\/(?P<region>[a-z]{2})(\/|$)/', $path, $matches)) {
-			$region = $matches['region'];
-			$baseUrl = substr($path, 0, 3);
-		}
-
-		# validate locale and update session
-		if ($region && $config->isValidRegion($region)) {
-			if ($language && $config->isValidLanguage($region, $language)) {
-				$session::setLocale($region, $language);
-				return $baseUrl;
-			} else {
-				$session::setRegion($region);
-				return $baseUrl;
-			}
-		}
-
-		# invalid data so return the whole path
-		return $path;
 	}
 }

@@ -53,6 +53,27 @@ class View extends \Foomo\MVC\View
 	}
 
 	/**
+	 * Returns the current layout name
+	 *
+	 * @return string
+	 */
+	public function getLayoutPartial()
+	{
+		return 'layout/' . ((null != $layout = $this->model->getContentData('layout')) ? $layout : 'default');
+	}
+
+	/**
+	 * Note: requires the mime type to look like: 'application/neos+page'
+	 *
+	 * @return string
+	 */
+	public function getContentPartial()
+	{
+		$type = explode('+', explode('/', $this->model->getContent()->mimeType)[1]);
+		return $type[0] . DIRECTORY_SEPARATOR . $type[1];
+	}
+
+	/**
 	 * Returns a partial with the given partial data i.e.
 	 *
 	 * $partial = 'my/partial';
@@ -73,8 +94,7 @@ class View extends \Foomo\MVC\View
 	}
 
 	/**
-	 * @param array $variables
-	 * @return string
+	 * @inheritdoc
 	 */
 	public function render($variables = [])
 	{

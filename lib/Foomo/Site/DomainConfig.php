@@ -22,6 +22,9 @@ namespace Foomo\Site;
 use Foomo\Config\AbstractConfig;
 
 /**
+ * Foomo site is based on the concept of dimension.
+ * Build into dimensions are 'languages' & 'regions'.
+ *
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
@@ -48,11 +51,10 @@ class DomainConfig extends AbstractConfig
 	 * List of allowed regions and their languages
 	 * Note: The first region & language is used as the default
 	 *
-	 * @var array[string][string]
+	 * @var array string[string][string]
 	 */
-	public $locales = [
-		'de' => ['de'],
-		'eu' => ['en', 'de']
+	public $dimensions = [
+		'en_US' => [],
 	];
 	/**
 	 * List of allowed groups
@@ -60,12 +62,6 @@ class DomainConfig extends AbstractConfig
 	 * @var string[]
 	 */
 	public $groups = [];
-	/**
-	 * List of allowed states
-	 *
-	 * @var string[]
-	 */
-	public $states = [];
 	/**
 	 * Map of nodeIds
 	 *
@@ -80,7 +76,7 @@ class DomainConfig extends AbstractConfig
 	/**
 	 * Map of navigation request
 	 *
-	 * @var array
+	 * @var array string[string][mixed]
 	 */
 	public $navigations = [
 		'main'   => [
@@ -122,9 +118,10 @@ class DomainConfig extends AbstractConfig
 	 * @var array
 	 */
 	public $classes = [
-		"router"   => "\\Foomo\\Site\\Router",
-		"session"  => "\\Foomo\\Site\\Session",
-		"frontend" => "\\Foomo\\Site\\Frontend",
+		"env"           => "\\Foomo\\Site\\Env",
+		"router"        => "\\Foomo\\Site\\Router",
+		"frontend"      => "\\Foomo\\Site\\Frontend",
+		"contentServer" => "\\Foomo\\Site\\ContentServer",
 	];
 	/**
 	 * List of enabled sub router classes
@@ -138,71 +135,116 @@ class DomainConfig extends AbstractConfig
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns list of configures regions
+	 * Returns configured dimension keys
 	 *
 	 * @return string[]
 	 */
-	public function getRegions()
+	public function getDimensionIds()
 	{
-		return array_keys($this->locales);
+		return array_keys($this->dimensions);
 	}
 
 	/**
-	 * Returns list of configures languages for the given region
+	 * Returns property value for a given dimension
 	 *
-	 * @param string $region
+	 * @param string $dimensionId
+	 * @param string $property
+	 * @return string|null
+	 */
+	public function getDimensionValue($dimensionId, $property)
+	{
+		if (!$this->isValidDimension($dimensionId)) {
+			trigger_error("Dimension '$dimensionId' does not exist!", E_USER_ERROR);
+		}
+		return (isset($this->getDimension($dimensionId)[$property])) ? $this->getDimension($dimensionId)[$property] : null;
+	}
+
+	/**
+	 * Validates value against the configuration
+	 *
+	 * @param string $dimensionId
+	 * @return bool
+	 */
+	public function isValidDimension($dimensionId)
+	{
+		return array_key_exists($dimensionId, $this->dimensions);
+	}
+
+	/**
+	 * @param string $dimensionId
+	 * @return array
+	 */
+	public function getDimension($dimensionId)
+	{
+		if (!$this->isValidDimension($dimensionId)) {
+			trigger_error("Dimension '$dimensionId' does not exist!", E_USER_ERROR);
+		}
+		return $this->dimensions[$dimensionId];
+	}
+
+	/**
+	 * Returns all dimensions containing the given value
+	 *
+	 * @param string $property
+	 * @param string $value
+	 * @return array
+	 */
+	public function findDimensionsWithValue($property, $value)
+	{
+		return $this->findDimensionsWithValues([$property => $value]);
+	}
+
+	/**
+	 * Return whether a dimension exists with the given values
+	 *
+	 * @param array $values
+	 * @return array
+	 */
+	public function findDimensionsWithValues(array $values)
+	{
+		$ret = [];
+		foreach ($this->dimensions as $dimensionId => $dimension) {
+			$hasValues = true;
+			foreach ($values as $property => $value) {
+				if (!isset($dimension[$property]) || $dimension[$property] != $value) {
+					$hasValues = false;
+					break;
+				}
+			}
+			if ($hasValues) {
+				$ret[$dimensionId] = $dimension;
+			}
+		}
+		return $ret;
+	}
+
+	/**
+	 * Returns all dimension values for the given property
+	 *
+	 * @param string $property
+	 * @return array
+	 */
+	public function getAllDimensionValues($property)
+	{
+		$ret = [];
+		foreach ($this->dimensions as $id => $dimension) {
+			$ret[$id] = (array_key_exists($property, $dimension)) ? $dimension[$property] : null;
+		}
+		return $ret;
+	}
+
+	/**
+	 * Return all dimension properties
+	 *
 	 * @return string[]
 	 */
-	public function getLanguages($region)
+	public function getAllDimensionProperties()
 	{
-		if (!$this->isValidRegion($region)) {
-			trigger_error("Invalid region: '$region'", E_USER_ERROR);
+		$ret = [];
+		foreach ($this->dimensions as $dimension) {
+			$ret = array_unique(array_merge($ret, array_keys($dimension)));
 		}
-		return $this->locales[$region];
-	}
-
-	/**
-	 * Returns first configured region
-	 *
-	 * @return string
-	 */
-	public function getDefaultRegion()
-	{
-		return $this->getRegions()[0];
-	}
-
-	/**
-	 * Returns first configured region's language
-	 *
-	 * @param string $region
-	 * @return string
-	 */
-	public function getDefaultLanguage($region = null)
-	{
-		if (is_null($region)) {
-			$region = $this->getDefaultRegion();
-		}
-		if (!$this->isValidRegion($region)) {
-			trigger_error("Invalid region: '$region'", E_USER_ERROR);
-		}
-		return $this->locales[$region][0];
-	}
-
-	/**
-	 * Returns first configured locale
-	 *
-	 * @param string $region
-	 * @return string
-	 */
-	public function getDefaultLocale($region = null)
-	{
-		if (is_null($region)) {
-			$region = $this->getDefaultRegion();
-		}
-		if (!$this->isValidRegion($region)) {
-			trigger_error("Invalid region: '$region'", E_USER_ERROR);
-		}
-		return $region . '_' . strtoupper($this->getDefaultLanguage($region));
+		return $ret;
 	}
 
 	/**
@@ -226,7 +268,7 @@ class DomainConfig extends AbstractConfig
 	public function getNavigation($id)
 	{
 		if (!isset($this->navigations[$id])) {
-			trigger_error("NavigationId '$id'' does not exist!", E_USER_ERROR);
+			trigger_error("NavigationId '$id' does not exist!", E_USER_ERROR);
 		}
 		return $this->navigations[$id];
 	}
@@ -238,7 +280,7 @@ class DomainConfig extends AbstractConfig
 	public function getEmail($id)
 	{
 		if (!isset($this->emails[$id])) {
-			trigger_error("Email '$id'' does not exist!", E_USER_ERROR);
+			trigger_error("Email '$id' does not exist!", E_USER_ERROR);
 		}
 		return $this->emails[$id];
 	}
@@ -250,43 +292,9 @@ class DomainConfig extends AbstractConfig
 	public function getClass($id)
 	{
 		if (!isset($this->classes[$id])) {
-			trigger_error("Class '$id'' does not exist!", E_USER_ERROR);
+			trigger_error("Class '$id' does not exist!", E_USER_ERROR);
 		}
 		return $this->classes[$id];
-	}
-
-	/**
-	 * Validates value against the configuration
-	 *
-	 * @param string $region
-	 * @return bool
-	 */
-	public function isValidRegion($region)
-	{
-		return (isset($this->locales[$region]));
-	}
-
-	/**
-	 * Validates value against the configuration
-	 *
-	 * @param string $region
-	 * @param string $language
-	 * @return bool
-	 */
-	public function isValidLanguage($region, $language)
-	{
-		return in_array($language, $this->locales[$region]);
-	}
-
-	/**
-	 * Validates value against the configuration
-	 *
-	 * @param string $state
-	 * @return bool
-	 */
-	public function isValidState($state)
-	{
-		return in_array($state, $this->states);
 	}
 
 	/**

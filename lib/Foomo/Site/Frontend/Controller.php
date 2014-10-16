@@ -45,21 +45,32 @@ class Controller
 	/**
 	 * Simple default action handler
 	 *
+	 * @todo check if applications can resolve the url
+	 *
 	 * @throws Site\Exception\HTTPException
 	 */
 	public function actionDefault()
 	{
+		$config = Site::getConfig();
 		$url = parse_url($_SERVER['REQUEST_URI']);
-		$content = Site\ContentServer\Client::getContent($url["path"]);
+
+		# retrieve the content
+		$content = Site\ContentServer\Client::getContent($url['path'], array_reverse($config->getDimensionIds()));
 
 		# set content
 		$this->model->setContent($content);
 
-		# handle status
-		if ($content->status == Vo\Content\SiteContent::STATUS_OK) {
-			$this->model->renderContent();
-		} else {
+		# validate status
+		if ($content->status != Vo\Content\SiteContent::STATUS_OK) {
 			throw new Site\Exception\HTTPException($content->status, 'Content server client result not OK!');
 		}
+
+		# validate path
+		if ($this->model->getContent()->URI != $url['path']) {
+			throw new Site\Exception\HTTPException(404, 'Content not found!');
+		}
+
+		# render the content
+		$this->model->renderContent();
 	}
 }

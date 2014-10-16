@@ -20,8 +20,6 @@
 namespace Foomo\Site\Toolbox\ContentServer\Frontend;
 
 use Foomo\ContentServer\Vo\Content\RepoNode;
-use Foomo\Cache\Persistence\Expr;
-use Foomo\Cache\Manager;
 use Foomo\Site;
 
 /**
@@ -38,44 +36,33 @@ class Model
 	/**
 	 * @var string
 	 */
-	public $region;
+	public $dimension;
 	/**
-	 * @var string
+	 * @var RepoNode
 	 */
-	public $language;
+	public $repoNode;
+	/**
+	 * @var RepoNode[]
+	 */
+	public $repoNodes;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @param string $region
-	 * @param string $language
+	 * @param string $dimension
 	 * @return $this
 	 */
-	public function setLocale($region, $language)
+	public function setDimension($dimension = null)
 	{
-		$config = Site::getConfig();
-
-		if (is_null($region) || !$config->isValidRegion($region)) {
-			$region = $config->getDefaultRegion();
+		$this->repoNodes = \Foomo\Site\Module::getSiteContentServerProxyConfig()->getProxy()->getRepo();
+		if (is_null($dimension) || !isset($this->repoNodes->$dimension)) {
+			$this->dimension = array_keys(get_object_vars($this->repoNodes))[0];
+		} else {
+			$this->dimension = $dimension;
 		}
-
-		if (is_null($language) || !$config->isValidLanguage($region, $language)) {
-			$language = $config->getDefaultLanguage($region);
-		}
-
-		$this->region = $region;
-		$this->language = $language;
-
+		$this->repoNode = $this->repoNodes->{$this->dimension};
 		return $this;
-	}
-
-	/**
-	 * @return RepoNode
-	 */
-	public function getRepoNode()
-	{
-		return \Foomo\Site\Module::getSiteContentServerProxyConfig()->getProxy()->getRepo();
 	}
 }

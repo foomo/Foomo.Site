@@ -82,35 +82,23 @@ class Model
 	}
 
 	/**
+	 * Returns a site content data property
+	 *
 	 * @param string $property
-	 * @param string $region
-	 * @param string $language
 	 * @return null|mixed
 	 */
-	public function getContentData($property, $region = null, $language = null)
+	public function getContentData($property)
 	{
-		$session = Site::getSession();
-
-		if (is_null($region)) {
-			$region = $session::getRegion();
-		}
-
-		if (is_null($language)) {
-			$language = $session::getLanguage();
-		}
-
-		if (
-			isset($this->getContent()->data->$region) &&
-			isset($this->getContent()->data->$region->$language) &&
-			isset($this->getContent()->data->$region->$language->$property)
-		) {
-			return $this->getContent()->data->$region->$language->$property;
+		if (isset($this->getContent()->data->$property)) {
+			return $this->getContent()->data->$property;
 		} else {
 			return null;
 		}
 	}
 
 	/**
+	 * Returns a site content node
+	 *
 	 * @param string $id
 	 * @return Vo\Content\Node
 	 */
@@ -120,6 +108,8 @@ class Model
 	}
 
 	/**
+	 * Returns the site content rendering
+	 *
 	 * @return string
 	 * @throws Site\Exception\HTTPException
 	 */
@@ -139,23 +129,14 @@ class Model
 	 */
 	public function renderContent()
 	{
-		$session = Site::getSession();
+		$env = Site::getEnv();
 
-		# retrieve adapter for current content
-		$handlerId = $this->getContentHandlerId();
-
-		$adapter = Site::getAdapter($handlerId);
-
-		if ($adapter === false) {
-			throw new Site\Exception\HTTPException(500, "Unknown content handler: $handlerId");
-		}
+		$adapter = $this->getContentAdapter();
 
 		# get content
-		// @todo: what about groups & state!?
 		$rendering = $adapter::getContent(
+			$this->getContent()->dimension,
 			$this->getContent()->item->id,
-			$session::getRegion(),
-			$session::getLanguage(),
 			$this->getContent()->URI
 		);
 
@@ -168,12 +149,22 @@ class Model
 	}
 
 	/**
-	 * Returns the current content's handler id
+	 * Returns the current content's adapter from it's mimeType
+	 * Note: requires the mime type to look like: 'application/neos+page'
 	 *
-	 * @return string
+	 * @return bool|Site\AdapterInterface
+	 * @throws Site\Exception\HTTPException
 	 */
-	public function getContentHandlerId()
+	public function getContentAdapter()
 	{
-		return explode('/', $this->getContent()->handler)[0];
+		$adapterId = explode('+', explode('/', $this->getContent()->mimeType)[1])[0];
+
+		$adapter = Site::getAdapter($adapterId);
+
+		if ($adapter === false) {
+			throw new Site\Exception\HTTPException(500, "Unknown content adapter for mimeType: $adapterId");
+		}
+
+		return $adapter;
 	}
 }

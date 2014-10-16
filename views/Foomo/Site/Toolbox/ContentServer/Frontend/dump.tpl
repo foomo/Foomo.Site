@@ -13,7 +13,7 @@
   <div class="greyBox">
     <?
 
-    $geshi = new GeSHi(json_encode($model->getRepoNode(), JSON_PRETTY_PRINT), 'Javascript');
+    $geshi = new GeSHi(json_encode($model->repoNode, JSON_PRETTY_PRINT), 'Javascript');
     echo $geshi->parse_code();
     ?>
   </div>

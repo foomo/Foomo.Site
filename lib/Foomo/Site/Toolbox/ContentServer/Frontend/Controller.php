@@ -43,35 +43,31 @@ class Controller
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @param string $region
-	 * @param string $language
+	 * @param string $dimension
 	 */
-	public function actionDefault($region = null, $language = null)
+	public function actionDefault($dimension = null)
 	{
-		$this->model->setLocale($region, $language);
+		$this->model->setDimension($dimension);
 	}
 
 	/**
-	 *
-	 * @param string $region
-	 * @param string $language
+	 * @param string $dimension
 	 */
-	public function actionDump($region = null, $language = null)
+	public function actionDump($dimension = null)
 	{
-		$this->model->setLocale($region, $language);
+		$this->model->setDimension($dimension);
 	}
 
 	/**
-	 * Update
-	 *
-	 * @param string $region
-	 * @param string $language
+	 * @param string $action
+	 * @param string $dimension
 	 */
-	public function actionUpdate($region = null, $language = null)
+	public function actionUpdate($action, $dimension = null)
 	{
 		$result = Module::getSiteContentServerProxyConfig()->getProxy()->update();
+
 		if ($result->success) {
-			MVC::redirect('default', [$region, $language]);
+			MVC::redirect($action, [$dimension]);
 		} else {
 			MVC::abort();
 			var_dump($result);

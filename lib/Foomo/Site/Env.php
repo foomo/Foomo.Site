@@ -19,35 +19,21 @@
 
 namespace Foomo\Site;
 
-use Foomo\Translation;
-
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-class Session implements SessionInterface
+class Env implements EnvInterface
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Variables
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @var string
-	 */
-	private $region;
-	/**
-	 * @var string
-	 */
-	private $language;
-	/**
 	 * @var string[]
 	 */
 	private $groups = [];
-	/**
-	 * @var string
-	 */
-	private $state;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Constructor
@@ -58,10 +44,6 @@ class Session implements SessionInterface
 	 */
 	public function __construct()
 	{
-		# set default values
-		$config = Module::getSiteConfig();
-		$this->region = $config->getDefaultRegion();
-		$this->language = $config->getDefaultLanguage();
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -74,83 +56,7 @@ class Session implements SessionInterface
 	public static function boot()
 	{
 		static::getInstance();
-		static::updateLocaleChain();
-	}
-
-	/**
-	 * @inheritdoc
-	 *
-	 * @return string
-	 */
-	public static function getRegion()
-	{
-		return static::getInstance()->region;
-	}
-
-	/**
-	 * @param string $region
-	 */
-	public static function setRegion($region)
-	{
-		$config = Module::getSiteConfig();
-		if ($config->isValidRegion($region)) {
-			static::getInstance(true)->region = $region;
-			// check if language exists
-			if (!$config->isValidLanguage($region, static::getLanguage())) {
-				static::setLanguage($config->getDefaultLanguage($region));
-			}
-			static::updateLocaleChain();
-		} else {
-			trigger_error("Invalid region: $region", E_USER_WARNING);
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 *
-	 * @return string
-	 */
-	public static function getLanguage()
-	{
-		return static::getInstance()->language;
-	}
-
-	/**
-	 * @param string $language
-	 */
-	public static function setLanguage($language)
-	{
-		if ($language != static::getLanguage()) {
-			$config = Module::getSiteConfig();
-
-			if ($config->isValidLanguage(static::getRegion(), $language)) {
-				static::getInstance(true)->language = $language;
-				static::updateLocaleChain();
-			} else {
-				trigger_error("Invalid language: $language", E_USER_WARNING);
-			}
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 *
-	 * @return string
-	 */
-	public static function getLocale()
-	{
-		return strtolower(static::getRegion()) . '_' . strtoupper(static::getLanguage());
-	}
-
-	/**
-	 * @param string $region
-	 * @param string $language
-	 * @return string
-	 */
-	public static function setLocale($region, $language)
-	{
-		static::setRegion($region);
-		static::setLanguage($language);
+//		static::updateLocaleChain();
 	}
 
 	/**
@@ -178,37 +84,12 @@ class Session implements SessionInterface
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 *
-	 * @return string
-	 */
-	public static function getState()
-	{
-		return static::getInstance()->state;
-	}
-
-	/**
-	 * @param string $state
-	 */
-	public static function setState($state)
-	{
-		if ($state != static::getState()) {
-			$config = Module::getSiteConfig();
-			if ($config->isValidState($state)) {
-				static::getInstance(true)->state = $state;
-			} else {
-				trigger_error("Invalid state: $state", E_USER_WARNING);
-			}
-		}
-	}
-
 	// --------------------------------------------------------------------------------------------
 	// ~ Private static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @param bool $write return session in write mode
+	 * @param bool $write return env in write mode
 	 * @return static
 	 */
 	protected static function getInstance($write = false)
@@ -217,13 +98,5 @@ class Session implements SessionInterface
 			\Foomo\Session::lockAndLoad();
 		}
 		return \Foomo\Session::getClassInstance(get_called_class());
-	}
-
-	/**
-	 * Update the default translation locale chain
-	 */
-	protected static function updateLocaleChain()
-	{
-		Translation::setDefaultLocaleChain([static::getLocale(), static::getLanguage()]);
 	}
 }

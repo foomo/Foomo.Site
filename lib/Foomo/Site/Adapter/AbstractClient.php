@@ -37,13 +37,13 @@ abstract class AbstractClient
 	/**
 	 * Load content from the remote content server
 	 *
-	 * @param string   $nodeId
-	 * @param string[] $env
+	 * @param string $dimension
+	 * @param string $nodeId
 	 * @return string
 	 */
-	protected static function load($nodeId, $env = [])
+	protected static function load($dimension, $nodeId)
 	{
-		return Cache\Proxy::call(get_called_class(), 'cachedLoad', [$nodeId, $env]);
+		return Cache\Proxy::call(get_called_class(), 'cachedLoad', [$dimension, $nodeId]);
 	}
 
 	/**

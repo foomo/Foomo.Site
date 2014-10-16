@@ -19,52 +19,53 @@
 
 namespace Foomo\Site;
 
+use Foomo\Site;
+
 /**
- * @link    www.foomo.org
+ * @link www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
- * @author  franklin
  */
-interface AdapterInterface
+class DomainConfigTest extends \PHPUnit_Framework_TestCase
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Public methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Return the name of the adapter i.e. `neos`
 	 *
-	 * @return string
 	 */
-	static function getName();
+	public function setUp()
+	{
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public test methods
+	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns list of resources required for the root module
 	 *
-	 * @return \Foomo\Modules\Resource[]
 	 */
-	static function getModuleResources();
+	public function testGetDefaultDimensionId()
+	{
+		$config = Module::getSiteConfig();
+		$dimensionIds = array_keys($config->dimensions);
+
+		$this->assertEquals(
+			$dimensionIds[0],
+			$config->getDefaultDimensionId()
+		);
+	}
 
 	/**
-	 * Returns the adapters domain config
 	 *
-	 * @return \Foomo\Site\Adapter\DomainConfig
 	 */
-	static function getAdapterConfig();
+	public function testGetDefaultDimension()
+	{
+		$config = Module::getSiteConfig();
 
-	/**
-	 * Returns list of sub routes
-	 *
-	 * @return \Foomo\Site\Adapter\Neos\SubRouter[]
-	 */
-	static function getSubRoutes();
-
-	/**
-	 * Returns a node's content from the remote content server
-	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @param string $baseURL
-	 * @return string
-	 */
-	static function getContent($dimension, $nodeId, $baseURL);
+		$this->assertEquals(
+			reset($config->dimensions),
+			$config->getDefaultDimension()
+		);
+	}
 }

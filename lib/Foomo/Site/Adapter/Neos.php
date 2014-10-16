@@ -19,8 +19,8 @@
 
 namespace Foomo\Site\Adapter;
 
-use Foomo\Site;
 use Foomo\ContentServer\Vo;
+use Foomo\Site;
 
 /**
  * @link    www.foomo.org
@@ -59,17 +59,11 @@ class Neos extends AbstractBase
 
 	/**
 	 * @inheritdoc
-	 *
-	 * @param string   $nodeId
-	 * @param string   $region
-	 * @param string   $language
-	 * @param string   $baseURL
-	 * @return string
 	 */
-	public static function getContent($nodeId, $region, $language, $baseURL)
+	public static function getContent($dimension, $nodeId, $baseURL)
 	{
 		/* @var $client ClientInterface */
 		$client = static::getAdapterConfig()->getClass('client');
-		return $client::get($nodeId, $region, $language, $baseURL);
+		return $client::get($dimension, $nodeId, $baseURL);
 	}
 }

@@ -99,7 +99,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 	{
 		$session = Site::getSession();
 		$config = Module::getSiteConfig();
-		$region = $config->getRegions()[1];
+		$regions = $config->getAllDimensionValues('region');
+		$region = reset($regions);
 
 		$session::setRegion($region);
 

@@ -33,15 +33,15 @@ class Site
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Initialize session & run router
+	 * Initialize env & run router
 	 *
 	 * @return mixed
 	 */
 	public static function run()
 	{
-		# boot session
-		$session = static::getSession();
-		$session::boot();
+		# boot env
+		$env = static::getEnv();
+		$env::boot();
 
 		# setup url handler
 		URLHandler::exposeClassId(false);
@@ -93,13 +93,13 @@ class Site
 	}
 
 	/**
-	 * Returns the configured site session class name
+	 * Returns the configured site env class name
 	 *
-	 * @return string|\Foomo\Site\SessionInterface
+	 * @return string|\Foomo\Site\EnvInterface
 	 */
-	public static function getSession()
+	public static function getEnv()
 	{
-		return static::getConfig()->getClass("session");
+		return static::getConfig()->getClass("env");
 	}
 
 	/**

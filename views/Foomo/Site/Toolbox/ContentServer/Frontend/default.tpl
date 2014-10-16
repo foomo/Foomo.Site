@@ -14,10 +14,11 @@
 	<table class="pure-table" style="width:100%;margin:20px 0;">
 		<thead>
 		<tr>
-			<th>ID</th>
+			<th style="min-width:15px">ID</th>
 			<th>Name</th>
-			<th>Handler</th>
 			<th>Url</th>
+			<th style="min-width:15px"></th>
+			<th style="min-width:15px"></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -26,7 +27,7 @@
 			[
 				'level'      => 0,
 				'parentNode' => null,
-				'repoNode'   => $model->getRepoNode(),
+				'repoNode'   => $model->repoNode,
 			]
 		); ?>
 		</tbody>

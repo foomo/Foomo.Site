@@ -68,7 +68,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 		$resources = array(
 			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.4.*'),
 			\Foomo\Modules\Resource\Module::getResource('Foomo.Media', '0.3.*'),
-			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '0.2.*'),
+			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '0.3.*'),
 		);
 
 		# resources when enabled
