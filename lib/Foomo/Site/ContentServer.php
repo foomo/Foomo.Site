@@ -40,7 +40,7 @@ class ContentServer implements ContentServerInterface
 	public static function export()
 	{
 		try {
-			$siteRepoNodes = [];
+			$siteRepoNodes = (object) [];
 			foreach (Site::getConfig()->adapters as $adapter) {
 				$adapterRepoNodes = static::getRepoNode($adapter::getAdapterConfig()->getPathUrl('repository'));
 				foreach ($adapterRepoNodes as $dimension => $repoNode) {
@@ -96,12 +96,15 @@ class ContentServer implements ContentServerInterface
 	}
 
 	/**
-	 * @param array $siteRepoNodes
-	 * @param array $adapterRepoNodes
-	 * @return array
+	 * @param mixed $siteRepoNodes
+	 * @param mixed $adapterRepoNodes
+	 * @return mixed
 	 */
 	protected static function mergeRepoNodes($siteRepoNodes, $adapterRepoNodes)
 	{
-		return array_merge($siteRepoNodes, $adapterRepoNodes);
+		foreach ($adapterRepoNodes as $key => $value) {
+			$siteRepoNodes->$key = $value;
+		}
+		return $siteRepoNodes;
 	}
 }
