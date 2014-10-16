@@ -84,8 +84,7 @@ class Menu
 	{
 		$ret = static::renderMenuOpen($node, $path, $level);
 
-		foreach ($node as $childNode) {
-
+		foreach (Site\ContentServer\NodeIterator::getIterator($node) as $childNode) {
 			if (!static::isVisible($childNode)) {
 				continue;
 			}

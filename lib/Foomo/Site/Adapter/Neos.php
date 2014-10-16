@@ -51,6 +51,7 @@ class Neos extends AbstractBase
 	public static function getSubRoutes()
 	{
 		$routes = [];
+
 		foreach (static::getAdapterConfig()->subRouters as $subRouter) {
 			$routes[$subRouter::$prefix] = $subRouter::getSubRoute();
 		}
