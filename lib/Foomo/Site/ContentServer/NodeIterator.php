@@ -148,7 +148,7 @@ class NodeIterator implements \Iterator, \Countable
 	 */
 	public function count()
 	{
-		return count($this->node->nodes);
+		return count(get_object_vars($this->node->nodes));
 	}
 
 	// --------------------------------------------------------------------------------------------
