@@ -105,7 +105,7 @@ abstract class AbstractClient
 	{
 		$html = '';
 		foreach ($node->childNodes as $childNode) {
-			$html .= $doc->saveHTML($childNode);
+			$html .= $doc->saveXML($childNode);
 		}
 		return $html;
 	}

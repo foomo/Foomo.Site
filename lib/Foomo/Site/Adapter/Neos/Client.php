@@ -64,20 +64,31 @@ class Client extends AbstractClient implements ClientInterface
 	 */
 	protected static function replaceApps(\DOMDocument $doc, $baseURL)
 	{
-		$oldNodes = [];
-		$newNodes = [];
+		$appPaths = [];
+		$xpath = new \DOMXpath($doc);
+
+		foreach ($doc->getElementsByTagName('app') as $appNode) {
+			/* @var $appNode \DOMElement */
+			$appPaths[] = $appNode->getNodePath();
+		}
+
+		# sort paths by length so we render the nested first
+		usort($appPaths, function($a, $b) {
+			return strlen($b) - strlen($a);
+		});
 
 		# render apps and create nodes
-		foreach ($doc->getElementsByTagName('app') as $element) {
-			/* @var $element \DOMElement */
-			$appDoc = new \DOMDocument();
+		foreach ($appPaths as $appPath) {
 
-			# get class name
-			$appClassName = $element->getAttribute('class');
+			/* @var $appNode \DOMElement */
+			$appNode = $xpath->query($appPath)->item(0);
+
+			# get app class name
+			$appClassName = $appNode->getAttribute('class');
 
 			# find & retrieve app data
 			$appData = new \stdClass();
-			foreach ($element->getElementsByTagName('script') as $script) {
+			foreach ($appNode->getElementsByTagName('script') as $script) {
 				/* @var $script \DOMElement */
 				if ($script->hasAttribute('rel') && $script->getAttribute('rel') == 'app-data') {
 					$appData = (object) json_decode($script->textContent);
@@ -87,27 +98,19 @@ class Client extends AbstractClient implements ClientInterface
 			}
 
 			# retrieve inner app html
-			$appData->html = self::getInnerHtml($doc, $element);
+			$appData->html = self::getInnerHtml($doc, $appNode);
 
 			# render app
 			$appHtml = self::renderApp($appClassName, $appData, $baseURL);
 
-			$appDoc->loadHTML('<div>' . $appHtml . '</div>');
-			$appNode = $appDoc->getElementsByTagName('div')->item(0);
-			$appNode = $doc->importNode($appNode, true);
+			# create app dom document
+			$appFragment = $doc->createDocumentFragment();
+			$appFragment->appendXML($appHtml);
 
-			# add nodes
-			$oldNodes[] = $element;
-			$newNodes[] = $appNode;
-		}
 
-		# replace in dom
-		foreach ($oldNodes as $key => $oldNode) {
-			$fragment = $doc->createDocumentFragment();
-			while ($newNodes[$key]->childNodes->length > 0) {
-				$fragment->appendChild($newNodes[$key]->childNodes->item(0));
-			}
-			$oldNode->parentNode->replaceChild($fragment, $oldNode);
+			# replace in dom
+			$appNode->parentNode->replaceChild($appFragment, $appNode);
+
 		}
 	}
 
