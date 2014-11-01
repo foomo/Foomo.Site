@@ -19,6 +19,7 @@
 
 namespace Foomo\Site\Toolbox\ContentServer\Frontend;
 
+use Foomo\ContentServer\ServerManager;
 use Foomo\MVC;
 use Foomo\Site\Module;
 
@@ -73,5 +74,19 @@ class Controller
 			var_dump($result);
 			exit;
 		}
+	}
+
+	/**
+	 * @param string $action
+	 * @param string $dimension
+	 */
+	public function actionRestart($action, $dimension = null)
+	{
+		$config = Module::getSiteContentServerProxyConfig();
+		if (ServerManager::serverIsRunning($config)) {
+			ServerManager::kill($config);
+			ServerManager::startServer($config);
+		}
+		MVC::redirect($action, [$dimension]);
 	}
 }

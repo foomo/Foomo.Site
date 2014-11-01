@@ -7,6 +7,7 @@
 $buttons = [
 	'default' => 'View List',
 	'dump'    => 'View Dump',
+	'restart' => 'Restart the Content Server',
 ]
 ?>
 

@@ -53,6 +53,7 @@ class Model
 	/**
 	 * @param string $dimension
 	 * @return $this
+	 * @throws \Exception
 	 */
 	public function setDimension($dimension = null)
 	{
