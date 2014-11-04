@@ -43,8 +43,6 @@ class Neos extends AbstractBase
 
 	/**
 	 * @inheritdoc
-	 *
-	 * @return \Foomo\Site\Adapter\Neos\SubRouter[]
 	 */
 	public static function getSubRoutes()
 	{
@@ -59,10 +57,10 @@ class Neos extends AbstractBase
 	/**
 	 * @inheritdoc
 	 */
-	public static function getContent($dimension, $nodeId, $baseURL)
+	public static function getContent($siteContent)
 	{
 		/* @var $client ClientInterface */
 		$client = static::getAdapterConfig()->getClass('client');
-		return $client::get($dimension, $nodeId, $baseURL);
+		return $client::get($siteContent->dimension, $siteContent->item->id, $siteContent->URI);
 	}
 }

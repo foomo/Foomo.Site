@@ -42,11 +42,14 @@ class ContentServer implements ContentServerInterface
 		try {
 			$siteRepoNodes = (object) [];
 			foreach (Site::getConfig()->adapters as $adapter) {
-				$adapterRepoNodes = static::getRepoNode($adapter::getAdapterConfig()->getPathUrl('repository'));
-				foreach ($adapterRepoNodes as $dimension => $repoNode) {
-					static::iterateNode($dimension, $repoNode);
+				$adapterConfig = $adapter::getAdapterConfig();
+				if ($adapterConfig) {
+					$adapterRepoNodes = static::getRepoNode($adapterConfig->getPathUrl('repository'));
+					foreach ($adapterRepoNodes as $dimension => $repoNode) {
+						static::iterateNode($dimension, $repoNode);
+					}
+					$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes);
 				}
-				$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes);
 			}
 			return $siteRepoNodes;
 		} catch (\Exception $e) {
@@ -96,15 +99,17 @@ class ContentServer implements ContentServerInterface
 	}
 
 	/**
-	 * @param mixed $siteRepoNodes
-	 * @param mixed $adapterRepoNodes
+	 * Simple merge handling
+	 *
+	 * @param mixed $siteRepoNode
+	 * @param mixed $adapterRepoNode
 	 * @return mixed
 	 */
-	protected static function mergeRepoNodes($siteRepoNodes, $adapterRepoNodes)
+	protected static function mergeRepoNodes($siteRepoNode, $adapterRepoNode)
 	{
-		foreach ($adapterRepoNodes as $key => $value) {
-			$siteRepoNodes->$key = $value;
+		foreach ($adapterRepoNode as $adapterDimension => $repoNode) {
+			$siteRepoNode->$adapterDimension = $repoNode;
 		}
-		return $siteRepoNodes;
+		return $siteRepoNode;
 	}
 }

@@ -125,7 +125,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 		$cacheFilename = Cache::getFilename($nodeId, $url, 'neos', (int) $time);
 
 		if ($cacheFilename) {
-			Image\Server::serve($cacheFilename, 'neos', $type);
+			Image\Server::serve($cacheFilename, Neos::getName(), $type);
 		} else {
 			$this->error();
 		}

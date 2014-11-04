@@ -19,6 +19,8 @@
 
 namespace Foomo\Site;
 
+use Foomo\ContentServer\Vo\Content\SiteContent;
+
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
@@ -61,10 +63,8 @@ interface AdapterInterface
 	/**
 	 * Returns a node's content from the remote content server
 	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @param string $baseURL
-	 * @return string
+	 * @param SiteContent $siteContent
+	 * @return mixed
 	 */
-	static function getContent($dimension, $nodeId, $baseURL);
+	static function getContent($siteContent);
 }

@@ -43,6 +43,14 @@ class View extends \Foomo\MVC\View
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * @return Site\Env
+	 */
+	public function getEnv()
+	{
+		return Site::getEnv();
+	}
+
+	/**
 	 * Returns the model's content rendering
 	 *
 	 * @return string

@@ -19,8 +19,8 @@
 
 namespace Foomo\Site\Adapter;
 
-use Foomo\Site;
 use Foomo\ContentServer\Vo;
+use Foomo\Site;
 
 /**
  * @link    www.foomo.org
@@ -35,8 +35,6 @@ abstract class AbstractBase implements Site\AdapterInterface
 
 	/**
 	 * @inheritdoc
-	 *
-	 * @return \Foomo\Modules\Resource[]
 	 */
 	public static function getModuleResources()
 	{
@@ -51,8 +49,6 @@ abstract class AbstractBase implements Site\AdapterInterface
 
 	/**
 	 * @inheritdoc
-	 *
-	 * @return \Foomo\Site\Adapter\DomainConfig
 	 */
 	public static function getAdapterConfig()
 	{

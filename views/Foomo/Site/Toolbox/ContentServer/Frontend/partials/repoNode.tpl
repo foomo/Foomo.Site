@@ -19,7 +19,8 @@ $mimeTypes = [
 	'application/neos+external'    => 'fa-external-link',
 	'application/neos+directory'   => 'fa-folder-o',
 	'application/shop+category'    => 'fa-shopping-cart',
-	'application/shop+placeholder' => 'fa-close',
+	'application/shop+placeholder' => 'fa-external-link-square',
+	'application/shop+product'		 => 'fa-female',
 ];
 ?>
 

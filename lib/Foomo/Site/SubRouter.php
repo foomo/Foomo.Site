@@ -38,7 +38,7 @@ class SubRouter extends \Foomo\Router
 	 *
 	 * @var string
 	 */
-	public static $prefix = '/subroute';
+	public static $prefix = 'subroute';
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public methods
@@ -51,6 +51,16 @@ class SubRouter extends \Foomo\Router
 	{
 		header("HTTP/1.0 404 Not Found");
 		echo 'file not found';
+		exit;
+	}
+
+	/**
+	 * @param string $uri
+	 */
+	public function redirect($uri)
+	{
+		header("HTTP/1.1 301 Moved Permanently");
+		header("Location: $uri");
 		exit;
 	}
 

@@ -133,21 +133,10 @@ class Model
 	 */
 	public function renderContent()
 	{
-		$env = Site::getEnv();
-
 		$adapter = $this->getContentAdapter();
 
 		# get content
-		$rendering = $adapter::getContent(
-			$this->getContent()->dimension,
-			$this->getContent()->item->id,
-			$this->getContent()->URI
-		);
-
-		# validate rendering
-		if (empty($rendering)) {
-			throw new Site\Exception\HTTPException(500, "Content couldn't be rendered");
-		}
+		$rendering = $adapter::getContent($this->getContent());
 
 		$this->contentRendering = $rendering;
 	}
