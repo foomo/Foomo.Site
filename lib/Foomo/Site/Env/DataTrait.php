@@ -45,7 +45,11 @@ trait DataTrait
 	 */
 	public static function getData($key)
 	{
-		return self::getInstance()->data[$key];
+		if (isset(self::getInstance()->data[$key])) {
+			return self::getInstance()->data[$key];
+		} else {
+			return null;
+		}
 	}
 
 	/**
