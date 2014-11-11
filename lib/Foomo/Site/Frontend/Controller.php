@@ -21,6 +21,7 @@ namespace Foomo\Site\Frontend;
 
 use Foomo\Site;
 use Foomo\ContentServer\Vo;
+use Foomo\Timer;
 
 /**
  * @link    www.foomo.org
@@ -51,11 +52,14 @@ class Controller
 	 */
 	public function actionDefault()
 	{
+		Timer::addMarker('running default action');
+
 		$config = Site::getConfig();
 		$url = parse_url($_SERVER['REQUEST_URI']);
 
 		# retrieve the content
 		$content = Site\ContentServer\Client::getContent($url['path'], array_reverse($config->getDimensionIds()));
+		Timer::addMarker('retrieved content from content server');
 
 		# set content
 		$this->model->setContent($content);
@@ -72,5 +76,6 @@ class Controller
 
 		# render the content
 		$this->model->renderContent();
+		Timer::addMarker('rendered content on model');
 	}
 }

@@ -25,6 +25,7 @@ use Foomo\Site\Adapter\ClientInterface;
 use Foomo\Site\Adapter\Neos;
 use Foomo\Site\Exception\HTTPException;
 use Foomo\Site\Module;
+use Foomo\Timer;
 
 /**
  * @link    www.foomo.org
@@ -43,6 +44,7 @@ class Client extends AbstractClient implements ClientInterface
 	public static function get($dimension, $nodeId, $baseURL)
 	{
 		if (!empty($html = self::load($dimension, $nodeId))) {
+
 			$doc = self::getDOMDocument($html);
 
 			# replace apps
@@ -73,9 +75,11 @@ class Client extends AbstractClient implements ClientInterface
 		}
 
 		# sort paths by length so we render the nested first
-		usort($appPaths, function($a, $b) {
-			return strlen($b) - strlen($a);
-		});
+		usort(
+			$appPaths, function ($a, $b) {
+				return strlen($b) - strlen($a);
+			}
+		);
 
 		# render apps and create nodes
 		foreach ($appPaths as $appPath) {
@@ -107,10 +111,8 @@ class Client extends AbstractClient implements ClientInterface
 			$appFragment = $doc->createDocumentFragment();
 			$appFragment->appendXML($appHtml);
 
-
 			# replace in dom
 			$appNode->parentNode->replaceChild($appFragment, $appNode);
-
 		}
 	}
 

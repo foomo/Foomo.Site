@@ -21,6 +21,7 @@ namespace Foomo\Site;
 
 use Foomo\Config;
 use Foomo\Site;
+use Foomo\Timer;
 
 /**
  * @link    www.foomo.org
@@ -76,6 +77,7 @@ class Router extends \Foomo\Router
 	 */
 	public function site()
 	{
+		Timer::addMarker('running site frontend');
 		return \Foomo\MVC::run(\Foomo\Site::getFrontend());
 	}
 
