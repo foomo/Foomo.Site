@@ -41,9 +41,17 @@ abstract class AbstractClient
 	 * @param string $nodeId
 	 * @return string
 	 */
-	protected static function load($dimension, $nodeId)
+	protected static function cachedLoad($dimension, $nodeId)
 	{
-		return Cache\Proxy::call(get_called_class(), 'cachedLoad', [$dimension, $nodeId]);
+		return Cache\Proxy::call(
+			'Foomo\Site\Adapter',
+			'cachedLoadClientContent',
+			[
+				get_called_class(),
+				$dimension,
+				$nodeId
+			]
+		);
 	}
 
 	/**

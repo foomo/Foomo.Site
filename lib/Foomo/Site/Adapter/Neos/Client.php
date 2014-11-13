@@ -43,7 +43,7 @@ class Client extends AbstractClient implements ClientInterface
 	 */
 	public static function get($dimension, $nodeId, $baseURL)
 	{
-		if (!empty($html = self::load($dimension, $nodeId))) {
+		if (!empty($html = self::cachedLoad($dimension, $nodeId))) {
 
 			$doc = self::getDOMDocument($html);
 
@@ -54,6 +54,22 @@ class Client extends AbstractClient implements ClientInterface
 		} else {
 			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
 		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function load($dimension, $nodeId)
+	{
+		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
+		$json = json_decode(file_get_contents($url));
+		$doc = self::getDOMDocument($json->html);
+
+		# replace images & links
+		self::replaceImages($doc);
+		self::replaceLinks($dimension, $doc);
+
+		return $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -114,27 +130,6 @@ class Client extends AbstractClient implements ClientInterface
 			# replace in dom
 			$appNode->parentNode->replaceChild($appFragment, $appNode);
 		}
-	}
-
-	/**
-	 * @internal
-	 * @Foomo\Cache\CacheResourceDescription
-	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @return string
-	 */
-	public static function cachedLoad($dimension, $nodeId)
-	{
-		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
-		$json = json_decode(file_get_contents($url));
-		$doc = self::getDOMDocument($json->html);
-
-		# replace images & links
-		self::replaceImages($doc);
-		self::replaceLinks($dimension, $doc);
-
-		return $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
 	}
 
 	/**

@@ -22,7 +22,7 @@ namespace Foomo\Site\Adapter\Neos;
 use Foomo\Media\Image;
 use Foomo\Site\Adapter\Media;
 use Foomo\Site\Adapter\Neos;
-use Foomo\Site\Cache;
+use Foomo\Site\Adapter\Cache;
 use Foomo\Utils;
 
 /**
@@ -106,6 +106,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 		if ($cacheFilename) {
 			Utils::streamFile($cacheFilename, $filename, 'application/octet-stream', true);
+			exit;
 		} else {
 			$this->error();
 		}
@@ -126,6 +127,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 		if ($cacheFilename) {
 			Image\Server::serve($cacheFilename, Neos::getName(), $type);
+			exit;
 		} else {
 			$this->error();
 		}

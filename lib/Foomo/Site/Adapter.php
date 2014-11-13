@@ -5,49 +5,45 @@
  *
  * The foomo Opensource Framework is free software: you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public License as
- * published  by the Free Software Foundation, either version 3 of the
+ * published  by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
  * The foomo Opensource Framework is distributed in the hope that it will
  * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Adapter;
+namespace Foomo\Site;
+
+use Foomo\Cache;
+use Foomo\Site\Adapter\Neos;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-interface ClientInterface
+class Adapter
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Internal static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Return the content from the remote server
-	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @param string $baseURL
-	 * @return string
-	 */
-	static function get($dimension, $nodeId, $baseURL);
-
-	/**
-	 * Load the content from remote server
-	 *
 	 * @internal
+	 * @Foomo\Cache\CacheResourceDescription
 	 *
+	 * @param string $clientClass
 	 * @param string $dimension
 	 * @param string $nodeId
 	 * @return string
 	 */
-	static function load($dimension, $nodeId);
+	public static function cachedLoadClientContent($clientClass, $dimension, $nodeId)
+	{
+		return $clientClass::load($dimension, $nodeId);
+	}
 }
