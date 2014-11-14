@@ -17,55 +17,83 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\App;
+namespace Foomo\Site\Adapter;
 
+use Foomo\ContentServer\Vo;
 use Foomo\MVC;
+use Foomo\Router\MVC\URLHandler;
+use Foomo\Site;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
+ * @author  franklin
  */
-trait RunnableTrait
+class Foomo extends AbstractBase
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @param array  $data
-	 * @param string $baseUrl
-	 * @return string
+	 * @inheritdoc
 	 */
-	public static function run($data, $baseUrl = null)
+	public static function getName()
 	{
-		$app = new static;
-		$app->setAppData($data);
-		return MVC::run($app, $baseUrl, true, true);
+		return 'foomo';
 	}
 
 	/**
-	 * @param array  $data
-	 * @param string $action
-	 * @param array  $parameters
-	 * @param string $baseUrl
-	 * @return string
+	 * @inheritdoc
 	 */
-	public static function runAction($data, $action, $parameters = [], $baseUrl = null)
+	public static function getSubRoutes()
 	{
-		$app = new static;
-		$app->setAppData($data);
-		return MVC::runAction($app, $action, $parameters, $baseUrl);
+		return [];
 	}
 
-	// --------------------------------------------------------------------------------------------
-	// ~ Protected methods
-	// --------------------------------------------------------------------------------------------
+	/**
+	 * @inheritdoc
+	 */
+	public static function getModuleResources()
+	{
+		return [];
+	}
 
 	/**
-	 * @param $data
+	 * @inheritdoc
 	 */
-	protected function setAppData($data)
+	public static function getAdapterConfig()
 	{
-		$this->model->data = $data;
+		return null;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public static function getContent($siteContent)
+	{
+		$className = false;
+
+		if (isset($siteContent->data->appClassName)) {
+			$className = $siteContent->data->appClassName;
+		}
+		if (isset($siteContent->data->appData)) {
+			$data = $siteContent->data->appData;
+		}
+
+		if ($className) {
+			$classes = [
+				$className,
+				$className . '\\Frontend',
+			];
+			foreach ($classes as $class) {
+				if (class_exists($class)) {
+					return call_user_func_array([$class, 'run'], [$data, $siteContent->URI]);
+				}
+			}
+			return '<pre>No App found for: ' . implode(', ', $classes) . '</pre>';
+		} else {
+			return '<pre>No App Class Name defined</pre>';
+		}
 	}
 }

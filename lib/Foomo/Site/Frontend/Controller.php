@@ -19,6 +19,8 @@
 
 namespace Foomo\Site\Frontend;
 
+use Foomo\MVC;
+use Foomo\Router\MVC\URLHandler;
 use Foomo\Site;
 use Foomo\ContentServer\Vo;
 use Foomo\Timer;
@@ -30,6 +32,17 @@ use Foomo\Timer;
  */
 class Controller
 {
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @todo this should go somewhere else
+	 *
+	 * @var bool
+	 */
+	public static $resolved = false;
+
 	// --------------------------------------------------------------------------------------------
 	// ~ Variables
 	// --------------------------------------------------------------------------------------------
@@ -46,16 +59,37 @@ class Controller
 	/**
 	 * Simple default action handler
 	 *
-	 * @todo check if applications can resolve the url
-	 *
 	 * @throws Site\Exception\HTTPException
 	 */
 	public function actionDefault()
 	{
 		Timer::addMarker('running default action');
+		$this->loadSiteContent($_SERVER['REQUEST_URI']);
 
+		# render the content
+		# URLHandler::exposeClassId(true);
+		URLHandler::strictParameterHandling(true);
+		$this->model->renderContent();
+		Timer::addMarker('rendered content on model');
+
+		# validate path
+		if (!static::$resolved) {
+			throw new Site\Exception\HTTPException(404, 'Content not found!');
+		}
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Protected methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @param string $url
+	 * @throws Site\Exception\HTTPException
+	 */
+	protected function loadSiteContent($url)
+	{
+		$url = parse_url($url);
 		$config = Site::getConfig();
-		$url = parse_url($_SERVER['REQUEST_URI']);
 
 		# retrieve the content
 		$content = Site\ContentServer\Client::getContent($url['path'], array_reverse($config->getDimensionIds()));
@@ -64,18 +98,13 @@ class Controller
 		# set content
 		$this->model->setContent($content);
 
+		# set resolved state
+		static::$resolved = ($this->model->getContent()->URI == $url['path']);
+
 		# validate status
 		if ($content->status != Vo\Content\SiteContent::STATUS_OK) {
 			throw new Site\Exception\HTTPException($content->status, 'Content server client result not OK!');
 		}
 
-		# validate path
-		if ($this->model->getContent()->URI != $url['path']) {
-			throw new Site\Exception\HTTPException(404, 'Content not found!');
-		}
-
-		# render the content
-		$this->model->renderContent();
-		Timer::addMarker('rendered content on model');
 	}
 }
