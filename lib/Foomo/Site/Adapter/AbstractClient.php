@@ -76,6 +76,7 @@ abstract class AbstractClient
 					]
 				)
 			) {
+				trigger_error('Invalid XML: ' . $xmlError->message, E_USER_WARNING);
 				throw new HTTPException(500, $xmlError->message);
 			}
 		}

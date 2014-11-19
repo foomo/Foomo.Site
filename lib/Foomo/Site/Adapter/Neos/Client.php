@@ -102,19 +102,20 @@ class Client extends AbstractClient implements ClientInterface
 
 			/* @var $appNode \DOMElement */
 			$appNode = $xpath->query($appPath)->item(0);
+			$appNodeId = $appNode->getAttribute('id');
 
 			# get app class name
 			$appClassName = $appNode->getAttribute('class');
 
+
 			# find & retrieve app data
 			$appData = new \stdClass();
-			foreach ($appNode->getElementsByTagName('script') as $script) {
-				/* @var $script \DOMElement */
-				if ($script->hasAttribute('rel') && $script->getAttribute('rel') == 'app-data') {
-					$appData = (object) json_decode($script->textContent);
-					$script->parentNode->removeChild($script);
-					break;
-				}
+			if (null != $appNodeData = $doc->getElementById('data-' . $appNodeId)) {
+				/* @var $appNodeData \DOMElement */
+				$data = $appNodeData->textContent;
+				$data = str_replace(array('<![CDATA[',']]>'), '', $data);
+				$appData = json_decode($data);
+				$appNodeData->parentNode->removeChild($appNodeData);
 			}
 
 			# retrieve inner app html

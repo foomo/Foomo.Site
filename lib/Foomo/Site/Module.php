@@ -112,6 +112,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	{
 		return [
 			MenuEntry::create('Root.Site', 'Site', self::NAME, 'Foomo.Site.Toolbox'),
+			MenuEntry::create('Root.Site.Adapter', 'Adapter', self::NAME, 'Foomo.Site.Toolbox.Adapter'),
 			MenuEntry::create('Root.Site.ContentServer', 'Content Server', self::NAME, 'Foomo.Site.Toolbox.ContentServer'),
 		];
 	}

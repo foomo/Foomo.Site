@@ -17,85 +17,64 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Adapter;
+namespace Foomo\Site\Toolbox\Adapter\Frontend;
 
-use Foomo\ContentServer\Vo;
+use Foomo\Cache\Persistence\Expr;
 use Foomo\MVC;
-use Foomo\Router\MVC\URLHandler;
-use Foomo\Site;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-class Foomo extends AbstractBase
+class Controller
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Variables
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @inheritdoc
+	 * @var Model
 	 */
-	public static function getName()
+	public $model;
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 *
+	 */
+	public function actionDefault()
 	{
-		return 'foomo';
+		MVC::redirect('cachedContent');
 	}
 
 	/**
-	 * @inheritdoc
+	 *
 	 */
-	public static function getSubRoutes()
+	public function actionCachedContent()
 	{
-		return [];
 	}
 
 	/**
-	 * @inheritdoc
+	 * @param string $nodeId
+	 * @param string $dimension
 	 */
-	public static function getModuleResources()
+	public function actionDeleteCachedContent($nodeId=null, $dimension = null)
 	{
-		return [];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function getAdapterConfig()
-	{
-		return null;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function getContent($siteContent)
-	{
-		$data = null;
-		$className = false;
-
-		if (isset($siteContent->data->appClassName)) {
-			$className = $siteContent->data->appClassName;
-		}
-
-		if (isset($siteContent->data->appData)) {
-			$data = $siteContent->data->appData;
-		}
-
-		if ($className) {
-			$classes = [
-				$className,
-				$className . '\\Frontend',
-			];
-			foreach ($classes as $class) {
-				if (class_exists($class)) {
-					return call_user_func_array([$class, 'run'], [$data, $siteContent->URI]);
-				}
-			}
-			return '<pre>No App found for: ' . implode(', ', $classes) . '</pre>';
+		if (is_null($nodeId) && is_null($dimension)) {
+			$expr = null;
+		} else if (is_null($dimension)) {
+			$expr = Expr::propEq('nodeId', $nodeId);
 		} else {
-			return '<pre>No App Class Name defined</pre>';
+			$expr = Expr::groupAnd(
+				Expr::propEq('nodeId', $nodeId),
+				Expr::isNotExpired('nodeId', $dimension)
+			);
 		}
+
+		$this->model->deleteCachedContent($expr);
+		MVC::redirect('cachedContent');
 	}
 }
