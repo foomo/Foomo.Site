@@ -20,6 +20,7 @@
 namespace Foomo\Site;
 
 use Foomo\Cache;
+use Foomo\CSV\Jobs\Manager;
 use Foomo\Site\Adapter\Neos;
 
 /**
@@ -29,6 +30,12 @@ use Foomo\Site\Adapter\Neos;
  */
 class Adapter
 {
+	// --------------------------------------------------------------------------------------------
+	// ~ Constants
+	// --------------------------------------------------------------------------------------------
+
+	const CACHED_CONTENT_RESOURCE = 'Foomo\Site\Adapter::cachedLoadClientContent';
+
 	// --------------------------------------------------------------------------------------------
 	// ~ Internal static methods
 	// --------------------------------------------------------------------------------------------
@@ -45,5 +52,25 @@ class Adapter
 	public static function cachedLoadClientContent($clientClass, $dimension, $nodeId)
 	{
 		return $clientClass::load($dimension, $nodeId);
+	}
+
+	/**
+	 * @param Cache\Persistence\Expr $expr
+	 * @param int $limit
+	 * @param int $offset
+	 * @return Cache\CacheResourceIterator|Cache\CacheResource[]
+	 */
+	public static function getCachedLoadClientContent($expr=null, $limit=0, $offset=0)
+	{
+		return Cache\Manager::query(self::CACHED_CONTENT_RESOURCE, $expr, $limit, $offset);
+	}
+
+	/**
+	 * @param Cache\Persistence\Expr $expr
+	 * @param string $policy
+	 */
+	public static function invalidateCachedLoadClientContent($expr = null, $policy = Cache\Invalidator::POLICY_DELETE)
+	{
+		Cache\Manager::invalidateWithQuery(self::CACHED_CONTENT_RESOURCE, $expr, true, $policy);
 	}
 }

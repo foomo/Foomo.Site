@@ -19,8 +19,10 @@
 
 namespace Foomo\Site\Toolbox\ContentServer\Frontend;
 
+use Foomo\Cache\Persistence\Expr;
 use Foomo\ContentServer\ServerManager;
 use Foomo\MVC;
+use Foomo\Site\Adapter;
 use Foomo\Site\Module;
 
 /**
@@ -48,7 +50,37 @@ class Controller
 	 */
 	public function actionDefault($dimension = null)
 	{
+		MVC::redirect('list', compact('dimension'));
+	}
+
+	/**
+	 * @param string $dimension
+	 */
+	public function actionList($dimension = null)
+	{
 		$this->model->setDimension($dimension);
+	}
+
+	/**
+	 * @param string $action
+	 * @param string $dimension
+	 * @param string $nodeId
+	 * @param bool   $all
+	 */
+	public function deleteCachedContent($action, $dimension, $nodeId, $all = false)
+	{
+		if (is_null($nodeId) && is_null($dimension)) {
+			$expr = null;
+		} else if (!$all) {
+			$expr = Expr::propEq('nodeId', $nodeId);
+		} else {
+			$expr = Expr::groupAnd(
+				Expr::propEq('nodeId', $nodeId),
+				Expr::propEq('dimension', $dimension)
+			);
+		}
+		Adapter::invalidateCachedLoadClientContent($expr);
+		MVC::redirect($action, [$dimension]);
 	}
 
 	/**

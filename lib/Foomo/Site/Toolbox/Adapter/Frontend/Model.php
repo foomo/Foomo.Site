@@ -32,12 +32,6 @@ use Foomo\Site;
 class Model
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Constructor
-	// --------------------------------------------------------------------------------------------
-
-	const CACHED_CONTENT_RESOURCE = 'Foomo\Site\Adapter::cachedLoadClientContent';
-
-	// --------------------------------------------------------------------------------------------
 	// ~ Public methods
 	// --------------------------------------------------------------------------------------------
 
@@ -47,7 +41,7 @@ class Model
 	public function getCachedContent()
 	{
 		$resources = [];
-		foreach (Manager::query(self::CACHED_CONTENT_RESOURCE) as $resource) {
+		foreach (Site\Adapter::getCachedLoadClientContent() as $resource) {
 			if (!isset($resources[$resource->properties['clientClass']])) {
 				$resources[$resource->properties['clientClass']] = [];
 			}
@@ -62,11 +56,6 @@ class Model
 	 */
 	public function deleteCachedContent($expr = null)
 	{
-		Manager::invalidateWithQuery(
-			self::CACHED_CONTENT_RESOURCE,
-			$expr,
-			true,
-			Invalidator::POLICY_DELETE
-		);
+		Site\Adapter::invalidateCachedLoadClientContent($expr);
 	}
 }

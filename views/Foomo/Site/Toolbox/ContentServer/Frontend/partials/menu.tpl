@@ -5,7 +5,7 @@
 /* @var $language string */
 
 $buttons = [
-	'default' => 'View List',
+	'list'    => 'View List',
 	'dump'    => 'View Dump',
 	'restart' => 'Restart the Content Server',
 ]

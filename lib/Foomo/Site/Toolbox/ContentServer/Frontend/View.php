@@ -19,6 +19,8 @@
 
 namespace Foomo\Site\Toolbox\ContentServer\Frontend;
 
+use Foomo\Cache\CacheResource;
+
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
@@ -26,4 +28,34 @@ namespace Foomo\Site\Toolbox\ContentServer\Frontend;
  */
 class View extends \Foomo\Site\Toolbox\Frontend\View
 {
+	// --------------------------------------------------------------------------------------------
+	// ~ Variables
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @var Model
+	 */
+	public $model;
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @param string $nodeId
+	 * @param string $dimension
+	 * @return CacheResource
+	 */
+	public function getCachedContent($nodeId, $dimension = null)
+	{
+		$ret = null;
+		$resources = $this->model->getCachedContent();
+		if (isset($resources[$nodeId])) {
+			$ret = $resources[$nodeId];
+		}
+		if (!is_null($dimension) && !is_null($ret) && isset($ret[$dimension])) {
+			$ret = $ret[$dimension];
+		}
+		return $ret;
+	}
 }

@@ -70,7 +70,7 @@ class Controller
 		} else {
 			$expr = Expr::groupAnd(
 				Expr::propEq('nodeId', $nodeId),
-				Expr::isNotExpired('nodeId', $dimension)
+				Expr::propEq('dimension', $dimension)
 			);
 		}
 

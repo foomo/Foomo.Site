@@ -66,4 +66,24 @@ class Model
 		$this->repoNode = $this->repoNodes->{$this->dimension};
 		return $this;
 	}
+
+	/**
+	 * @return array
+	 */
+	public function getCachedContent()
+	{
+		static $resources;
+		if (is_null($resources)) {
+			/* @var $resource \Foomo\Cache\CacheResource */
+			foreach (Site\Adapter::getCachedLoadClientContent() as $resource) {
+				$nodeId = $resource->properties['nodeId'];
+				$dimension = $resource->properties['dimension'];
+				if (!isset($resources[$nodeId])) {
+					$resources[$nodeId] = [];
+				}
+				$resources[$nodeId][$dimension] = $resource;
+			}
+		}
+		return $resources;
+	}
 }
