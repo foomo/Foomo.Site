@@ -35,9 +35,9 @@ class Router extends \Foomo\Router
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Add configured, adapter and own routes
+	 * @param array $routes
 	 */
-	public function __construct()
+	public function __construct($routes = [])
 	{
 		parent::__construct();
 
@@ -59,10 +59,15 @@ class Router extends \Foomo\Router
 
 		# add default routes
 		$this->addRoutes(
-			[
-				'/robots.txt' => 'robots',
-				'/*'          => 'site',
-			]
+			array_merge(
+				[
+					'/robots.txt' => 'robots',
+				],
+				$routes,
+				[
+					'/*'  => 'site'
+				]
+			)
 		);
 	}
 
