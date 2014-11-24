@@ -21,9 +21,12 @@ namespace Foomo\Site\Toolbox\ContentServer\Frontend;
 
 use Foomo\Cache\Persistence\Expr;
 use Foomo\ContentServer\ServerManager;
+use Foomo\ContentServer\Vo\Content\RepoNode;
 use Foomo\MVC;
+use Foomo\Site;
 use Foomo\Site\Adapter;
 use Foomo\Site\Module;
+use Foomo\Utils;
 
 /**
  * @link    www.foomo.org
@@ -50,43 +53,21 @@ class Controller
 	 */
 	public function actionDefault($dimension = null)
 	{
-		MVC::redirect('list', compact('dimension'));
+		MVC::redirect('viewList', compact('dimension'));
 	}
 
 	/**
 	 * @param string $dimension
 	 */
-	public function actionList($dimension = null)
+	public function actionViewList($dimension = null)
 	{
 		$this->model->setDimension($dimension);
 	}
 
 	/**
-	 * @param string $action
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @param bool   $all
-	 */
-	public function deleteCachedContent($action, $dimension, $nodeId, $all = false)
-	{
-		if (is_null($nodeId) && is_null($dimension)) {
-			$expr = null;
-		} else if (!$all) {
-			$expr = Expr::propEq('nodeId', $nodeId);
-		} else {
-			$expr = Expr::groupAnd(
-				Expr::propEq('nodeId', $nodeId),
-				Expr::propEq('dimension', $dimension)
-			);
-		}
-		Adapter::invalidateCachedLoadClientContent($expr);
-		MVC::redirect($action, [$dimension]);
-	}
-
-	/**
 	 * @param string $dimension
 	 */
-	public function actionDump($dimension = null)
+	public function actionViewDump($dimension = null)
 	{
 		$this->model->setDimension($dimension);
 	}
@@ -95,7 +76,7 @@ class Controller
 	 * @param string $action
 	 * @param string $dimension
 	 */
-	public function actionUpdate($action, $dimension = null)
+	public function actionUpdateServer($action, $dimension = null)
 	{
 		$result = Module::getSiteContentServerProxyConfig()->getProxy()->update();
 
@@ -112,7 +93,39 @@ class Controller
 	 * @param string $action
 	 * @param string $dimension
 	 */
-	public function actionRestart($action, $dimension = null)
+	public function actionUpdateCaches($action, $dimension = null)
+	{
+		$this->deleteCaches();
+		$res = $this->callNodes(
+			\Foomo\Site\Module::getSiteContentServerProxyConfig()->getProxy()->getRepo()
+		);
+		if ($res) {
+			MVC::abort();
+			header('Content-Type: text/plain');
+			print_r($res);
+			exit;
+		} else {
+			MVC::redirect($action, [$dimension]);
+		}
+	}
+
+	/**
+	 * @param string $action
+	 * @param string $dimension
+	 * @param string $nodeId
+	 * @param bool   $all
+	 */
+	public function actionDeleteCaches($action, $dimension = null, $nodeId = null, $all = false)
+	{
+		$this->deleteCaches($dimension, $nodeId, $all);
+		MVC::redirect($action, [$dimension]);
+	}
+
+	/**
+	 * @param string $action
+	 * @param string $dimension
+	 */
+	public function actionRestartServer($action, $dimension = null)
 	{
 		$config = Module::getSiteContentServerProxyConfig();
 		if (ServerManager::serverIsRunning($config)) {
@@ -120,5 +133,54 @@ class Controller
 			ServerManager::startServer($config);
 		}
 		MVC::redirect($action, [$dimension]);
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Private methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @param string $dimension
+	 * @param string $nodeId
+	 * @param bool   $all
+	 */
+	private function deleteCaches($dimension = null, $nodeId = null, $all = false)
+	{
+		if (is_null($nodeId) && is_null($dimension)) {
+			$expr = null;
+		} else if (!$all) {
+			$expr = Expr::propEq('nodeId', $nodeId);
+		} else {
+			$expr = Expr::groupAnd(
+				Expr::propEq('nodeId', $nodeId),
+				Expr::propEq('dimension', $dimension)
+			);
+		}
+		Adapter::invalidateCachedLoadClientContent($expr);
+	}
+
+	/**
+	 * @param RepoNode[] $repoNodes
+	 * @return string[]
+	 */
+	private function callNodes($repoNodes)
+	{
+		$ret = [];
+		foreach ($repoNodes as $repoNode) {
+			$url = Utils::getServerUrl(false, true) . $repoNode->URI;
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+			curl_setopt($ch, CURLOPT_HEADER, true);
+			curl_setopt($ch, CURLOPT_NOBODY, true);
+			if (curl_exec($ch) === false) {
+				$ret[] = 'ERROR ' . curl_error($ch) . '(' . $url .')';
+			}
+			curl_close($ch);
+
+			$ret = array_merge($this->callNodes($repoNode->nodes), $ret);
+		}
+		return $ret;
 	}
 }

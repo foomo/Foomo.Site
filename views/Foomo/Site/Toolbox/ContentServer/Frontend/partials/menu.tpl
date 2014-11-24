@@ -5,9 +5,10 @@
 /* @var $language string */
 
 $buttons = [
-	'list'    => 'View List',
-	'dump'    => 'View Dump',
-	'restart' => 'Restart the Content Server',
+	'viewList'      => 'View List',
+	'viewDump'      => 'View Dump',
+	'updateCaches'  => '<span class="fa fa-tachometer"></span> Updated all Content Caches',
+	'restartServer' => '<span class="fa fa-power-off"></span> Restart the Content Server',
 ]
 ?>
 

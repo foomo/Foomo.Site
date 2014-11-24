@@ -63,7 +63,7 @@ $mimeTypes = [
 				href="#"
 				class="fa fa-files-o"
 				style="text-decoration:none;"
-				title="DesinationId: <?= $repoNode->destinationId ?>"
+				title="DestinationId: <?= $repoNode->destinationId ?>"
 				onclick="alert('DestinationId:\n<?= $repoNode->destinationId ?>');return false;"
 				></a>
 		<? endif ?>
@@ -76,19 +76,19 @@ $mimeTypes = [
 				style="text-decoration:none;color:darkred;"
 				title="Delete cached resource"
 				onclick="return confirm('Delete cache for <?= $repoNode->name; ?>?');"
-				href="<?= $view->url('deleteCachedContent', compact('action', 'dimension', 'nodeId', 'all')) ?>"
+				href="<?= $view->url('deleteCaches', compact('action', 'dimension', 'nodeId', 'all')) ?>"
 				></a>
 		<? endif ?>
 	</td>
 	<td style="text-align:center;">
-		<? if (null != $resources = $view->getCachedContent($nodeId)): ?>
+		<? if ((null != $resources = $view->getCachedContent($nodeId)) && count($resources) > 1): ?>
 			<? $all = true; ?>
 			<a
 				class="fa fa-files-o"
 				style="text-decoration:none;color:darkred;"
 				title="Delete cached resource in all dimensions"
 				onclick="return confirm('Delete cache in all dimensions for <?= $repoNode->name; ?>?');"
-				href="<?= $view->url('deleteCachedContent', compact('action', 'dimension', 'nodeId', 'all')) ?>"
+				href="<?= $view->url('deleteCaches', compact('action', 'dimension', 'nodeId', 'all')) ?>"
 				></a>
 		<? endif ?>
 	</td>

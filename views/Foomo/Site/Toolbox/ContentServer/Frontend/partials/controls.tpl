@@ -1,6 +1,9 @@
 <?php
 /* @var $view \Foomo\Site\Toolbox\ContentServer\Frontend\View */
 /* @var $model \Foomo\Site\Toolbox\ContentServer\Frontend\Model */
+
+$action = $view->currentAction;
+$dimension = $model->dimension;
 ?>
 
 <div class="appContent">
@@ -18,11 +21,12 @@
 				</option>
       <? endforeach; ?>
     </select>
+
     <a
       class="linkButtonYellow"
-      href="<?= $view->url('update', array($view->currentAction, $model->dimension)) ?>"
+      href="<?= $view->url('updateServer', compact('action', 'dimension')) ?>"
       >
-      <span class="fa fa-refresh"></span> Update
+      <span class="fa fa-refresh"></span> Update Repository
     </a>
   </div>
 </div>
