@@ -43,7 +43,8 @@ class Client extends AbstractClient implements ClientInterface
 	 */
 	public static function get($dimension, $nodeId, $baseURL)
 	{
-		if (!empty($html = self::cachedLoad($dimension, $nodeId))) {
+		$html = self::cachedLoad($dimension, $nodeId);
+		if (!empty($html)) {
 
 			$doc = self::getDOMDocument($html);
 
@@ -106,7 +107,6 @@ class Client extends AbstractClient implements ClientInterface
 
 			# get app class name
 			$appClassName = $appNode->getAttribute('class');
-
 
 			# find & retrieve app data
 			$appData = new \stdClass();
