@@ -131,11 +131,15 @@ trait LocaleTrait
 	/**
 	 * Current locale i.e. `en_US`
 	 *
-	 * @return string
+	 * @return string|null
 	 */
 	public static function getLocale()
 	{
-		return strtolower(static::getRegion()) . '_' . strtoupper(static::getLanguage());
+		if (!static::getLanguage() || !static::getRegion()) {
+			return null;
+		} else {
+			return strtolower(static::getLanguage()) . '_' . strtoupper(static::getRegion());
+		}
 	}
 
 	/**
@@ -145,11 +149,16 @@ trait LocaleTrait
 	 */
 	public static function setLocale($region, $language)
 	{
-		/* @var $inst self */
-		$inst = static::getInstance(true);
-		$inst->region = $region;
-		$inst->language = $language;
-		static::updateLocaleChain();
+		if (
+			static::getRegion() != $region ||
+			static::getLanguage() != $language
+		) {
+			/* @var $inst self */
+			$inst = static::getInstance(true);
+			$inst->region = $region;
+			$inst->language = $language;
+			static::updateLocaleChain();
+		}
 	}
 
 	// --------------------------------------------------------------------------------------------

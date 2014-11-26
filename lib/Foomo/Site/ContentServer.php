@@ -43,7 +43,7 @@ class ContentServer implements ContentServerInterface
 			$siteRepoNodes = (object) [];
 			foreach (Site::getConfig()->adapters as $adapter) {
 				$adapterConfig = $adapter::getAdapterConfig();
-				if ($adapterConfig) {
+				if ($adapterConfig && $adapterConfig->getPathUrl('repository')) {
 					$adapterRepoNodes = static::getRepoNode($adapterConfig->getPathUrl('repository'));
 					foreach ($adapterRepoNodes as $dimension => $repoNode) {
 						static::iterateNode($dimension, $repoNode);

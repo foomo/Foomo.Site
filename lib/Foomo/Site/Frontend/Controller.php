@@ -37,7 +37,7 @@ class Controller
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @todo this should go somewhere else
+	 * @todo this should go somewhere else (i.e. custom urlhandler)
 	 *
 	 * @var bool
 	 */
