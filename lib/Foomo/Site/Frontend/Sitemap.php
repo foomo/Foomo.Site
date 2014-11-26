@@ -63,15 +63,15 @@ class Sitemap
 
 	/**
 	 * @param RepoNode $node
-	 * @param string   $priority
+	 * @param array    $attributes
 	 * @return string
 	 */
-	public static function render($node, $priority = '0.5')
+	public static function render($node, $attributes = [])
 	{
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
 		$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . PHP_EOL;
 		$xml .= 'xmlns:xhtml="http://www.w3.org/1999/xhtml">' . PHP_EOL;
-		$xml .= static::iterateNode($node, compact('priority'));
+		$xml .= static::iterateNode($node, $attributes);
 		$xml .= '</urlset>';
 		return $xml;
 	}
@@ -110,9 +110,9 @@ class Sitemap
 	{
 		$ret = '<url>' . PHP_EOL;
 		$attributes['loc'] = Site::getConfig()->domain . htmlentities($node->URI);
-		foreach($attributes as $key => $value) {
+		foreach ($attributes as $key => $value) {
 			if (!empty($value)) {
-				$ret .= "<".$key.">" . $value . "</".$key.">" . PHP_EOL;
+				$ret .= "<" . $key . ">" . $value . "</" . $key . ">" . PHP_EOL;
 			}
 		}
 		$ret .= '</url>' . PHP_EOL;
