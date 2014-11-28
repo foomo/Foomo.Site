@@ -19,6 +19,7 @@
 
 namespace Foomo\Site;
 
+use Foomo\Config\Smtp;
 use Foomo\Frontend\ToolboxConfig\MenuEntry;
 use Foomo\Modules\Manager;
 
@@ -79,6 +80,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 				$resources = array_merge(
 					[
 						# site module configs
+						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.smtp'),
 						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.ContentServer.config'),
 						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.config'),
 					],
@@ -122,6 +124,14 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * @return Smtp
+	 */
+	public static function getSMTPConfig()
+	{
+		return self::getRootModuleConfig(Smtp::NAME);
+	}
+
+	/**
 	 * @return \Foomo\Site\DomainConfig
 	 */
 	public static function getSiteConfig()
@@ -159,6 +169,16 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	public static function getRootModuleClass()
 	{
 		return \Foomo\Modules\Manager::getModuleClassByName(static::getRootModule());
+	}
+	/**
+	 * Returns the implementing site module name space
+	 *
+	 * @return string|\Foomo\Modules\ModuleBase
+	 */
+	public static function getRootModuleNamespace()
+	{
+		$className = static::getRootModuleClass();
+		return implode('\\', array_slice(explode('\\', $className), 0, -1));
 	}
 
 	/**
