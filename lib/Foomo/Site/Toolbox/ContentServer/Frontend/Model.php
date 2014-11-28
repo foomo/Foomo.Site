@@ -58,7 +58,7 @@ class Model
 	public function setDimension($dimension = null)
 	{
 		$this->repoNodes = \Foomo\Site\Module::getSiteContentServerProxyConfig()->getProxy()->getRepo();
-		if ($this->repoNodes) {
+		if ($this->repoNodes && !empty($this->repoNodes)) {
 			if (is_null($dimension) || !isset($this->repoNodes->$dimension)) {
 				$this->dimension = array_keys(get_object_vars($this->repoNodes))[0];
 			} else {
