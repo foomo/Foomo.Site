@@ -48,11 +48,11 @@ class Mail
 		# get config
 		if (is_null($config)) {
 			$config = Module::getSMTPConfig();
-			$mailer->setSmtpConfig($config);
 		}
+		$mailer->setSmtpConfig($config);
 
-		if (!isset($headers['From'])) {
-			$headers['From'] = $config->username;
+		if (!isset($headers["From"])) {
+			$headers["From"] = $config->username;
 		}
 
 		# render templates
@@ -63,41 +63,13 @@ class Mail
 
 		# send mail
 		$subject = Mail\Frontend::getTranslation($name)->_($msgId);
-		$result = $mailer->sendMail($to, $subject, $plain, $html, $headers);
+		$result = $mailer->sendMail($to, $subject, $plain, $html->output(), $headers);
 
 		# log on errors
 		if (!$result) {
-			self::appendToLog(
-				'========================================' . PHP_EOL .
-				$mailer->getLastError() . PHP_EOL .
-				'----------------------------------------' . PHP_EOL .
-				$html . PHP_EOL .
-				'----------------------------------------' . PHP_EOL .
-				$plain . PHP_EOL .
-				'========================================' . PHP_EOL
-			);
 			trigger_error($mailer->getLastError(), E_USER_WARNING);
 		}
 
 		return $result;
-	}
-
-	/**
-	 * @return string
-	 */
-	public static function getLogFilename()
-	{
-		$rootClassName = Module::getRootModuleClass();
-		return $rootClassName::getLogDir() . '/mail.log';
-	}
-
-	/**
-	 * @param $message
-	 */
-	public static function appendToLog($message)
-	{
-		$fp = fopen(self::getLogFilename(), 'a+');
-		fwrite($fp, $message);
-		fclose($fp);
 	}
 }
