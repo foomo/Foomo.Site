@@ -83,7 +83,7 @@ class Router extends \Foomo\Router
 	public function site()
 	{
 		Timer::addMarker('running site frontend');
-		return \Foomo\MVC::run(\Foomo\Site::getFrontend());
+		return \Foomo\MVC::run(\Foomo\Site::getFrontend(), 'Foomo\\Site\\Frontend\\URLHandler');
 	}
 
 	/**

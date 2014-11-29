@@ -33,17 +33,6 @@ use Foomo\Timer;
 class Controller
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * @todo this should go somewhere else (i.e. custom urlhandler)
-	 *
-	 * @var bool
-	 */
-	public static $resolved = false;
-
-	// --------------------------------------------------------------------------------------------
 	// ~ Variables
 	// --------------------------------------------------------------------------------------------
 
@@ -73,7 +62,7 @@ class Controller
 		Timer::addMarker('rendered content on model');
 
 		# validate path
-		if (!static::$resolved) {
+		if (!Site\URLHandler::getMarkedAsResolved()) {
 			throw new Site\Exception\HTTPException(404, 'Content not found!');
 		}
 	}
@@ -98,8 +87,9 @@ class Controller
 		# set content
 		$this->model->setContent($content);
 
-		# set resolved state
-		static::$resolved = ($this->model->getContent()->URI == $url['path']);
+		if ($this->model->getContent()->URI == $url['path']) {
+			Site\URLHandler::markAsResolved();
+		}
 
 		# validate status
 		if ($content->status != Vo\Content\SiteContent::STATUS_OK) {
