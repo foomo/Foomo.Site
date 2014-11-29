@@ -83,6 +83,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.smtp'),
 						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.ContentServer.config'),
 						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.config'),
+						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.analytics'),
 					],
 					$resources
 				);
@@ -129,6 +130,14 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	public static function getSMTPConfig()
 	{
 		return self::getRootModuleConfig(Smtp::NAME);
+	}
+
+	/**
+	 * @return \Foomo\Site\Analytics\DomainConfig
+	 */
+	public static function getAnalyticsConfig()
+	{
+		return self::getRootModuleConfig(\Foomo\Site\Analytics\DomainConfig::NAME);
 	}
 
 	/**
