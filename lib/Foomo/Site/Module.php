@@ -80,10 +80,11 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 				$resources = array_merge(
 					[
 						# site module configs
-						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.smtp'),
 						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.ContentServer.config'),
 						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.config'),
-						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.analytics'),
+						# add these to your site if you want to use Mail or Analytics
+						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.smtp'),
+						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.analytics'),
 					],
 					$resources
 				);
