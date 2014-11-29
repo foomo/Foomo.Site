@@ -21,6 +21,7 @@ namespace Foomo\Site\Frontend;
 
 use Foomo\ContentServer\Vo\Content\RepoNode;
 use Foomo\Site;
+use Foomo\Utils;
 
 /**
  * Simple sitemap implementation
@@ -74,6 +75,37 @@ class Sitemap
 		$xml .= static::iterateNode($node, $attributes);
 		$xml .= '</urlset>';
 		return $xml;
+	}
+
+	/**
+	 * Set headers, echos & exits
+	 *
+	 * @param RepoNode $node
+	 * @param array    $attributes
+	 * @return string
+	 */
+	public static function output($node, $attributes = [])
+	{
+		header('Content-Type: text/xml; charset=utf-8;');
+		echo static::render($node, $attributes);
+		exit;
+	}
+
+	/**
+	 * Set headers, echos & exits
+	 *
+	 * @param string[] $uris Array of relative uri
+	 */
+	public static function outputIndex($uris)
+	{
+		header('Content-Type: text/xml; charset=utf-8;');
+		$xml = '<sitemapindex>';
+		foreach ($uris as $uri) {
+			$xml .= '<sitemap><loc>' . Utils::getServerUrl() . $uri . '</loc></sitemap>';
+		}
+		$xml .= '</sitemapindex>';
+		echo $xml;
+		exit;
 	}
 
 	// --------------------------------------------------------------------------------------------
