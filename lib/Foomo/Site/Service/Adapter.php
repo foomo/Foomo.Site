@@ -41,6 +41,8 @@ class Adapter
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * @note If you change the api here, make sure to check the Neos publishing call!
+	 *
 	 * @param string $nodeId
 	 * @param string $dimension
 	 * @param string $clientClass
@@ -48,6 +50,7 @@ class Adapter
 	 */
 	public function deleteClientCache($nodeId = null, $dimension = null, $clientClass = null)
 	{
+		trigger_error(__FUNCTION__);
 		$exprs = [];
 
 		if (is_null($nodeId)) {

@@ -30,6 +30,25 @@ use Foomo\Site;
 class View extends \Foomo\MVC\View
 {
 	// --------------------------------------------------------------------------------------------
+	// ~ Static variables
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * Flag if the actual frontend view started to render
+	 *
+	 * @var bool
+	 */
+	protected static $rendering = false;
+	/**
+	 * @var array
+	 */
+	protected static $bundlesToAdd = [];
+	/**
+	 * @var string
+	 */
+	protected static $javascripts = [];
+
+	// --------------------------------------------------------------------------------------------
 	// ~ Variables
 	// --------------------------------------------------------------------------------------------
 
@@ -108,12 +127,31 @@ class View extends \Foomo\MVC\View
 	{
 		# check if we are a partial or not
 		if ($this->partial == '') {
+			static::$rendering = true;
 			$this->renderHead(
 				HTMLDocument::getInstance(),
 				(!\Foomo\Config::isProductionMode())
 			);
 		}
-		return parent::render($variables);
+		# render
+		$ret = parent::render($variables);
+
+		if ($this->partial == '') {
+			# add a view bundle containing the registerd bundles
+			if (!empty(static::$bundlesToAdd)) {
+				Site\Bundles::addMergedBundleToDoc('view', static::$bundlesToAdd);
+			}
+			# add javascripts
+			if (!empty(static::$javascripts)) {
+				HTMLDocument::getInstance()->addJavascriptToBody(trim('
+					$(document).ready(function() {
+						' . implode(PHP_EOL, array_reverse(static::$javascripts)) . '
+					});
+				'));
+			}
+		}
+
+		return $ret;
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -125,9 +163,44 @@ class View extends \Foomo\MVC\View
 	 * so we can send it off the browser for optimized page speed
 	 *
 	 * @param HTMLDocument $HTMLDoc
-	 * @param bool         $debug
 	 */
-	protected function renderHead(HTMLDocument $HTMLDoc, $debug)
+	protected function renderHead(HTMLDocument $HTMLDoc)
 	{
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * Add javascript executed on jquery's on load event
+	 *
+	 * @param $script
+	 */
+	public static function addJavascript($script)
+	{
+		static::$javascripts[] = str_replace('\t', '', $script);
+	}
+
+	/**
+	 * Add a bundle to the `view` bundle
+	 *
+	 * @param string   $name
+	 * @param array    $data
+	 * @param string[] $services
+	 * @param string   $module
+	 */
+	public static function addBundle($name, array $data = [], array $services = [], $module = null)
+	{
+		if (is_null($module)) {
+			$module = Site\Module::getRootModule();
+		}
+
+		// don't add them to the doc yet since the frontend hasn't started rendering yet!
+		if (static::$rendering) {
+			Site\Bundles::addBundleToDoc($name, $module, $data, $services);
+		} else {
+			static::$bundlesToAdd[] = [$name, $module, $data, $services];
+		}
 	}
 }
