@@ -178,11 +178,16 @@ class View extends \Foomo\MVC\View
 	/**
 	 * Add javascript executed on jquery's on load event
 	 *
-	 * @param $script
+	 * @param string $script
+	 * @param bool $append
 	 */
-	public static function addJavascript($script)
+	public static function addJavascript($script, $append = true)
 	{
-		static::$javascripts[] = str_replace('\t', '', $script);
+		if ($append) {
+			array_push(static::$javascripts, $script);
+		} else {
+			array_unshift(static::$javascripts, $script);
+		}
 	}
 
 	/**
