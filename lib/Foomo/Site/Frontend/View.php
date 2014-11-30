@@ -126,17 +126,20 @@ class View extends \Foomo\MVC\View
 	public function render($variables = [])
 	{
 		# check if we are a partial or not
-		if ($this->partial == '') {
+		$isFrontend = ($this->partial == '');
+
+		if ($isFrontend) {
 			static::$rendering = true;
 			$this->renderHead(
 				HTMLDocument::getInstance(),
 				(!\Foomo\Config::isProductionMode())
 			);
 		}
+
 		# render
 		$ret = parent::render($variables);
 
-		if ($this->partial == '') {
+		if ($isFrontend) {
 			# add a view bundle containing the registerd bundles
 			if (!empty(static::$bundlesToAdd)) {
 				Site\Bundles::addMergedBundleToDoc('view', static::$bundlesToAdd);
