@@ -109,12 +109,13 @@ class Client extends AbstractClient implements ClientInterface
 			$appClassName = $appNode->getAttribute('class');
 
 			# find & retrieve app data
-			$appData = new \stdClass();
+			$appData = (object) array();
 			if (null != $appNodeData = $doc->getElementById('data-' . $appNodeId)) {
 				/* @var $appNodeData \DOMElement */
 				$data = $appNodeData->textContent;
-				$data = str_replace(array('<![CDATA[',']]>'), '', $data);
-				$appData = json_decode($data);
+				if ($data) {
+					$appData = json_decode($data);
+				}
 				$appNodeData->parentNode->removeChild($appNodeData);
 			}
 

@@ -95,18 +95,15 @@ class Controller
 	 */
 	public function actionUpdateCaches($action, $dimension = null)
 	{
-		$this->deleteCaches();
-		$res = $this->callNodes(
-			\Foomo\Site\Module::getSiteContentServerProxyConfig()->getProxy()->getRepo()
-		);
-		if ($res) {
-			MVC::abort();
-			header('Content-Type: text/plain');
-			print_r($res);
-			exit;
-		} else {
-			MVC::redirect($action, [$dimension]);
+		MVC::abort();
+		header('Content-Type: text/plain');
+		$repo = \Foomo\Site\Module::getSiteContentServerProxyConfig()->getProxy()->getRepo();
+		$res = [];
+		foreach ($repo as $dimension => $repoNode) {
+			$res = array_merge($this->updateRepoNodeCache($dimension, $repoNode), $res);
 		}
+		echo implode(PHP_EOL, $res);
+		exit;
 	}
 
 	/**
@@ -117,7 +114,7 @@ class Controller
 	 */
 	public function actionDeleteCaches($action, $dimension = null, $nodeId = null, $all = false)
 	{
-		$this->deleteCaches($dimension, $nodeId, $all);
+		$this->deleteContentCache($nodeId, ($all) ? null : $dimension);
 		MVC::redirect($action, [$dimension]);
 	}
 
@@ -140,46 +137,62 @@ class Controller
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @param string $dimension
 	 * @param string $nodeId
-	 * @param bool   $all
+	 * @param string $dimension
 	 */
-	private function deleteCaches($dimension = null, $nodeId = null, $all = false)
+	private function deleteContentCache($nodeId = null, $dimension = null)
 	{
 		if (is_null($nodeId) && is_null($dimension)) {
 			$expr = null;
-		} else if (!$all) {
+		} else if (!is_null($nodeId) && is_null($dimension)) {
 			$expr = Expr::propEq('nodeId', $nodeId);
-		} else {
+		} else if (!is_null($nodeId) && !is_null($dimension)) {
 			$expr = Expr::groupAnd(
 				Expr::propEq('nodeId', $nodeId),
 				Expr::propEq('dimension', $dimension)
 			);
+		} else if (is_null($nodeId) && !is_null($dimension)) {
+			$expr = Expr::propEq('dimension', $dimension);
 		}
 		Adapter::invalidateCachedLoadClientContent($expr);
 	}
 
 	/**
-	 * @param RepoNode[] $repoNodes
+	 * @param string $dimension
+	 * @param RepoNode $repoNode
 	 * @return string[]
 	 */
-	private function callNodes($repoNodes)
+	private function updateRepoNodeCache($dimension, $repoNode)
 	{
 		$ret = [];
-		foreach ($repoNodes as $repoNode) {
-			$url = Utils::getServerUrl(false, true) . $repoNode->URI;
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
-			curl_setopt($ch, CURLOPT_HEADER, true);
-			curl_setopt($ch, CURLOPT_NOBODY, true);
-			if (curl_exec($ch) === false) {
-				$ret[] = 'ERROR ' . curl_error($ch) . '(' . $url .')';
-			}
-			curl_close($ch);
+		$time = microtime(true);
+		$url = Utils::getServerUrl(false, true) . $repoNode->URI;
 
-			$ret = array_merge($this->callNodes($repoNode->nodes), $ret);
+		// delete cache
+		$this->deleteContentCache($repoNode->id, $dimension);
+
+		// curl site to build cache
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		if (curl_exec($ch) === false) {
+			$ret[] = 'ERROR ' . curl_error($ch) . '(' . $url .')';
+			// @todo for now we are stopping here
+			echo implode(PHP_EOL, $ret);
+			exit;
+		} else {
+			$ret[] = 'Cached (' . number_format((microtime(true) - $time), 2) . 's): ' . $url;
+		}
+		curl_close($ch);
+
+		# iterate children
+		if ($repoNode->nodes && !empty($repoNode->nodes)) {
+			foreach ($repoNode->nodes as $childRepoNode) {
+				$ret = array_merge($this->updateRepoNodeCache($dimension, $childRepoNode), $ret);
+			}
 		}
 		return $ret;
 	}
