@@ -181,7 +181,7 @@ class Client extends AbstractClient implements ClientInterface
 			if (substr($href, 0, 7) == 'neos://') {
 				$ids = array_unique(array_merge($ids, [substr($href, 7)]));
 				$elements[] = $element;
-			} else if (preg_match('~^(?:f|ht)tps?://~i', $href)) {
+			} else if (preg_match('~^(?:f|ht)tps?://~i', $href) && !$element->hasAttribute('target')) {
 				// add target attr
 				$element->setAttribute('target', '_blank');
 			}
