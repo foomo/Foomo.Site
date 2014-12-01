@@ -78,7 +78,8 @@ class Controller
 	 */
 	public function actionUpdateServer($action, $dimension = null)
 	{
-		$result = Module::getSiteContentServerProxyConfig()->getProxy()->update();
+		$service = new Site\Service\ContentServer();
+		$result = $service->update();
 
 		if ($result->success) {
 			MVC::redirect($action, [$dimension]);
