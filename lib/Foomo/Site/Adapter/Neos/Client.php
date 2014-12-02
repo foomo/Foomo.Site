@@ -127,7 +127,7 @@ class Client extends AbstractClient implements ClientInterface
 
 			# create app dom document
 			$appFragment = $doc->createDocumentFragment();
-			$appFragment->appendXML($appHtml);
+			$appFragment->appendXML('<![CDATA[' . $appHtml . ']]>');
 
 			# replace in dom
 			$appNode->parentNode->replaceChild($appFragment, $appNode);
