@@ -59,10 +59,10 @@ class Mail
 		$app = new \Foomo\Site\Mail\Frontend();
 		$html = MVC::runAction($app, 'html', compact('name', 'vars'), null, false);
 		$plain = MVC::runAction($app, 'plain', compact('name', 'vars'));
-		$msgId = strtoupper(preg_replace('/([a-z])([A-Z])/', '$1_$2', $name));
 
 		# send mail
-		$subject = Mail\Frontend::getTranslation($name)->_($msgId);
+		$subject = Mail\Frontend::getTranslation($name)->_('MAIL_SUBJECT');
+
 		$result = $mailer->sendMail($to, $subject, $plain, $html->output(), $headers);
 
 		# log on errors
