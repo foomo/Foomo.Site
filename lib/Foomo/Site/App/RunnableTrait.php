@@ -66,6 +66,10 @@ trait RunnableTrait
 	 */
 	protected function setAppData($data)
 	{
-		$this->model->data = $data;
+		if (method_exists($this->model,'setData')) {
+			$this->model->setData($data);
+		} else {
+			$this->model->data = $data;
+		}
 	}
 }

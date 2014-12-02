@@ -20,9 +20,9 @@
 namespace Foomo\Site\Adapter\Neos;
 
 use Foomo\Media\Image;
+use Foomo\Site\Adapter\Cache;
 use Foomo\Site\Adapter\Media;
 use Foomo\Site\Adapter\Neos;
-use Foomo\Site\Adapter\Cache;
 use Foomo\Utils;
 
 /**
@@ -105,7 +105,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 		$cacheFilename = Cache::getFilename($nodeId, $url);
 
 		if ($cacheFilename) {
-			Utils::streamFile($cacheFilename, $filename, 'application/octet-stream', true);
+			Utils::streamFile($cacheFilename, $filename, Utils::guessMime($cacheFilename));
 			exit;
 		} else {
 			$this->error();
