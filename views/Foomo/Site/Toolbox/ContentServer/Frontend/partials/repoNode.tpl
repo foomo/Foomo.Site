@@ -1,5 +1,5 @@
 <?php
-/* @var $view \Foomo\MVC\View */
+/* @var $view \Foomo\Site\Toolbox\ContentServer\Frontend\View */
 /* @var $model \Foomo\Site\Toolbox\ContentServer\Frontend\Model */
 /* @var $repoNode \Foomo\ContentServer\Vo\Content\RepoNode */
 /* @var $parentNode \Foomo\ContentServer\Vo\Content\RepoNode */
@@ -70,7 +70,6 @@ $mimeTypes = [
 	</td>
 	<td style="text-align:center;">
 		<? if (null != $resource = $view->getCachedContent($nodeId, $dimension)): ?>
-			<? $all = false; ?>
 			<a
 				class="fa fa-file-o"
 				style="text-decoration:none;color:darkred;"
@@ -81,8 +80,7 @@ $mimeTypes = [
 		<? endif ?>
 	</td>
 	<td style="text-align:center;">
-		<? if ((null != $resources = $view->getCachedContent($nodeId)) && count($resources) > 1): ?>
-			<? $all = true; ?>
+		<? if ((null != $resources = $view->getCachedContent($nodeId))): ?>
 			<a
 				class="fa fa-files-o"
 				style="text-decoration:none;color:darkred;"

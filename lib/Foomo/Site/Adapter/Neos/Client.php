@@ -45,13 +45,13 @@ class Client extends AbstractClient implements ClientInterface
 	{
 		\Foomo\Timer::addMarker('service neos content');
 		\Foomo\Timer::start($topic = __METHOD__);
-		$html = self::cachedLoad($dimension, $nodeId);
+		$html = static::cachedLoad($dimension, $nodeId);
 		if (!empty($html)) {
 
-			$doc = self::getDOMDocument($html);
+			$doc = static::getDOMDocument($html);
 
 			# replace apps
-			self::replaceApps($doc, $baseURL);
+			static::replaceApps($doc, $baseURL);
 
 			$html = $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
 			\Foomo\Timer::stop($topic);
@@ -69,11 +69,11 @@ class Client extends AbstractClient implements ClientInterface
 		\Foomo\Timer::start($topic = __METHOD__);
 		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
 		$json = json_decode(file_get_contents($url));
-		$doc = self::getDOMDocument($json->html);
+		$doc = static::getDOMDocument($json->html);
 
 		# replace images & links
-		self::replaceImages($doc);
-		self::replaceLinks($dimension, $doc);
+		static::replaceImages($doc);
+		static::replaceLinks($dimension, $doc);
 
 		$html =  $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
 		\Foomo\Timer::stop($topic);
@@ -127,10 +127,10 @@ class Client extends AbstractClient implements ClientInterface
 			}
 
 			# retrieve inner app html
-			$appData->html = self::getInnerHtml($doc, $appNode);
+			$appData->html = static::getInnerHtml($doc, $appNode);
 
 			# render app
-			$appHtml = self::renderApp($appClassName, $appData, $baseURL);
+			$appHtml = static::renderApp($appClassName, $appData, $baseURL);
 
 			# create app dom document
 			$appFragment = $doc->createDocumentFragment();
