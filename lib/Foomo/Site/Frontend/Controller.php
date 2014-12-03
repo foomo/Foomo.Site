@@ -59,7 +59,6 @@ class Controller
 		# URLHandler::exposeClassId(true);
 		URLHandler::strictParameterHandling(true);
 		$this->model->renderContent();
-		Timer::addMarker('rendered content on model');
 
 		# validate path
 		if (!Site\URLHandler::getMarkedAsResolved()) {
@@ -77,6 +76,7 @@ class Controller
 	 */
 	protected function loadSiteContent($url)
 	{
+		\Foomo\Timer::start($topic = __METHOD__);
 		$url = parse_url($url);
 		$config = Site::getConfig();
 
@@ -95,6 +95,6 @@ class Controller
 		if ($content->status != Vo\Content\SiteContent::STATUS_OK) {
 			throw new Site\Exception\HTTPException($content->status, 'Content server client result not OK!');
 		}
-
+		\Foomo\Timer::stop($topic);
 	}
 }

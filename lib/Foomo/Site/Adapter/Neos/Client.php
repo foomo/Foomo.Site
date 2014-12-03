@@ -43,6 +43,8 @@ class Client extends AbstractClient implements ClientInterface
 	 */
 	public static function get($dimension, $nodeId, $baseURL)
 	{
+		\Foomo\Timer::addMarker('service neos content');
+		\Foomo\Timer::start($topic = __METHOD__);
 		$html = self::cachedLoad($dimension, $nodeId);
 		if (!empty($html)) {
 
@@ -51,7 +53,9 @@ class Client extends AbstractClient implements ClientInterface
 			# replace apps
 			self::replaceApps($doc, $baseURL);
 
-			return $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
+			$html = $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
+			\Foomo\Timer::stop($topic);
+			return $html;
 		} else {
 			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
 		}
@@ -62,6 +66,7 @@ class Client extends AbstractClient implements ClientInterface
 	 */
 	public static function load($dimension, $nodeId)
 	{
+		\Foomo\Timer::start($topic = __METHOD__);
 		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
 		$json = json_decode(file_get_contents($url));
 		$doc = self::getDOMDocument($json->html);
@@ -70,7 +75,9 @@ class Client extends AbstractClient implements ClientInterface
 		self::replaceImages($doc);
 		self::replaceLinks($dimension, $doc);
 
-		return $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
+		$html =  $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
+		\Foomo\Timer::stop($topic);
+		return $html;
 	}
 
 	// --------------------------------------------------------------------------------------------

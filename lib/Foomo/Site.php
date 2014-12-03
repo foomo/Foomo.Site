@@ -39,6 +39,8 @@ class Site
 	 */
 	public static function run()
 	{
+		\Foomo\Timer::addMarker('running Foomo.Site');
+
 		# boot env
 		$env = static::getEnv();
 		$env::boot();

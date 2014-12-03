@@ -90,6 +90,8 @@ class Bundles
 	public static function getBundle($name, $moduleName, array $data = [], array $services = [], array $dependencies = [])
 	{
 		# create unique name
+		\Foomo\Timer::addMarker('getting bundle');
+
 
 		# create TypeScript apps bundle
 		$bundle = static::getTypeScriptBundle($name, $moduleName, $data);

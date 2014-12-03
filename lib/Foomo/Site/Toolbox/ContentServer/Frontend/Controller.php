@@ -159,6 +159,8 @@ class Controller
 	}
 
 	/**
+	 * @todo use KRAKEN to warm caches
+	 *
 	 * @param string $dimension
 	 * @param RepoNode $repoNode
 	 * @return string[]
@@ -168,6 +170,8 @@ class Controller
 		$ret = [];
 		$time = microtime(true);
 		$url = Utils::getServerUrl(false, true) . $repoNode->URI;
+
+		//trigger_error('warming cache for ' . $url);
 
 		// delete cache
 		$this->deleteContentCache($repoNode->id, $dimension);
@@ -179,6 +183,7 @@ class Controller
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
 		curl_setopt($ch, CURLOPT_HEADER, true);
 		curl_setopt($ch, CURLOPT_NOBODY, true);
+		// @todo images are not being loaded/cached
 		if (curl_exec($ch) === false) {
 			$ret[] = 'ERROR ' . curl_error($ch) . '(' . $url .')';
 			// @todo for now we are stopping here

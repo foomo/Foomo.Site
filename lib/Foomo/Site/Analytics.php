@@ -103,11 +103,34 @@ class Analytics
 	}
 
 	/**
+	 * @param string $cmd
+	 * @param mixed $value
+	 * @return self
+	 */
+	public function addSet($cmd, $value)
+	{
+		$this->add(['set', $cmd, $value]);
+		return $this;
+	}
+
+	/**
 	 * @param string[] $cmd
 	 * @return self
 	 */
 	public function add(array $cmd)
 	{
+		foreach ($cmd as $key => $option) {
+			switch (true) {
+				case is_bool($option):
+					$cmd[$key] = ($option) ? 'true' : 'false';
+					break;
+				case is_string($option):
+					$cmd[$key] = '"' . $option . '"';
+					break;
+				default:
+					break;
+			}
+		}
 		$this->cmds[] = $cmd;
 		return $this;
 	}
@@ -126,7 +149,7 @@ class Analytics
 
 		# add commands
 		foreach ($this->cmds as $cmd) {
-			$script .= "ga('" . implode("', '", $cmd) . "');" . PHP_EOL;
+			$script .= "ga(" . implode(",", $cmd) . ");" . PHP_EOL;
 		}
 		return $script;
 	}

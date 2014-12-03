@@ -34,8 +34,6 @@ class SubRouter extends \Foomo\Router
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @todo: should this be a static var?
-	 *
 	 * @var string
 	 */
 	public static $prefix = 'subroute';

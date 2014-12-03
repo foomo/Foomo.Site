@@ -133,12 +133,14 @@ class Model
 	 */
 	public function renderContent()
 	{
+		\Foomo\Timer::start($topic = __METHOD__);
 		$adapter = $this->getContentAdapter();
 
 		# get content
 		$rendering = $adapter::getContent($this->getContent());
 
 		$this->contentRendering = $rendering;
+		\Foomo\Timer::stop($topic);
 	}
 
 	/**

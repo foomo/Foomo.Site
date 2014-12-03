@@ -26,8 +26,6 @@ use Foomo\Site\Adapter\Neos;
 use Foomo\Utils;
 
 /**
- * @todo    check image & asset route
- *
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  */
@@ -89,7 +87,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 	}
 
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Public route methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
@@ -100,12 +98,21 @@ class SubRouter extends \Foomo\Site\SubRouter
 	 */
 	public function asset($nodeId, $filename)
 	{
+		\Foomo\Session::saveAndRelease();
+
+		\Foomo\Timer::addMarker('serving asset');
 		$config = Neos::getAdapterConfig();
 		$url = $config->getPathUrl('asset') . '/' . $nodeId;
+		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
 		$cacheFilename = Cache::getFilename($nodeId, $url);
+		\Foomo\Timer::stop($topic);
 
 		if ($cacheFilename) {
+			\Foomo\Timer::start($topic = 'Foomo\Utils::streamFile');
 			Utils::streamFile($cacheFilename, $filename, Utils::guessMime($cacheFilename));
+			\Foomo\Timer::stop($topic);
+			\Foomo\Timer::addMarker('done');
+			#\Foomo\Timer::writeStatsToFile();
 			exit;
 		} else {
 			$this->error();
@@ -121,12 +128,24 @@ class SubRouter extends \Foomo\Site\SubRouter
 	 */
 	public function image($type, $nodeId, $time = null)
 	{
+		\Foomo\Timer::addMarker('serving neos image');
+		\Foomo\Session::saveAndRelease();
+
 		$config = Neos::getAdapterConfig();
 		$url = $config->getPathUrl('image') . '/' . $nodeId;
+
+		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
 		$cacheFilename = Cache::getFilename($nodeId, $url, 'neos', (int) $time);
+		\Foomo\Timer::stop($topic);
+
 
 		if ($cacheFilename) {
+			\Foomo\Timer::start($topic = 'Foomo\Media\Image\Server::serve');
 			Image\Server::serve($cacheFilename, Neos::getName(), $type);
+			\Foomo\Timer::stop($topic);
+
+			\Foomo\Timer::addMarker('done');
+			#\Foomo\Timer::writeStatsToFile();
 			exit;
 		} else {
 			$this->error();

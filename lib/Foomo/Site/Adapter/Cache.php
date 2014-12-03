@@ -44,6 +44,7 @@ class Cache
 	public static function getFilename($nodeId, $url, $type = 'files', $time = 0)
 	{
 		$module = Module::getRootModuleClass();
+
 		$filename = $module::getCacheDir($type) . DIRECTORY_SEPARATOR . $nodeId;
 
 		if (file_exists($filename)) {
