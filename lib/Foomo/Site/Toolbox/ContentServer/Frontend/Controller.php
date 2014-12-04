@@ -171,28 +171,39 @@ class Controller
 		$time = microtime(true);
 		$url = Utils::getServerUrl(false, true) . $repoNode->URI;
 
-		//trigger_error('warming cache for ' . $url);
+		if (
+			in_array(
+				$repoNode->mimeType,
+				[
+					'application/neos+page',
+					'application/foomo+app',
+					'application/shop+category',
+				]
+			)
+		) {
+			//trigger_error('warming cache for ' . $url);
 
-		// delete cache
-		$this->deleteContentCache($repoNode->id, $dimension);
+			// delete cache
+			$this->deleteContentCache($repoNode->id, $dimension);
 
-		// curl site to build cache
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
-		curl_setopt($ch, CURLOPT_HEADER, true);
-		curl_setopt($ch, CURLOPT_NOBODY, true);
-		// @todo images are not being loaded/cached
-		if (curl_exec($ch) === false) {
-			$ret[] = 'ERROR ' . curl_error($ch) . '(' . $url .')';
-			// @todo for now we are stopping here
-			echo implode(PHP_EOL, $ret);
-			exit;
-		} else {
-			$ret[] = 'Cached (' . number_format((microtime(true) - $time), 2) . 's): ' . $url;
+			// curl site to build cache
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+			curl_setopt($ch, CURLOPT_HEADER, true);
+			curl_setopt($ch, CURLOPT_NOBODY, true);
+			// @todo images are not being loaded/cached
+			if (curl_exec($ch) === false) {
+				$ret[] = 'ERROR ' . curl_error($ch) . '(' . $url .')';
+				// @todo for now we are stopping here
+				echo implode(PHP_EOL, $ret);
+				exit;
+			} else {
+				$ret[] = 'Cached (' . number_format((microtime(true) - $time), 2) . 's): ' . $url;
+			}
+			curl_close($ch);
 		}
-		curl_close($ch);
 
 		# iterate children
 		if ($repoNode->nodes && !empty($repoNode->nodes)) {
