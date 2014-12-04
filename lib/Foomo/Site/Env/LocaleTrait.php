@@ -157,8 +157,8 @@ trait LocaleTrait
 			$inst = static::getInstance(true);
 			$inst->region = $region;
 			$inst->language = $language;
-			static::updateLocaleChain();
 		}
+		static::updateLocaleChain();
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -170,6 +170,8 @@ trait LocaleTrait
 	 */
 	protected static function updateLocaleChain()
 	{
-		Translation::setDefaultLocaleChain([static::getLocale(), static::getLanguage()]);
+		$locale = static::getLocale();
+		$language = static::getLanguage();
+		Translation::setDefaultLocaleChain([$locale, $language]);
 	}
 }

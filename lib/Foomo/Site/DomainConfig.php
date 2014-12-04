@@ -23,7 +23,6 @@ use Foomo\Config\AbstractConfig;
 
 /**
  * Foomo site is based on the concept of dimension.
- * Build into dimensions are 'languages' & 'regions'.
  *
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
@@ -48,13 +47,12 @@ class DomainConfig extends AbstractConfig
 	 */
 	public $domain = 'http://www.mydomain.com';
 	/**
-	 * List of allowed regions and their languages
-	 * Note: The first region & language is used as the default
+	 * List of allowed/configured dimension i.e.
 	 *
 	 * @var array string[string][string]
 	 */
 	public $dimensions = [
-		'en_US' => [],
+		'en_US' => ['region' => 'us', 'language' => 'en'],
 	];
 	/**
 	 * List of allowed groups
@@ -63,7 +61,7 @@ class DomainConfig extends AbstractConfig
 	 */
 	public $groups = [];
 	/**
-	 * Map of nodeIds
+	 * Map of nodeIds which will be used within the site
 	 *
 	 * @var array
 	 */
