@@ -453,10 +453,3 @@ protected function renderHead(HTMLDocument $HTMLDoc)
     ...
 }
 ```
-
-## Neos
-
-
-## Frontend
-
-### Social Links
