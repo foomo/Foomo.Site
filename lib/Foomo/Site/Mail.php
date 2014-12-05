@@ -62,7 +62,6 @@ class Mail
 
 		# send mail
 		$subject = Mail\Frontend::getTranslation($name)->_('MAIL_SUBJECT');
-
 		$result = $mailer->sendMail($to, $subject, $plain, $html->output(), $headers);
 
 		# log on errors
