@@ -137,7 +137,15 @@ class Model
 		$adapter = $this->getContentAdapter();
 
 		# get content
-		$rendering = $adapter::getContent($this->getContent());
+		try {
+			$rendering = $adapter::getContent($this->getContent());
+		} catch(\Exception $e) {
+			trigger_error(
+				'Could not retrieve content:' . $e->getMessage() . PHP_EOL . $e->getTraceAsString(),
+				E_USER_WARNING
+			);
+			throw new Site\Exception\HTTPException(500, $e->getMessage(), $e);
+		}
 
 		$this->contentRendering = $rendering;
 		\Foomo\Timer::stop($topic);
