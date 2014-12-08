@@ -61,11 +61,12 @@ class Menu
 	 * @param Node   $node
 	 * @param Item[] $path
 	 * @param int    $depth
+	 * @param int    $level
 	 * @return string
 	 */
-	public static function render($node, $path = [], $depth = 0)
+	public static function render($node, $path = [], $depth = 0, $level = 0)
 	{
-		return static::renderNode($node, $path, $depth, 0);
+		return static::renderNode($node, $path, $depth, $level);
 	}
 
 	//---------------------------------------------------------------------------------------------
