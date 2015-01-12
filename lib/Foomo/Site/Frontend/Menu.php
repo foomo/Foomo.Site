@@ -83,6 +83,10 @@ class Menu
 	 */
 	protected static function renderNode($node, array $path, $depth, $level)
 	{
+		if (!$node) {
+			return '';
+		}
+		
 		$ret = static::renderMenuOpen($node, $path, $level);
 
 		foreach (Site\ContentServer\NodeIterator::getIterator($node) as $childNode) {
