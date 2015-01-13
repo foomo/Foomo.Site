@@ -68,7 +68,12 @@ class Client extends AbstractClient implements ClientInterface
 	{
 		\Foomo\Timer::start($topic = __METHOD__);
 		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
-		$json = json_decode(file_get_contents($url));
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$json = json_decode(curl_exec($ch));
+		curl_close($ch);
 		$doc = static::getDOMDocument($json->html);
 
 		# replace images & links
