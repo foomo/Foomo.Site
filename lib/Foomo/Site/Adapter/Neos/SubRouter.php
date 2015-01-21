@@ -109,7 +109,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 		if ($cacheFilename) {
 			\Foomo\Timer::start($topic = 'Foomo\Utils::streamFile');
-			Utils::streamFile($cacheFilename, $filename, Utils::guessMime($cacheFilename));
+			Utils::streamFile($cacheFilename, $filename, Utils::guessMime($cacheFilename), true);
 			\Foomo\Timer::stop($topic);
 			\Foomo\Timer::addMarker('done');
 			#\Foomo\Timer::writeStatsToFile();
