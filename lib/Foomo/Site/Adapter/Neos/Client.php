@@ -20,6 +20,7 @@
 namespace Foomo\Site\Adapter\Neos;
 
 use Foomo\Cache;
+use Foomo\Config;
 use Foomo\Site\Adapter\AbstractClient;
 use Foomo\Site\Adapter\ClientInterface;
 use Foomo\Site\Adapter\Neos;
@@ -72,6 +73,7 @@ class Client extends AbstractClient implements ClientInterface
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (Config::isProductionMode()));
 		$json = json_decode(curl_exec($ch));
 		curl_close($ch);
 		$doc = static::getDOMDocument($json->html);
