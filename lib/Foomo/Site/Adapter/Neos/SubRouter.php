@@ -141,7 +141,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 		if ($cacheFilename) {
 			\Foomo\Timer::start($topic = 'Foomo\Media\Image\Server::serve');
-			Image\Server::serve($cacheFilename, Neos::getName(), $type);
+			Image\Server::serve($cacheFilename, Neos::getName(), $type, null, (microtime() + 30 * 24 * 3600));
 			\Foomo\Timer::stop($topic);
 
 			\Foomo\Timer::addMarker('done');
