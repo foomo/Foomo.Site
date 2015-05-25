@@ -181,7 +181,7 @@ class Bundles
 			$templatesDir = dirname($resolvedFilename) . '/templates';
 			$templatesRenderer = new TypeScript\TemplateRenderer(
 				$templatesDir . '.ts',
-				\OuiSet\Module::getBaseDir('templates') . '/BackboneTemplates.tpl',
+				Module::getBaseDir('templates') . '/BackboneTemplates.tpl',
 				(object) ['module' => $moduleName . '.Apps.' . ucfirst($name)]
 			);
 
