@@ -193,12 +193,19 @@ class Client extends AbstractClient implements ClientInterface
 		foreach ($doc->getElementsByTagName('a') as $element) {
 			/* @var $element \DOMElement */
 			$href = $element->getAttribute('href');
-			if (substr($href, 0, 7) == 'neos://') {
-				$ids = array_unique(array_merge($ids, [substr($href, 7)]));
-				$elements[] = $element;
-			} else if (preg_match('~^(?:f|ht)tps?://~i', $href) && !$element->hasAttribute('target')) {
-				// add target attr
-				$element->setAttribute('target', '_blank');
+			switch (true) {
+				case (substr($href, 0, 7) == 'nodeid:'):
+					$ids = array_unique(array_merge($ids, [substr($href, 7)]));
+					$elements[] = $element;
+					break;
+				case (substr($href, 0, 7) == 'neos://'):
+					$ids = array_unique(array_merge($ids, [substr($href, 7)]));
+					$elements[] = $element;
+					break;
+				case (preg_match('~^(?:f|ht)tps?://~i', $href) && !$element->hasAttribute('target')):
+					// add target attr
+					$element->setAttribute('target', '_blank');
+					break;
 			}
 		}
 
