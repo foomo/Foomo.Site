@@ -61,6 +61,27 @@ class Client
 		return static::getContentServerProxy()->getContent($request);
 	}
 
+	/**
+	 * @param string $id
+	 *
+	 * @return string[]
+	 */
+	public static function getItemMap($id)
+	{
+		return static::getContentServerProxy()->getItemMap($id);
+	}
+
+	/**
+	 * @param string $dimension
+	 * @param string[] $ids
+	 *
+	 * @return string[]
+	 */
+	public static function getURIs($dimension, $ids)
+	{
+		return static::getContentServerProxy()->getURIs($dimension, $ids);
+	}
+
 	// --------------------------------------------------------------------------------------------
 	// ~ Protected static methods
 	// --------------------------------------------------------------------------------------------
