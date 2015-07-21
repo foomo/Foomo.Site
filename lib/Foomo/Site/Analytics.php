@@ -56,7 +56,8 @@ class Analytics
 	public static function getInstance()
 	{
 		if (is_null(self::$inst)) {
-			self::$inst = new self();
+			$class = get_called_class();
+			self::$inst = new $class();
 		}
 		return self::$inst;
 	}
@@ -110,6 +111,16 @@ class Analytics
 	public function addSet($cmd, $value)
 	{
 		$this->add(['set', $cmd, $value]);
+		return $this;
+	}
+
+	/**
+	 * @param string $cmd
+	 * @return self
+	 */
+	public function addRequire($cmd)
+	{
+		$this->add(['require', $cmd]);
 		return $this;
 	}
 
