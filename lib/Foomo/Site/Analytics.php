@@ -35,7 +35,7 @@ class Analytics
 	/**
 	 * @var self
 	 */
-	private static $inst;
+	protected static $inst;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Variables
@@ -44,22 +44,21 @@ class Analytics
 	/**
 	 * @var array
 	 */
-	private $cmds = [];
+	protected $cmds = [];
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public static function getInstance()
 	{
-		if (is_null(self::$inst)) {
-			$class = get_called_class();
-			self::$inst = new $class();
+		if (is_null(static::$inst)) {
+			static::$inst = new static();
 		}
-		return self::$inst;
+		return static::$inst;
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -115,12 +114,12 @@ class Analytics
 	}
 
 	/**
-	 * @param string $cmd
+	 * @param mixed $value
 	 * @return self
 	 */
-	public function addRequire($cmd)
+	public function addRequire($value)
 	{
-		$this->add(['require', $cmd]);
+		$this->add(['require', $value]);
 		return $this;
 	}
 
@@ -137,6 +136,10 @@ class Analytics
 					break;
 				case is_string($option):
 					$cmd[$key] = '"' . $option . '"';
+					break;
+				case is_array($option):
+				case is_object($option):
+					$cmd[$key] = json_encode($option);
 					break;
 				default:
 					break;
