@@ -17,7 +17,7 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site;
+namespace Foomo\Site\Frontend;
 
 use Foomo\Site;
 
