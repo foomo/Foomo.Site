@@ -61,7 +61,7 @@ class Controller
 		$this->model->renderContent();
 
 		# validate path
-		if (!Site\URLHandler::getMarkedAsResolved()) {
+		if (!Site\Frontend\URLHandler::getMarkedAsResolved()) {
 			throw new Site\Exception\HTTPException(404, 'Content not found!');
 		}
 	}
@@ -93,7 +93,7 @@ class Controller
 		$this->model->setContent($content);
 
 		if ($this->model->getContent()->URI == $url['path']) {
-			Site\URLHandler::markAsResolved();
+			Site\Frontend\URLHandler::markAsResolved();
 		}
 
 		# validate status
