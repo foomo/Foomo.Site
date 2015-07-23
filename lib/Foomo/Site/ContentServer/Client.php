@@ -54,7 +54,13 @@ class Client
 
 		# append request nodes
 		foreach ($config->navigations as $id => $navigation) {
-			$request->addNode($id, $navigation['id'], $navigation['mimeTypes'], $navigation['expand']);
+			$request->addNode(
+				$id,
+				$navigation['id'],
+				$navigation['mimeTypes'],
+				$navigation['expand'],
+				$navigation['dataFields']
+			);
 		}
 
 		# retrieve and return content
