@@ -68,6 +68,33 @@ class Client
 	}
 
 	/**
+	 * @param array    $nodes
+	 * @param string[] $dimensions
+	 * @param array    $data
+	 * @return Vo\Content\Node[]
+	 */
+	public static function getNodes(array $nodes, array $dimensions, array $data = [])
+	{
+		$env = Site::getEnv();
+
+		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups(), $data);
+		$request = Vo\Requests\Nodes::create($contentEnv);
+
+		# append request nodes
+		foreach ($nodes as $node) {
+			$request->addNode(
+				$node['name'],
+				$node['id'],
+				$node['mimeTypes'],
+				$node['expand'],
+				(isset($node['dataFields'])) ? $node['dataFields'] : []
+			);
+		}
+
+		return static::getContentServerProxy()->getNodes($request);
+	}
+
+	/**
 	 * @param string $id
 	 *
 	 * @return string[]
@@ -78,7 +105,7 @@ class Client
 	}
 
 	/**
-	 * @param string $dimension
+	 * @param string   $dimension
 	 * @param string[] $ids
 	 *
 	 * @return string[]
