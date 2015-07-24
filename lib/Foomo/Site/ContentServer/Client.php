@@ -95,16 +95,6 @@ class Client
 	}
 
 	/**
-	 * @param string $id
-	 *
-	 * @return string[]
-	 */
-	public static function getItemMap($id)
-	{
-		return static::getContentServerProxy()->getItemMap($id);
-	}
-
-	/**
 	 * @param string   $dimension
 	 * @param string[] $ids
 	 *
