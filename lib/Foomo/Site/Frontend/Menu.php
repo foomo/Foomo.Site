@@ -86,7 +86,7 @@ class Menu
 		if (!$node) {
 			return '';
 		}
-		
+
 		$ret = static::renderMenuOpen($node, $path, $level);
 
 		foreach (Site\ContentServer\NodeIterator::getIterator($node) as $childNode) {
@@ -163,9 +163,39 @@ class Menu
 
 		return '<a
 			class="' . implode(' ', $classes) . '"
-			href="' . $node->item->URI . '"
+			href="' . static::getMenuItemUri($node, $path, $level) . '"
+			target="' . static::getMenuItemTarget($node, $path, $level) . '"
 			title="' . htmlentities($node->item->name) . '"
 			>' . htmlentities($node->item->name) . '</a>' . PHP_EOL;
+	}
+
+	/**
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
+	 * @return string
+	 */
+	protected static function getMenuItemUri($node, array $path, $level)
+	{
+		if ($node->item->mimeType == 'application/neos+external') {
+			return $node->item->data->url;
+		} else {
+			return $node->item->URI;
+		}
+	}
+	/**
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
+	 * @return string
+	 */
+	protected static function getMenuItemTarget($node, array $path, $level)
+	{
+		if ($node->item->mimeType == 'application/neos+external') {
+			return $node->item->data->target;
+		} else {
+			return '_self';
+		}
 	}
 
 	/**

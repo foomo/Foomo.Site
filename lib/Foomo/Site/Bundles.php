@@ -92,7 +92,6 @@ class Bundles
 		# create unique name
 		\Foomo\Timer::addMarker('getting bundle');
 
-
 		# create TypeScript apps bundle
 		$bundle = static::getTypeScriptBundle($name, $moduleName, $data);
 
