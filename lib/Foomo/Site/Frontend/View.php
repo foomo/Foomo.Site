@@ -86,7 +86,12 @@ class View extends \Foomo\MVC\View
 	 */
 	public function getLayoutPartial()
 	{
-		return 'layout/' . ((null != $layout = $this->model->getContentData('layout')) ? $layout : 'default');
+		return 'layout/' . $this->getLayout();
+	}
+
+	public function getLayout()
+	{
+		return ((null != $layout = $this->model->getContentData('layout')) ? $layout : 'default');
 	}
 
 	/**
