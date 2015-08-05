@@ -94,19 +94,21 @@ class Menu
 				continue;
 			}
 
-			$active = (\in_array($node->item, $path));
-
-			$ret .= static::renderMenuItemOpen($childNode, $path, $level);
-			$ret .= static::renderMenuItem($childNode, $path, $level);
-			if (
-				($depth == 0 || $depth > $level + 1) &&
-				count($childNode) > 0 &&
-				($depth == 0 || (static::$expandAll || $active))
-			) {
-				$ret .= static::renderNode($childNode, $path, $depth, $level + 1);
+			$active = (\in_array($childNode->item, $path));
+			if (static::$expandAll || $active) {
+				$ret .= static::renderMenuItemOpen($childNode, $path, $level);
+				$ret .= static::renderMenuItem($childNode, $path, $level);
+				if (
+					count($childNode) > 0 &&
+					(static::$expandAll || $active) &&
+					($depth == 0 || $depth > $level + 1)
+				) {
+					$ret .= static::renderNode($childNode, $path, $depth, $level + 1);
+				}
+				$ret .= static::renderMenuItemClose($childNode, $path, $level);
 			}
-			$ret .= static::renderMenuItemClose($childNode, $path, $level);
 		}
+
 		$ret .= static::renderMenuClose($node, $path, $level);
 		return $ret;
 	}
