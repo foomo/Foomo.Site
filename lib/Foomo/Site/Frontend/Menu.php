@@ -119,10 +119,10 @@ class Menu
 	 */
 	protected static function isVisible($node)
 	{
-		return (
+		return !(
 			in_array($node->item->id, static::$ignoreIds) ||
 			in_array($node->item->name, static::$ignoreNames) ||
-			preg_match('/(' . implode('|', static::$ignorePatterns) . ')/i', $node->item->name) > 0
+			(!empty(static::$ignorePatterns) && preg_match('/(' . implode('|', static::$ignorePatterns) . ')/i', $node->item->name))
 		);
 	}
 
