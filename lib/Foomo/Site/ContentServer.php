@@ -53,6 +53,7 @@ class ContentServer implements ContentServerInterface
 			}
 			return $siteRepoNodes;
 		} catch (\Exception $e) {
+			trigger_error('EXCEPTION ('.$e->getCode().'): ' . $e->getMessage(), E_USER_WARNING);
 			return false;
 		}
 	}

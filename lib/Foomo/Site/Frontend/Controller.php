@@ -20,7 +20,6 @@
 namespace Foomo\Site\Frontend;
 
 use Foomo\MVC;
-use Foomo\Router\MVC\URLHandler;
 use Foomo\Site;
 use Foomo\ContentServer\Vo;
 use Foomo\Timer;
