@@ -152,7 +152,7 @@ class View extends \Foomo\MVC\View
 			# add javascripts
 			if (!empty(static::$javascripts)) {
 				HTMLDocument::getInstance()->addJavascriptToBody(trim('
-					$(document).ready(function() {
+					jQuery(document).ready(function() {
 						' . implode(PHP_EOL, array_reverse(static::$javascripts)) . '
 					});
 				'));
