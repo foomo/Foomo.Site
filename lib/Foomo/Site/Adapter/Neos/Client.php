@@ -46,20 +46,23 @@ class Client extends AbstractClient implements ClientInterface
 	{
 		\Foomo\Timer::addMarker('service neos content');
 		\Foomo\Timer::start($topic = __METHOD__);
+
 		$html = static::cachedLoad($dimension, $nodeId);
 		if (!empty($html)) {
-
 			$doc = static::getDOMDocument($html);
 
 			# replace apps
 			static::replaceApps($doc, $baseURL);
 
-			$html = $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
-			\Foomo\Timer::stop($topic);
-			return $html;
-		} else {
-			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
+			# grep first div in body (if exists)
+			$item = $doc->getElementsByTagName('div')->item(0);
+			if(!is_null($item)) {
+				$html = $doc->saveHTML($item);
+				\Foomo\Timer::stop($topic);
+				return $html;
+			}
 		}
+		throw new HTTPException(500, 'The content could not be loaded from the remote server!');
 	}
 
 	/**
@@ -82,7 +85,15 @@ class Client extends AbstractClient implements ClientInterface
 		static::replaceImages($doc);
 		static::replaceLinks($dimension, $doc);
 
-		$html =  $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
+		# grep first div in body (if exists)
+		$item = $doc->getElementsByTagName('div')->item(0);
+		if(!is_null($item)) {
+			$html = $doc->saveHTML($item);
+		} else {
+			trigger_error('unable to fetch first div in body on node '.$nodeId.' in dimension '.$dimension.', maybe the cms response is empty in ' . __METHOD__, E_USER_WARNING);
+			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
+		}
+
 		\Foomo\Timer::stop($topic);
 		return $html;
 	}
