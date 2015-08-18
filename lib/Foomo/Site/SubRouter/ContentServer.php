@@ -88,7 +88,7 @@ class ContentServer extends SubRouter
 					} else {
 						$result = json_encode($data);
 					}
-					if(is_null($result)) {
+					if(empty($result)) {
 						trigger_error("unable to encode json. json error code: " . json_last_error(), E_USER_WARNING);
 						throw new HTTPException(500);
 					}
