@@ -45,6 +45,7 @@ class ContentServer implements ContentServerInterface
 				$adapterConfig = $adapter::getAdapterConfig();
 				if ($adapterConfig && $adapterConfig->getPathUrl('repository')) {
 					$adapterRepoNodes = static::getRepoNode($adapterConfig->getPathUrl('repository'));
+					$adapterRepoNodes = static::validateRepoNodes($adapterRepoNodes);
 					foreach ($adapterRepoNodes as $dimension => $repoNode) {
 						static::iterateNode($dimension, $repoNode);
 					}
@@ -86,6 +87,17 @@ class ContentServer implements ContentServerInterface
 		foreach (NodeIterator::getIterator($repoNode) as $childRepoNode) {
 			static::iterateNode($dimension, $childRepoNode);
 		}
+	}
+
+	/**
+	 * Validate and modify the node
+	 *
+	 * @param mixed $repoNodes
+	 * @return mixed
+	 */
+	protected static function validateRepoNodes($repoNodes)
+	{
+		return $repoNodes;
 	}
 
 	/**
