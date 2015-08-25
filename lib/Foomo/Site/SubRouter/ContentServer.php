@@ -84,10 +84,20 @@ class ContentServer extends SubRouter
 				case 'json':
 					header('Content-Type: application/json');
 					if (defined('JSON_PRETTY_PRINT')) {
-						echo json_encode($data, JSON_PRETTY_PRINT);
+						$result = json_encode($data, JSON_PRETTY_PRINT);
 					} else {
-						echo json_encode($data);
+						$result = json_encode($data);
 					}
+					if(empty($result)) {
+						trigger_error("unable to encode json. json error code: " . json_last_error(), E_USER_WARNING);
+						throw new HTTPException(500);
+					}
+					echo $result;
+					break;
+				case 'serialzed':
+					header('Content-Type: text/plain;charset=utf-8;');
+					ini_set("html_errors", "Off");
+					echo serialize($data);
 					break;
 				case 'text':
 					header('Content-Type: text/plain;charset=utf-8;');
