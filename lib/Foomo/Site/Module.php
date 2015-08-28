@@ -19,6 +19,7 @@
 
 namespace Foomo\Site;
 
+use Foomo\Config;
 use Foomo\Config\Smtp;
 use Foomo\Frontend\ToolboxConfig\MenuEntry;
 use Foomo\Modules\Manager;
@@ -193,6 +194,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 
 	/**
 	 * Return a config for the implementing site module
+	 * Note: You can use the host as domain to override configs
 	 *
 	 * @param string $name
 	 * @param string $domain
@@ -200,6 +202,11 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	 */
 	public static function getRootModuleConfig($name, $domain = '')
 	{
-		return \Foomo\Config::getConf(self::getRootModule(), $name, $domain);
+		$overrideDomain = rtrim(join('/', [$_SERVER['HTTP_HOST'], $domain]), '/');
+		if (null != $config = Config::getConf(self::getRootModule(), $name, $overrideDomain)) {
+			return $config;
+		} else {
+			return Config::getConf(self::getRootModule(), $name, $domain);
+		}
 	}
 }
