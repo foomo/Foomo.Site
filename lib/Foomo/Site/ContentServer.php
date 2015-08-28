@@ -54,7 +54,7 @@ class ContentServer implements ContentServerInterface
 			}
 			return $siteRepoNodes;
 		} catch (\Exception $e) {
-			trigger_error('EXCEPTION ('.$e->getCode().'): ' . $e->getMessage(), E_USER_WARNING);
+			trigger_error('EXCEPTION (' . $e->getCode() . '): ' . $e->getMessage(), E_USER_WARNING);
 			return false;
 		}
 	}
@@ -77,8 +77,8 @@ class ContentServer implements ContentServerInterface
 	/**
 	 * Iterates over the repo node
 	 *
-	 * @param string   $dimension
-	 * @param mixed $repoNode
+	 * @param string $dimension
+	 * @param mixed  $repoNode
 	 */
 	protected static function iterateNode($dimension, $repoNode)
 	{
@@ -104,7 +104,7 @@ class ContentServer implements ContentServerInterface
 	 * Validate and modify the node
 	 *
 	 * @param string $dimension
-	 * @param mixed $repoNode
+	 * @param mixed  $repoNode
 	 */
 	protected static function validateNode($dimension, $repoNode)
 	{
