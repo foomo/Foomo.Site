@@ -53,7 +53,7 @@ class Frontend extends AbstractApp
 	/**
 	 * @return \Foomo\Translation
 	 */
-	public function getTranslation()
+	public static function getTranslation()
 	{
 		static $translation;
 		if (is_null($translation)) {
