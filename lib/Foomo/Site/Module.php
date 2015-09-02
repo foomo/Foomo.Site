@@ -202,7 +202,8 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	 */
 	public static function getRootModuleConfig($name, $domain = '')
 	{
-		$overrideDomain = rtrim(join('/', [$_SERVER['HTTP_HOST'], $domain]), '/');
+		$host = explode(':', $_SERVER['HTTP_HOST'])[0];
+		$overrideDomain = rtrim(join('/', [$host, $domain]), '/');
 		if (null != $config = Config::getConf(self::getRootModule(), $name, $overrideDomain)) {
 			return $config;
 		} else {
