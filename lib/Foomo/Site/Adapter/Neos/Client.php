@@ -105,6 +105,8 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @param \DOMDocument $doc
 	 * @param string       $baseURL
+	 *
+	 * @throws HTTPException
 	 */
 	protected static function replaceApps(\DOMDocument $doc, $baseURL)
 	{
@@ -149,14 +151,20 @@ class Client extends AbstractClient implements ClientInterface
 
 			# render app
 			$appHtml = static::renderApp($appClassName, $appData, $baseURL);
+			$appDom = static::getDOMDocument($appHtml);
 
-			# create app dom document
-			$appFragment = $doc->createDocumentFragment();
-			$appFragment->appendXML($appHtml);
+			# grep first div in body (if exists)
+			$item = $appDom->getElementsByTagName('div')->item(0);
 
+			# error handling
+			if(is_null($item)) {
+				trigger_error('unable to append the rendered app instance of class '.$appClassName.' to the given cms content in ' . __METHOD__, E_USER_WARNING);
+				throw new HTTPException(500, 'The content could not be loaded from the remote server!');
+			}
 
 			# replace in dom
-			$appNode->parentNode->replaceChild($appFragment, $appNode);
+			$item = $doc->importNode($item, true);
+			$appNode->parentNode->replaceChild($item, $appNode);
 		}
 	}
 

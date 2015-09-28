@@ -63,7 +63,7 @@ abstract class AbstractClient
 	{
 		$doc = new \DOMDocument();
 		libxml_use_internal_errors(true);
-		$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+		$doc->loadHTML('<!DOCTYPE html>' . PHP_EOL . '<html><head><meta charset="UTF-8"></head><body>'.$html.'</body></html>');
 		/* @var $xmlError \libXMLError */
 		foreach (libxml_get_errors() as $xmlError) {
 			if (
