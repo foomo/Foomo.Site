@@ -141,7 +141,17 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 		if ($cacheFilename) {
 			\Foomo\Timer::start($topic = 'Foomo\Media\Image\Server::serve');
+
+			//prevent upscaling the original image
+			$allowResizeAboveSourceSetting = Image\Processor::getAllowResizeAboveSource();
+
+			Image\Processor::allowResizeAboveSource(false);
+
 			Image\Server::serve($cacheFilename, Neos::getName(), $type, null, (microtime() + 30 * 24 * 3600));
+
+			//set back to what it was - as we disabled it for neos
+			Image\Processor::allowResizeAboveSource($allowResizeAboveSourceSetting);
+
 			\Foomo\Timer::stop($topic);
 
 			\Foomo\Timer::addMarker('done');
