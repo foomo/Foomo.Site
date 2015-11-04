@@ -158,7 +158,7 @@ class Client extends AbstractClient implements ClientInterface
 
 			# error handling
 			if(is_null($item)) {
-				trigger_error('unable to append the rendered app instance of class '.$appClassName.' to the given cms content in ' . __METHOD__, E_USER_WARNING);
+				trigger_error('unable to append the rendered app instance of class '.$appClassName.' to the given cms content in ' . __METHOD__ . ' while serving ' . $_SERVER['REQUEST_URI'], E_USER_WARNING);
 				throw new HTTPException(500, 'The content could not be loaded from the remote server!');
 			}
 
