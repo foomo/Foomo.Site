@@ -143,7 +143,7 @@ class Sitemap
 		$ret = '<url>' . PHP_EOL;
 		$uri = htmlentities($node->URI);
 		if ($uri == '/') {
-			$uri = '/';
+			$uri = '';
 		}
 		$attributes['loc'] = Site::getConfig()->domain . $uri;
 		foreach ($attributes as $key => $value) {
