@@ -141,7 +141,11 @@ class Sitemap
 	protected static function renderNode($node, array $attributes)
 	{
 		$ret = '<url>' . PHP_EOL;
-		$attributes['loc'] = Site::getConfig()->domain . htmlentities($node->URI);
+		$uri = htmlentities($node->URI);
+		if ($uri == '/') {
+			$uri = '/';
+		}
+		$attributes['loc'] = Site::getConfig()->domain . $uri;
 		foreach ($attributes as $key => $value) {
 			if (!empty($value)) {
 				$ret .= "<" . $key . ">" . $value . "</" . $key . ">" . PHP_EOL;
