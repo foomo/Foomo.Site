@@ -63,21 +63,31 @@ abstract class AbstractClient
 	{
 		$doc = new \DOMDocument();
 		libxml_use_internal_errors(true);
-		$doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+		$doc->loadHTML('<!DOCTYPE html>' . PHP_EOL . '<html><head><meta charset="UTF-8"></head><body>'.$html.'</body></html>');
 		/* @var $xmlError \libXMLError */
 		foreach (libxml_get_errors() as $xmlError) {
+			// error list is defined here
+			// 	http://xmlsoft.org/html/libxml-xmlerror.html
+
 			if (
 				$xmlError->level == LIBXML_ERR_ERROR &&
 				!in_array(
 					$xmlError->code,
 					[
 						801, // XML_HTML_UNKNOWN_TAG
-						68, // XML_HTML_UNKNOWN_TAG
+						68,  // XML_HTML_UNKNOWN_TAG
+						513, //  XML_DTD_ID_REDEFINED
 					]
 				)
 			) {
-				trigger_error('Invalid XML: ' . $xmlError->message, E_USER_WARNING);
-				throw new HTTPException(500, $xmlError->message);
+				switch($xmlError->level) {
+					case LIBXML_ERR_FATAL:
+					case LIBXML_ERR_ERROR:
+						trigger_error('badly invalid XML: ' . var_export($xmlError, true), E_USER_WARNING);
+						throw new HTTPException(500, $xmlError->message);
+					default:
+						trigger_error('invalid XML: ' . var_export($xmlError, true), E_USER_WARNING);
+				}
 			}
 		}
 		libxml_clear_errors();
