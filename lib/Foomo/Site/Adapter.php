@@ -71,6 +71,8 @@ class Adapter
 	 */
 	public static function invalidateCachedLoadClientContent($expr = null, $policy = Cache\Invalidator::POLICY_DELETE)
 	{
+		ini_set('max_execution_time', 300);
+		ini_set('memory_limit','2G');
 		Cache\Manager::invalidateWithQuery(self::CACHED_CONTENT_RESOURCE, $expr, true, $policy);
 		//sometimes apc does not remove items. to be on the safe side clear all
 		Cache\Manager::getFastPersistor()->reset();
