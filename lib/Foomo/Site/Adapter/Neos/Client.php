@@ -208,16 +208,15 @@ class Client extends AbstractClient implements ClientInterface
 		$ids = [];
 		$elements = [];
 
+
 		# collect all ids
 		foreach ($doc->getElementsByTagName('a') as $element) {
 			/* @var $element \DOMElement */
 			$href = $element->getAttribute('href');
 			switch (true) {
-				case (substr($href, 0, 7) == 'nodeid:'):
-					$ids = array_unique(array_merge($ids, [substr($href, 7)]));
-					$elements[] = $element;
-					break;
+				case (substr($href, 0, 7) == 'node://'):
 				case (substr($href, 0, 7) == 'neos://'):
+				case (substr($href, 0, 7) == 'nodeid:'):
 					$ids = array_unique(array_merge($ids, [substr($href, 7)]));
 					$elements[] = $element;
 					break;
