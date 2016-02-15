@@ -143,6 +143,14 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	}
 
 	/**
+	 * @return \Foomo\Site\Recaptcha\DomainConfig
+	 */
+	public static function getRecaptchaConfig()
+	{
+		return self::getRootModuleConfig(\Foomo\Site\Recaptcha\DomainConfig::NAME);
+	}
+
+	/**
 	 * @return \Foomo\Site\DomainConfig
 	 */
 	public static function getSiteConfig()
