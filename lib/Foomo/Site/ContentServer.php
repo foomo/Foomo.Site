@@ -19,7 +19,6 @@
 
 namespace Foomo\Site;
 
-use Foomo\ContentServer\Vo\Content\RepoNode;
 use Foomo\Site\ContentServer\NodeIterator;
 use Foomo\Site;
 
@@ -31,7 +30,7 @@ use Foomo\Site;
 class ContentServer implements ContentServerInterface
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Overriden public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
@@ -49,7 +48,7 @@ class ContentServer implements ContentServerInterface
 					foreach ($adapterRepoNodes as $dimension => $repoNode) {
 						static::iterateNode($dimension, $repoNode);
 					}
-					$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes);
+					$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes, $adapter);
 				}
 			}
 			return $siteRepoNodes;
@@ -116,9 +115,10 @@ class ContentServer implements ContentServerInterface
 	 *
 	 * @param mixed $siteRepoNode
 	 * @param mixed $adapterRepoNode
+	 * @param mixed $adapter
 	 * @return mixed
 	 */
-	protected static function mergeRepoNodes($siteRepoNode, $adapterRepoNode)
+	protected static function mergeRepoNodes($siteRepoNode, $adapterRepoNode, $adapter)
 	{
 		foreach ($adapterRepoNode as $adapterDimension => $repoNode) {
 			$siteRepoNode->$adapterDimension = $repoNode;
