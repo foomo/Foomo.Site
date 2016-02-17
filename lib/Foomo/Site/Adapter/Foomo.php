@@ -62,7 +62,7 @@ class Foomo extends AbstractBase
 	/**
 	 * @inheritdoc
 	 */
-	public static function getAdapterConfig()
+	public static function getAdapterConfig($domain=null)
 	{
 		return null;
 	}

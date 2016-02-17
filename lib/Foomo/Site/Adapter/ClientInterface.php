@@ -36,9 +36,10 @@ interface ClientInterface
 	 * @param string $dimension
 	 * @param string $nodeId
 	 * @param string $baseURL
+	 * @param string $domain configuration domain name
 	 * @return string
 	 */
-	static function get($dimension, $nodeId, $baseURL);
+	static function get($dimension, $nodeId, $baseURL, $domain);
 
 	/**
 	 * Load the content from remote server
@@ -47,7 +48,8 @@ interface ClientInterface
 	 *
 	 * @param string $dimension
 	 * @param string $nodeId
+	 * @param string $domain configuration domain name
 	 * @return string
 	 */
-	static function load($dimension, $nodeId);
+	static function load($dimension, $nodeId, $domain);
 }

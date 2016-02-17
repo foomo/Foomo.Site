@@ -21,6 +21,7 @@ namespace Foomo\Site\Adapter\Neos;
 
 use Foomo\Cache;
 use Foomo\Config;
+use Foomo\Site\Adapter\AbstractBase;
 use Foomo\Site\Adapter\AbstractClient;
 use Foomo\Site\Adapter\ClientInterface;
 use Foomo\Site\Adapter\Neos;
@@ -42,12 +43,12 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function get($dimension, $nodeId, $baseURL)
+	public static function get($dimension, $nodeId, $baseURL, $domain=null)
 	{
 		\Foomo\Timer::addMarker('service neos content');
 		\Foomo\Timer::start($topic = __METHOD__);
 
-		$html = static::cachedLoad($dimension, $nodeId);
+		$html = static::cachedLoad($dimension, $nodeId, $domain);
 		if (!empty($html)) {
 			$doc = static::getDOMDocument($html);
 
@@ -68,10 +69,14 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function load($dimension, $nodeId)
+	public static function load($dimension, $nodeId, $domain=null)
 	{
 		\Foomo\Timer::start($topic = __METHOD__);
-		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
+		if(is_null($domain)) {
+			$domain = Neos::getName();
+		}
+		$adapterConfig = AbstractBase::getAdapterConfig($domain);
+		$url = $adapterConfig->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);

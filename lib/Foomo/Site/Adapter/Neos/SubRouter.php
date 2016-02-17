@@ -101,7 +101,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 		\Foomo\Session::saveAndRelease();
 
 		\Foomo\Timer::addMarker('serving asset');
-		$config = Neos::getAdapterConfig();
+		$config = static::getAdapterConfig();
 		$url = $config->getPathUrl('asset') . '/' . $nodeId;
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
 		$cacheFilename = Cache::getFilename($nodeId, $url);
@@ -131,7 +131,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 		\Foomo\Timer::addMarker('serving neos image');
 		\Foomo\Session::saveAndRelease();
 
-		$config = Neos::getAdapterConfig();
+		$config = static::getAdapterConfig();
 		$url = $config->getPathUrl('image') . '/' . $nodeId;
 
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
@@ -160,5 +160,17 @@ class SubRouter extends \Foomo\Site\SubRouter
 		} else {
 			$this->error();
 		}
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @return \Foomo\Config\AbstractConfig|\Foomo\Site\Adapter\DomainConfig
+	 */
+	public static function getAdapterConfig()
+	{
+		return Neos::getAdapterConfig();
 	}
 }
