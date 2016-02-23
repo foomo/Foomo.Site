@@ -135,7 +135,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 		$url = $config->getPathUrl('image') . '/' . $nodeId;
 
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
-		$cacheFilename = Cache::getFilename($nodeId, $url, 'neos', (int) $time);
+		$cacheFilename = Cache::getFilename($nodeId, $url, static::$prefix, (int) $time);
 		\Foomo\Timer::stop($topic);
 
 

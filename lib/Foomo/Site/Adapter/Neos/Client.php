@@ -203,6 +203,8 @@ class Client extends AbstractClient implements ClientInterface
 	}
 
 	/**
+	 * Seems like this gets cached in static::load() ...
+	 *
 	 * @param string       $dimension
 	 * @param \DOMDocument $doc
 	 *
