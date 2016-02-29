@@ -68,11 +68,11 @@ class View extends \Foomo\MVC\View
 	/**
 	 * @inheritdoc
 	 */
-	public function partial($name, $variables = array())
+	public function partial($name, $variables = array(), $class = '')
 	{
 		$rootFrontendClass = ltrim(Site::getConfig()->getClass('frontend'), '\\');
 		$rootFrontendPartial = 'mail/' . $name;
-		$template = MVC::getViewPartialTemplate($rootFrontendClass, $rootFrontendPartial);
+		$template = MVC::getViewPartialTemplate(!empty($class) ? $class :$rootFrontendClass, $rootFrontendPartial);
 		if (strpos($template->file, 'partialNotFound') !== false) {
 			return parent::partial($name, $variables);
 		} else {
