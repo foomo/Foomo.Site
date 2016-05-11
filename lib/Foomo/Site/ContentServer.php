@@ -19,7 +19,6 @@
 
 namespace Foomo\Site;
 
-use Foomo\ContentServer\Vo\Content\RepoNode;
 use Foomo\Site\ContentServer\NodeIterator;
 use Foomo\Site;
 
@@ -31,7 +30,7 @@ use Foomo\Site;
 class ContentServer implements ContentServerInterface
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Overriden public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
@@ -45,14 +44,16 @@ class ContentServer implements ContentServerInterface
 				$adapterConfig = $adapter::getAdapterConfig();
 				if ($adapterConfig && $adapterConfig->getPathUrl('repository')) {
 					$adapterRepoNodes = static::getRepoNode($adapterConfig->getPathUrl('repository'));
+					$adapterRepoNodes = static::validateRepoNodes($adapterRepoNodes);
 					foreach ($adapterRepoNodes as $dimension => $repoNode) {
 						static::iterateNode($dimension, $repoNode);
 					}
-					$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes);
+					$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes, $adapter);
 				}
 			}
 			return $siteRepoNodes;
 		} catch (\Exception $e) {
+			trigger_error('EXCEPTION (' . $e->getCode() . '): ' . $e->getMessage(), E_USER_WARNING);
 			return false;
 		}
 	}
@@ -75,8 +76,8 @@ class ContentServer implements ContentServerInterface
 	/**
 	 * Iterates over the repo node
 	 *
-	 * @param string   $dimension
-	 * @param mixed $repoNode
+	 * @param string $dimension
+	 * @param mixed  $repoNode
 	 */
 	protected static function iterateNode($dimension, $repoNode)
 	{
@@ -90,8 +91,19 @@ class ContentServer implements ContentServerInterface
 	/**
 	 * Validate and modify the node
 	 *
+	 * @param mixed $repoNodes
+	 * @return mixed
+	 */
+	protected static function validateRepoNodes($repoNodes)
+	{
+		return $repoNodes;
+	}
+
+	/**
+	 * Validate and modify the node
+	 *
 	 * @param string $dimension
-	 * @param mixed $repoNode
+	 * @param mixed  $repoNode
 	 */
 	protected static function validateNode($dimension, $repoNode)
 	{
@@ -103,9 +115,10 @@ class ContentServer implements ContentServerInterface
 	 *
 	 * @param mixed $siteRepoNode
 	 * @param mixed $adapterRepoNode
+	 * @param mixed $adapter
 	 * @return mixed
 	 */
-	protected static function mergeRepoNodes($siteRepoNode, $adapterRepoNode)
+	protected static function mergeRepoNodes($siteRepoNode, $adapterRepoNode, $adapter)
 	{
 		foreach ($adapterRepoNode as $adapterDimension => $repoNode) {
 			$siteRepoNode->$adapterDimension = $repoNode;

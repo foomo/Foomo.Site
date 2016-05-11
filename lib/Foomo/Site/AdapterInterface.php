@@ -49,9 +49,10 @@ interface AdapterInterface
 	/**
 	 * Returns the adapters domain config
 	 *
+	 * @param string $domain
 	 * @return \Foomo\Site\Adapter\DomainConfig
 	 */
-	static function getAdapterConfig();
+	static function getAdapterConfig($domain=null);
 
 	/**
 	 * Returns list of sub routes

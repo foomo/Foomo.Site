@@ -101,7 +101,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 		\Foomo\Session::saveAndRelease();
 
 		\Foomo\Timer::addMarker('serving asset');
-		$config = Neos::getAdapterConfig();
+		$config = static::getAdapterConfig();
 		$url = $config->getPathUrl('asset') . '/' . $nodeId;
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
 		$cacheFilename = Cache::getFilename($nodeId, $url);
@@ -131,17 +131,27 @@ class SubRouter extends \Foomo\Site\SubRouter
 		\Foomo\Timer::addMarker('serving neos image');
 		\Foomo\Session::saveAndRelease();
 
-		$config = Neos::getAdapterConfig();
+		$config = static::getAdapterConfig();
 		$url = $config->getPathUrl('image') . '/' . $nodeId;
 
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
-		$cacheFilename = Cache::getFilename($nodeId, $url, 'neos', (int) $time);
+		$cacheFilename = Cache::getFilename($nodeId, $url, static::$prefix, (int) $time);
 		\Foomo\Timer::stop($topic);
 
 
 		if ($cacheFilename) {
 			\Foomo\Timer::start($topic = 'Foomo\Media\Image\Server::serve');
+
+			//prevent upscaling the original image
+			$allowResizeAboveSourceSetting = Image\Processor::getAllowResizeAboveSource();
+
+			Image\Processor::allowResizeAboveSource(false);
+
 			Image\Server::serve($cacheFilename, Neos::getName(), $type, null, (microtime() + 30 * 24 * 3600));
+
+			//set back to what it was - as we disabled it for neos
+			Image\Processor::allowResizeAboveSource($allowResizeAboveSourceSetting);
+
 			\Foomo\Timer::stop($topic);
 
 			\Foomo\Timer::addMarker('done');
@@ -150,5 +160,17 @@ class SubRouter extends \Foomo\Site\SubRouter
 		} else {
 			$this->error();
 		}
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @return \Foomo\Config\AbstractConfig|\Foomo\Site\Adapter\DomainConfig
+	 */
+	public static function getAdapterConfig()
+	{
+		return Neos::getAdapterConfig();
 	}
 }

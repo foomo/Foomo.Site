@@ -86,7 +86,12 @@ class View extends \Foomo\MVC\View
 	 */
 	public function getLayoutPartial()
 	{
-		return 'layout/' . ((null != $layout = $this->model->getContentData('layout')) ? $layout : 'default');
+		return 'layout/' . $this->getLayout();
+	}
+
+	public function getLayout()
+	{
+		return ((null != $layout = $this->model->getContentData('layout')) ? $layout : 'default');
 	}
 
 	/**
@@ -147,7 +152,7 @@ class View extends \Foomo\MVC\View
 			# add javascripts
 			if (!empty(static::$javascripts)) {
 				HTMLDocument::getInstance()->addJavascriptToBody(trim('
-					$(document).ready(function() {
+					jQuery(document).ready(function() {
 						' . implode(PHP_EOL, array_reverse(static::$javascripts)) . '
 					});
 				'));

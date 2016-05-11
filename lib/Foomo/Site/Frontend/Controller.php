@@ -20,7 +20,6 @@
 namespace Foomo\Site\Frontend;
 
 use Foomo\MVC;
-use Foomo\Router\MVC\URLHandler;
 use Foomo\Site;
 use Foomo\ContentServer\Vo;
 use Foomo\Timer;
@@ -61,7 +60,7 @@ class Controller
 		$this->model->renderContent();
 
 		# validate path
-		if (!Site\URLHandler::getMarkedAsResolved()) {
+		if (!URLHandler::getMarkedAsResolved()) {
 			throw new Site\Exception\HTTPException(404, 'Content not found!');
 		}
 	}
@@ -72,23 +71,28 @@ class Controller
 
 	/**
 	 * @param string $url
+	 * @param string[] $dimensions
 	 * @throws Site\Exception\HTTPException
 	 */
-	protected function loadSiteContent($url)
+	protected function loadSiteContent($url, $dimensions = null)
 	{
 		\Foomo\Timer::start($topic = __METHOD__);
 		$url = parse_url($url);
-		$config = Site::getConfig();
+
+		if(empty($dimensions)) {
+			$config = Site::getConfig();
+			$dimensions = $config->getDimensionIds();
+		}
 
 		# retrieve the content
-		$content = Site\ContentServer\Client::getContent($url['path'], array_reverse($config->getDimensionIds()));
+		$content = Site\ContentServer\Client::getContent($url['path'], array_reverse($dimensions));
 		Timer::addMarker('retrieved content from content server');
 
 		# set content
 		$this->model->setContent($content);
 
 		if ($this->model->getContent()->URI == $url['path']) {
-			Site\URLHandler::markAsResolved();
+			Site\Frontend\URLHandler::markAsResolved();
 		}
 
 		# validate status

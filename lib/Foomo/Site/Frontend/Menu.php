@@ -86,7 +86,7 @@ class Menu
 		if (!$node) {
 			return '';
 		}
-		
+
 		$ret = static::renderMenuOpen($node, $path, $level);
 
 		foreach (Site\ContentServer\NodeIterator::getIterator($node) as $childNode) {
@@ -94,19 +94,21 @@ class Menu
 				continue;
 			}
 
-			$active = (\in_array($node->item, $path));
-
-			$ret .= static::renderMenuItemOpen($childNode, $path, $level);
-			$ret .= static::renderMenuItem($childNode, $path, $level);
-			if (
-				($depth == 0 || $depth > $level + 1) &&
-				count($childNode) > 0 &&
-				($depth == 0 || (static::$expandAll || $active))
-			) {
-				$ret .= static::renderNode($childNode, $path, $depth, $level + 1);
+			$active = (\in_array($childNode->item, $path));
+			if (static::$expandAll || $active) {
+				$ret .= static::renderMenuItemOpen($childNode, $path, $level);
+				$ret .= static::renderMenuItem($childNode, $path, $level);
+				if (
+					count($childNode) > 0 &&
+					(static::$expandAll || $active) &&
+					($depth == 0 || $depth > $level + 1)
+				) {
+					$ret .= static::renderNode($childNode, $path, $depth, $level + 1);
+				}
+				$ret .= static::renderMenuItemClose($childNode, $path, $level);
 			}
-			$ret .= static::renderMenuItemClose($childNode, $path, $level);
 		}
+
 		$ret .= static::renderMenuClose($node, $path, $level);
 		return $ret;
 	}
@@ -117,10 +119,10 @@ class Menu
 	 */
 	protected static function isVisible($node)
 	{
-		return (
+		return !(
 			in_array($node->item->id, static::$ignoreIds) ||
 			in_array($node->item->name, static::$ignoreNames) ||
-			preg_match('/(' . implode('|', static::$ignorePatterns) . ')/i', $node->item->name) > 0
+			(!empty(static::$ignorePatterns) && preg_match('/(' . implode('|', static::$ignorePatterns) . ')/i', $node->item->name))
 		);
 	}
 
@@ -163,9 +165,39 @@ class Menu
 
 		return '<a
 			class="' . implode(' ', $classes) . '"
-			href="' . $node->item->URI . '"
+			href="' . static::getMenuItemUri($node, $path, $level) . '"
+			target="' . static::getMenuItemTarget($node, $path, $level) . '"
 			title="' . htmlentities($node->item->name) . '"
 			>' . htmlentities($node->item->name) . '</a>' . PHP_EOL;
+	}
+
+	/**
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
+	 * @return string
+	 */
+	protected static function getMenuItemUri($node, array $path, $level)
+	{
+		if ($node->item->mimeType == 'application/neos+external') {
+			return $node->item->data->url;
+		} else {
+			return $node->item->URI;
+		}
+	}
+	/**
+	 * @param Node    $node
+	 * @param Item[]  $path
+	 * @param integer $level
+	 * @return string
+	 */
+	protected static function getMenuItemTarget($node, array $path, $level)
+	{
+		if ($node->item->mimeType == 'application/neos+external') {
+			return $node->item->data->target;
+		} else {
+			return '_self';
+		}
 	}
 
 	/**

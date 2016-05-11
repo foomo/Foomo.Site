@@ -47,11 +47,12 @@ class Adapter
 	 * @param string $clientClass
 	 * @param string $dimension
 	 * @param string $nodeId
+	 * @param string $domain
 	 * @return string
 	 */
-	public static function cachedLoadClientContent($clientClass, $dimension, $nodeId)
+	public static function cachedLoadClientContent($clientClass, $dimension, $nodeId, $domain)
 	{
-		return $clientClass::load($dimension, $nodeId);
+		return $clientClass::load($dimension, $nodeId, $domain);
 	}
 
 	/**
@@ -71,6 +72,10 @@ class Adapter
 	 */
 	public static function invalidateCachedLoadClientContent($expr = null, $policy = Cache\Invalidator::POLICY_DELETE)
 	{
+		ini_set('max_execution_time', 300);
+		ini_set('memory_limit','2G');
 		Cache\Manager::invalidateWithQuery(self::CACHED_CONTENT_RESOURCE, $expr, true, $policy);
+		//sometimes apc does not remove items. to be on the safe side clear all
+		Cache\Manager::getFastPersistor()->reset();
 	}
 }

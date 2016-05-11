@@ -19,6 +19,7 @@
 
 namespace Foomo\Site;
 
+use Foomo\Config;
 use Foomo\Config\Smtp;
 use Foomo\Frontend\ToolboxConfig\MenuEntry;
 use Foomo\Modules\Manager;
@@ -35,7 +36,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	//---------------------------------------------------------------------------------------------
 
 	const NAME    = 'Foomo.Site';
-	const VERSION = '1.0.1';
+	const VERSION = '1.1.0';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
@@ -69,7 +70,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 		$resources = array(
 			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.4.*'),
 			\Foomo\Modules\Resource\Module::getResource('Foomo.Media', '0.3.*'),
-			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '0.3.*'),
+			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '1.3.*'),
 		);
 
 		# resources when enabled
@@ -142,6 +143,14 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	}
 
 	/**
+	 * @return \Foomo\Site\Recaptcha\DomainConfig
+	 */
+	public static function getRecaptchaConfig()
+	{
+		return self::getRootModuleConfig(\Foomo\Site\Recaptcha\DomainConfig::NAME);
+	}
+
+	/**
 	 * @return \Foomo\Site\DomainConfig
 	 */
 	public static function getSiteConfig()
@@ -193,6 +202,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 
 	/**
 	 * Return a config for the implementing site module
+	 * Note: You can use the host as domain to override configs
 	 *
 	 * @param string $name
 	 * @param string $domain
@@ -200,6 +210,12 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	 */
 	public static function getRootModuleConfig($name, $domain = '')
 	{
-		return \Foomo\Config::getConf(self::getRootModule(), $name, $domain);
+		$host = explode(':', $_SERVER['HTTP_HOST'])[0];
+		$overrideDomain = rtrim(join('/', [$host, $domain]), '/');
+		if (null != $config = Config::getConf(self::getRootModule(), $name, $overrideDomain)) {
+			return $config;
+		} else {
+			return Config::getConf(self::getRootModule(), $name, $domain);
+		}
 	}
 }

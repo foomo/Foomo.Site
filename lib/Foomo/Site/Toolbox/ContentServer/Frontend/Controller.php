@@ -20,12 +20,10 @@
 namespace Foomo\Site\Toolbox\ContentServer\Frontend;
 
 use Foomo\Cache\Persistence\Expr;
-use Foomo\ContentServer\ServerManager;
 use Foomo\ContentServer\Vo\Content\RepoNode;
 use Foomo\MVC;
 use Foomo\Site;
 use Foomo\Site\Adapter;
-use Foomo\Site\Module;
 use Foomo\Utils;
 
 /**
@@ -116,20 +114,6 @@ class Controller
 	public function actionDeleteCaches($action, $dimension = null, $nodeId = null, $all = false)
 	{
 		$this->deleteContentCache($nodeId, ($all) ? null : $dimension);
-		MVC::redirect($action, [$dimension]);
-	}
-
-	/**
-	 * @param string $action
-	 * @param string $dimension
-	 */
-	public function actionRestartServer($action, $dimension = null)
-	{
-		$config = Module::getSiteContentServerProxyConfig();
-		if (ServerManager::serverIsRunning($config)) {
-			ServerManager::kill($config);
-			ServerManager::startServer($config);
-		}
 		MVC::redirect($action, [$dimension]);
 	}
 

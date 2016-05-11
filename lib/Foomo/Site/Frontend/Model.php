@@ -160,8 +160,7 @@ class Model
 	 */
 	public function getContentAdapter()
 	{
-		$adapterId = explode('+', explode('/', $this->getContent()->mimeType)[1])[0];
-
+		$adapterId = Site::getAdapterDomainName($this->getContent());
 		$adapter = Site::getAdapter($adapterId);
 
 		if ($adapter === false) {

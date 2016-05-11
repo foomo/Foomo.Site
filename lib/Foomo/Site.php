@@ -118,4 +118,13 @@ class Site
 		}
 		return false;
 	}
+
+	/**
+	 * @param ContentServer\Vo\Content\SiteContent $content
+	 * @return string
+	 */
+	public static function getAdapterDomainName($content)
+	{
+		return explode('+', explode('/', $content->mimeType)[1])[0];
+	}
 }

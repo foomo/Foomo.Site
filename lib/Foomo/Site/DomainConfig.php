@@ -78,19 +78,22 @@ class DomainConfig extends AbstractConfig
 	 */
 	public $navigations = [
 		'main'   => [
-			'id'        => '',
-			'mimeTypes' => [],
-			'expand'    => true,
+			'id'         => '',
+			'mimeTypes'  => [],
+			'dataFields' => [],
+			'expand'     => true,
 		],
 		'meta'   => [
-			'id'        => '',
-			'mimeTypes' => [],
-			'expand'    => true,
+			'id'         => '',
+			'mimeTypes'  => [],
+			'dataFields' => [],
+			'expand'     => true,
 		],
 		'footer' => [
-			'id'        => '',
-			'mimeTypes' => [],
-			'expand'    => true,
+			'id'         => '',
+			'mimeTypes'  => [],
+			'dataFields' => [],
+			'expand'     => true,
 		],
 	];
 	/**

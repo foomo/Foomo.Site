@@ -50,8 +50,12 @@ abstract class AbstractBase implements Site\AdapterInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function getAdapterConfig()
+	public static function getAdapterConfig($domain=null)
 	{
-		return Site\Module::getRootModuleConfig(DomainConfig::NAME, static::getName());
+		if(is_null($domain)) {
+			$domain = static::getName();
+		}
+		return Site\Module::getRootModuleConfig(DomainConfig::NAME, $domain);
 	}
+
 }

@@ -56,11 +56,24 @@ class Neos extends AbstractBase
 
 	/**
 	 * @inheritdoc
+	 * @throws Site\Exception\HTTPException
 	 */
 	public static function getContent($siteContent)
 	{
+		if($siteContent->mimeType == 'application/neos+external') {
+			if(!isset($siteContent->data) && !isset($siteContent->data->url)) {
+				throw new Site\Exception\HTTPException(500, 'Could not resolve external link');
+			}
+			\Foomo\MVC::abort();
+			$location = htmlentities($siteContent->data->url);
+			header("Location: $location", true, 301);
+			exit;
+		}
+
+		$domain = Site::getAdapterDomainName($siteContent);
+		$adapterConfig = static::getAdapterConfig($domain);
 		/* @var $client ClientInterface */
-		$client = static::getAdapterConfig()->getClass('client');
-		return $client::get($siteContent->dimension, $siteContent->item->id, $siteContent->URI);
+		$client = $adapterConfig->getClass('client');
+		return $client::get($siteContent->dimension, $siteContent->item->id, $siteContent->URI, $domain);
 	}
 }

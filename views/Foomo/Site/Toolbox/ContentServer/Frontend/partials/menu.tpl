@@ -8,7 +8,6 @@ $buttons = [
 	'viewList'      => 'View List',
 	'viewDump'      => 'View Dump',
 	'updateCaches'  => '<span class="fa fa-tachometer"></span> Updated all Content Caches',
-	'restartServer' => '<span class="fa fa-power-off"></span> Restart the Content Server',
 ]
 ?>
 

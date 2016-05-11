@@ -21,6 +21,7 @@ namespace Foomo\Site\Adapter\Neos;
 
 use Foomo\Cache;
 use Foomo\Config;
+use Foomo\Site\Adapter\AbstractBase;
 use Foomo\Site\Adapter\AbstractClient;
 use Foomo\Site\Adapter\ClientInterface;
 use Foomo\Site\Adapter\Neos;
@@ -42,33 +43,40 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function get($dimension, $nodeId, $baseURL)
+	public static function get($dimension, $nodeId, $baseURL, $domain=null)
 	{
 		\Foomo\Timer::addMarker('service neos content');
 		\Foomo\Timer::start($topic = __METHOD__);
-		$html = static::cachedLoad($dimension, $nodeId);
-		if (!empty($html)) {
 
+		$html = static::cachedLoad($dimension, $nodeId, $domain);
+		if (!empty($html)) {
 			$doc = static::getDOMDocument($html);
 
 			# replace apps
 			static::replaceApps($doc, $baseURL);
 
-			$html = $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
-			\Foomo\Timer::stop($topic);
-			return $html;
-		} else {
-			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
+			# grep first div in body (if exists)
+			$item = $doc->getElementsByTagName('div')->item(0);
+			if(!is_null($item)) {
+				$html = $doc->saveHTML($item);
+				\Foomo\Timer::stop($topic);
+				return $html;
+			}
 		}
+		throw new HTTPException(500, 'The content could not be loaded from the remote server!');
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public static function load($dimension, $nodeId)
+	public static function load($dimension, $nodeId, $domain=null)
 	{
 		\Foomo\Timer::start($topic = __METHOD__);
-		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
+		if(is_null($domain)) {
+			$domain = Neos::getName();
+		}
+		$adapterConfig = AbstractBase::getAdapterConfig($domain);
+		$url = $adapterConfig->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -82,7 +90,15 @@ class Client extends AbstractClient implements ClientInterface
 		static::replaceImages($doc);
 		static::replaceLinks($dimension, $doc);
 
-		$html =  $doc->saveHTML($doc->getElementsByTagName('div')->item(0));
+		# grep first div in body (if exists)
+		$item = $doc->getElementsByTagName('div')->item(0);
+		if(!is_null($item)) {
+			$html = $doc->saveHTML($item);
+		} else {
+			trigger_error('unable to fetch first div in body on node "' . $nodeId . '" in dimension "'.$dimension.'" from "'. $url . '" - maybe the cms response is empty in ' . __METHOD__, E_USER_WARNING);
+			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
+		}
+
 		\Foomo\Timer::stop($topic);
 		return $html;
 	}
@@ -94,6 +110,8 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @param \DOMDocument $doc
 	 * @param string       $baseURL
+	 *
+	 * @throws HTTPException
 	 */
 	protected static function replaceApps(\DOMDocument $doc, $baseURL)
 	{
@@ -138,14 +156,20 @@ class Client extends AbstractClient implements ClientInterface
 
 			# render app
 			$appHtml = static::renderApp($appClassName, $appData, $baseURL);
+			$appDom = static::getDOMDocument($appHtml);
 
-			# create app dom document
-			$appFragment = $doc->createDocumentFragment();
-			$appFragment->appendXML($appHtml);
+			# grep first div in body (if exists)
+			$item = $appDom->getElementsByTagName('div')->item(0);
 
+			# error handling
+			if(is_null($item)) {
+				trigger_error('unable to append the rendered app instance of class '.$appClassName.' to the given cms content in ' . __METHOD__ . ' while serving ' . $_SERVER['REQUEST_URI'], E_USER_WARNING);
+				throw new HTTPException(500, 'The content could not be loaded from the remote server!');
+			}
 
 			# replace in dom
-			$appNode->parentNode->replaceChild($appFragment, $appNode);
+			$item = $doc->importNode($item, true);
+			$appNode->parentNode->replaceChild($item, $appNode);
 		}
 	}
 
@@ -179,6 +203,8 @@ class Client extends AbstractClient implements ClientInterface
 	}
 
 	/**
+	 * Seems like this gets cached in static::load() ...
+	 *
 	 * @param string       $dimension
 	 * @param \DOMDocument $doc
 	 *
@@ -189,16 +215,15 @@ class Client extends AbstractClient implements ClientInterface
 		$ids = [];
 		$elements = [];
 
+
 		# collect all ids
 		foreach ($doc->getElementsByTagName('a') as $element) {
 			/* @var $element \DOMElement */
 			$href = $element->getAttribute('href');
 			switch (true) {
-				case (substr($href, 0, 7) == 'nodeid:'):
-					$ids = array_unique(array_merge($ids, [substr($href, 7)]));
-					$elements[] = $element;
-					break;
+				case (substr($href, 0, 7) == 'node://'):
 				case (substr($href, 0, 7) == 'neos://'):
+				case (substr($href, 0, 7) == 'nodeid:'):
 					$ids = array_unique(array_merge($ids, [substr($href, 7)]));
 					$elements[] = $element;
 					break;

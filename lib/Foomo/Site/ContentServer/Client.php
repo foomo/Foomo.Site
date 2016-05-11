@@ -54,11 +54,55 @@ class Client
 
 		# append request nodes
 		foreach ($config->navigations as $id => $navigation) {
-			$request->addNode($id, $navigation['id'], $navigation['mimeTypes'], $navigation['expand']);
+			$request->addNode(
+				$id,
+				$navigation['id'],
+				$navigation['mimeTypes'],
+				$navigation['expand'],
+				$navigation['dataFields']
+			);
 		}
 
 		# retrieve and return content
 		return static::getContentServerProxy()->getContent($request);
+	}
+
+	/**
+	 * @param array    $nodes
+	 * @param string[] $dimensions
+	 * @param array    $data
+	 * @return Vo\Content\Node[]
+	 */
+	public static function getNodes(array $nodes, array $dimensions, array $data = [])
+	{
+		$env = Site::getEnv();
+
+		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups(), $data);
+		$request = Vo\Requests\Nodes::create($contentEnv);
+
+		# append request nodes
+		foreach ($nodes as $node) {
+			$request->addNode(
+				$node['name'],
+				$node['id'],
+				$node['mimeTypes'],
+				$node['expand'],
+				(isset($node['dataFields'])) ? $node['dataFields'] : []
+			);
+		}
+
+		return static::getContentServerProxy()->getNodes($request);
+	}
+
+	/**
+	 * @param string   $dimension
+	 * @param string[] $ids
+	 *
+	 * @return string[]
+	 */
+	public static function getURIs($dimension, $ids)
+	{
+		return static::getContentServerProxy()->getURIs($dimension, $ids);
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -69,12 +113,18 @@ class Client
 	 * Returns the configured site content server proxy
 	 *
 	 * @return \Foomo\ContentServer\ProxyInterface
+	 *
+	 * @throws Site\Exception\HTTPException
 	 */
 	protected static function getContentServerProxy()
 	{
 		static $inst;
 		if (is_null($inst)) {
-			$inst = Site\Module::getSiteContentServerProxyConfig()->getProxy();
+			try {
+				$inst = Site\Module::getSiteContentServerProxyConfig()->getProxy();
+			} catch (\Exception $e) {
+				throw new Site\Exception\HTTPException(503, Site\Exception\HTTPException::MSG_CONTENT_SERVER_UNAVAILABLE, $e);
+			}
 		}
 		return $inst;
 	}
