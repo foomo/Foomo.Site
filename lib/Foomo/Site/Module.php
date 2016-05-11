@@ -36,7 +36,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	//---------------------------------------------------------------------------------------------
 
 	const NAME    = 'Foomo.Site';
-	const VERSION = '1.0.2';
+	const VERSION = '1.1.0';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
@@ -70,7 +70,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 		$resources = array(
 			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.4.*'),
 			\Foomo\Modules\Resource\Module::getResource('Foomo.Media', '0.3.*'),
-			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '0.3.*'),
+			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '1.3.*'),
 		);
 
 		# resources when enabled
