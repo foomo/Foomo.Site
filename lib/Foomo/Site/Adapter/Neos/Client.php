@@ -95,7 +95,7 @@ class Client extends AbstractClient implements ClientInterface
 		if(!is_null($item)) {
 			$html = $doc->saveHTML($item);
 		} else {
-			trigger_error('unable to fetch first div in body on node '.$nodeId.' in dimension '.$dimension.', maybe the cms response is empty in ' . __METHOD__, E_USER_WARNING);
+			trigger_error('unable to fetch first div in body on node "' . $nodeId . '" in dimension "'.$dimension.'" from "'. $url . '" - maybe the cms response is empty in ' . __METHOD__, E_USER_WARNING);
 			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
 		}
 
