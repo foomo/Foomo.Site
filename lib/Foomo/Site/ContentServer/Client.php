@@ -38,16 +38,15 @@ class Client
 	 *
 	 * @param string   $uri
 	 * @param string[] $dimensions
-	 * @param array    $data
 	 * @return Vo\Content\SiteContent
 	 */
-	public static function getContent($uri, array $dimensions, array $data = [])
+	public static function getContent($uri, array $dimensions)
 	{
 		$env = Site::getEnv();
 		$config = Site::getConfig();
 
 		# create request env
-		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups(), $data);
+		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups());
 
 		# create request
 		$request = Vo\Requests\Content::create($uri, $contentEnv);
@@ -70,14 +69,13 @@ class Client
 	/**
 	 * @param array    $nodes
 	 * @param string[] $dimensions
-	 * @param array    $data
 	 * @return Vo\Content\Node[]
 	 */
-	public static function getNodes(array $nodes, array $dimensions, array $data = [])
+	public static function getNodes(array $nodes, array $dimensions)
 	{
 		$env = Site::getEnv();
 
-		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups(), $data);
+		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups());
 		$request = Vo\Requests\Nodes::create($contentEnv);
 
 		# append request nodes
