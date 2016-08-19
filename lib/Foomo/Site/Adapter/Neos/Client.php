@@ -199,7 +199,7 @@ class Client extends AbstractClient implements ClientInterface
 			/*if ($time) {
 				$uri .= '/' . $time;
 			}*/
-			
+
 			$image->setAttribute('src', $uri);
 		}
 	}
