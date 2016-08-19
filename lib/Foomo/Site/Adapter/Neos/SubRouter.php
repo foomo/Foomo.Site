@@ -51,7 +51,9 @@ class SubRouter extends \Foomo\Site\SubRouter
 		$this->addRoutes(
 			[
 				'/asset/:nodeId/:filename'   => 'asset',
-				'/image/:type/:nodeId/:time' => 'image',
+				'/image/:type/:nodeId/:time/:timestamp' => 'imageWithTimestamp',
+
+				'/image/:type/:nodeId/:time' => 'imageWithTimestamp',
 				'/image/:type/:nodeId'       => 'image',
 				'/*'                         => 'error',
 			]
@@ -81,9 +83,13 @@ class SubRouter extends \Foomo\Site\SubRouter
 	 * @param string $nodeId
 	 * @return string
 	 */
-	public static function getImageUri($type, $nodeId)
+	public static function getImageUri($type, $nodeId, $timestamp = null)
 	{
-		return static::getUri('/image/' . $type . '/' . $nodeId);
+		if (!is_null($timestamp)) {
+			return static::getUri('/image/' . $type . '/' . $nodeId .'/time/' . $timestamp);
+		} else {
+			return static::getUri('/image/' . $type . '/' . $nodeId);
+		}
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -119,6 +125,37 @@ class SubRouter extends \Foomo\Site\SubRouter
 		}
 	}
 
+	public function imageWithTimestamp($type, $nodeId, $time = null, $timestamp = 0) {
+		//restructure uri segments for backward compatibility reasons
+		if (is_numeric($time) && $timestamp == 0) {
+			$timestamp = $time;
+			$time = 'time';
+		}
+
+		if ($time == 'time' && is_numeric($timestamp)) {
+
+			if ($timestamp == 0) {
+				$config = static::getAdapterConfig();
+				$url = $config->getPathUrl('image') . '/' . $nodeId;
+				$cachedTimestamp = Cache::getTimestamp($url);
+
+				//redirect
+				if ($cachedTimestamp) {
+					$this->redirect(self::getImageUri($type, $nodeId, $cachedTimestamp));
+				} else {
+					$this->error();
+				}
+			}
+
+		} else {
+			//error
+			$this->error();
+		}
+		$this->image($type, $nodeId, $timestamp);
+
+	}
+
+
 	/**
 	 * Serve responsive images
 	 *
@@ -135,6 +172,8 @@ class SubRouter extends \Foomo\Site\SubRouter
 		$url = $config->getPathUrl('image') . '/' . $nodeId;
 
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
+
+
 		$cacheFilename = Cache::getFilename($nodeId, $url, static::$prefix, (int) $time);
 		\Foomo\Timer::stop($topic);
 
