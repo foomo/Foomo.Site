@@ -196,10 +196,6 @@ class Client extends AbstractClient implements ClientInterface
 			# get local uri
 			$uri = Neos\SubRouter::getImageUri($type, $nodeId, $time);
 
-			/*if ($time) {
-				$uri .= '/' . $time;
-			}*/
-
 			$image->setAttribute('src', $uri);
 		}
 	}

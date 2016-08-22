@@ -105,7 +105,7 @@ class Cache
 
 	public static function getTimestamp($url)
 	{
-		$timestamp = self::getTimestamp($url);
+		$timestamp = self::getCachedTimestamp($url);
 		if (!$timestamp) {
 			$headers = get_headers($url, 1);
 			$timestamp = self::setCachedTimestamp($url, $headers);

@@ -85,11 +85,10 @@ class SubRouter extends \Foomo\Site\SubRouter
 	 */
 	public static function getImageUri($type, $nodeId, $timestamp = null)
 	{
-		if (!is_null($timestamp)) {
-			return static::getUri('/image/' . $type . '/' . $nodeId .'/time/' . $timestamp);
-		} else {
+		if (empty($timestamp)) {
 			return static::getUri('/image/' . $type . '/' . $nodeId);
 		}
+		return static::getUri('/image/' . $type . '/' . $nodeId .'/time/' . $timestamp);
 	}
 
 	// --------------------------------------------------------------------------------------------
