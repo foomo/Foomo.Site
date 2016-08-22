@@ -132,20 +132,16 @@ class SubRouter extends \Foomo\Site\SubRouter
 		}
 
 		if ($time == 'time' && is_numeric($timestamp)) {
+			$sourceFile = Cache::getSourceFilename($nodeId, static::$prefix);
+			if (file_exists($sourceFile)) {
 
-			if ($timestamp == 0) {
-				$config = static::getAdapterConfig();
-				$url = $config->getPathUrl('image') . '/' . $nodeId;
-				$cachedTimestamp = Cache::getTimestamp($url);
+				$cachedTimestamp = filemtime($sourceFile);
 
 				//redirect
-				if ($cachedTimestamp) {
+				if ($cachedTimestamp != $timestamp) {
 					$this->redirect(self::getImageUri($type, $nodeId, $cachedTimestamp));
-				} else {
-					$this->error();
 				}
 			}
-
 		} else {
 			//error
 			$this->error();

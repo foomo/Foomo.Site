@@ -43,26 +43,16 @@ class Cache
 	 */
 	public static function getFilename($nodeId, $url, $type = 'files', $time = 0)
 	{
-		$module = Module::getRootModuleClass();
-
-		$filename = $module::getCacheDir($type) . DIRECTORY_SEPARATOR . $nodeId;
+		$filename = self::getSourceFilename($nodeId, $type);
 
 		if (file_exists($filename)) {
 
-			//+ redirect on timestamps lower then the cached one
-
 			if ($time == 0) {
-				$time = self::getCachedTimestamp($url);
-				if (!$time) {
-					//retrieve and save in fast cache
-					# get file headers
-					$headers = get_headers($url, 1);
-					self::setCachedTimestamp($url, $headers);
-				}
+				$time = filemtime($filename);
 			}
 
 			# check if file exists on the source
-			if ($time > self::getCachedTimestamp($url)) { //filemtime($filename)
+			if ($time > filemtime($filename)) {
 				return static::loadRemoteFile($url, $filename);
 			} else {
 				return $filename;
@@ -72,47 +62,33 @@ class Cache
 		}
 	}
 
+
+	public static function getSourceFilename($nodeId, $type = 'files') {
+		$module = Module::getRootModuleClass();
+		return $module::getCacheDir($type) . DIRECTORY_SEPARATOR . $nodeId;
+	}
+
 	// --------------------------------------------------------------------------------------------
 	// ~ Private static methods
 	// --------------------------------------------------------------------------------------------
 
-	/**
-	 * @param string $sourceUrl
-	 * @return int | bool
-	 */
-	public static function getCachedTimestamp($sourceUrl)
-	{
-		$persistor = \Foomo\Cache\Manager::getFastPersistor();
-		return $persistor->directLoad($sourceUrl);
-	}
 
 	/**
-	 * @param string $sourceUrl
 	 * @param array $headers see $http_response_header
-	 * @return mixed
+	 * @return int
 	 */
-	public static function setCachedTimestamp($sourceUrl, $headers)
+	public static function extractLastModifiedFromHeader($headers)
 	{
 		if ($headers && strstr($headers[0], '200') !== false && isset($headers['Last-Modified'])) {
 			$dt = new \DateTime($headers['Last-Modified']);
 			$timestamp = $dt->getTimestamp();
-			$persistor = \Foomo\Cache\Manager::getFastPersistor();
-			$persistor->directSave($sourceUrl, $timestamp);
+			if ($timestamp > time()) {
+				$timestamp = time();
+			}
 			return $timestamp;
 		}
-		return null;
+		return time();
 	}
-
-	public static function getTimestamp($url)
-	{
-		$timestamp = self::getCachedTimestamp($url);
-		if (!$timestamp) {
-			$headers = get_headers($url, 1);
-			$timestamp = self::setCachedTimestamp($url, $headers);
-		}
-		return $timestamp;
-	}
-
 
 	/**
 	 * Loads a remote file and returns it's local file name
@@ -125,8 +101,9 @@ class Cache
 	{
 		$content = @file_get_contents($url);
 		if ($content) {
-			self::setCachedTimestamp($url, $http_response_header);
 			file_put_contents($filename, $content);
+			//manipulate the file mtime
+			touch($filename, self::extractLastModifiedFromHeader($http_response_header));
 			return $filename;
 		} else {
 			return false;
