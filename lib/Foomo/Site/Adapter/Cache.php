@@ -65,6 +65,9 @@ class Cache
 
 	public static function getSourceFilename($nodeId, $type = 'files') {
 		$module = Module::getRootModuleClass();
+		if(substr($type, 0, 1) == "/") {
+			$type = substr($type, 1);
+		}
 		return $module::getCacheDir($type) . DIRECTORY_SEPARATOR . $nodeId;
 	}
 
@@ -79,13 +82,25 @@ class Cache
 	 */
 	public static function extractLastModifiedFromHeader($headers)
 	{
-		if ($headers && strstr($headers[0], '200') !== false && isset($headers['Last-Modified'])) {
-			$dt = new \DateTime($headers['Last-Modified']);
-			$timestamp = $dt->getTimestamp();
-			if ($timestamp > time()) {
-				$timestamp = time();
+		if ($headers && strstr($headers[0], '200') !== false) {
+			$lastModified = false;
+			if(isset($headers['Last-Modified'])) {
+				$lastModified = $headers['Last-Modified'];
+			} else {
+				foreach($headers as $header) {
+					if(substr($header, 0, 14) == "Last-Modified:") {
+						$lastModified = substr($header, 15);
+					}
+				}
 			}
-			return $timestamp;
+			if($lastModified) {
+				$dt = new \DateTime($lastModified);
+				$timestamp = $dt->getTimestamp();
+				if($timestamp > time()) {
+					$timestamp = time();
+				}
+				return $timestamp;
+			}
 		}
 		return time();
 	}
@@ -103,7 +118,8 @@ class Cache
 		if ($content) {
 			file_put_contents($filename, $content);
 			//manipulate the file mtime
-			touch($filename, self::extractLastModifiedFromHeader($http_response_header));
+			$timestamp = self::extractLastModifiedFromHeader($http_response_header);
+			touch($filename, $timestamp);
 			return $filename;
 		} else {
 			return false;
