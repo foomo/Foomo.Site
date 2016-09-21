@@ -36,7 +36,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	//---------------------------------------------------------------------------------------------
 
 	const NAME    = 'Foomo.Site';
-	const VERSION = '1.3.2';
+	const VERSION = '1.4.0';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
@@ -83,6 +83,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 						# site module configs
 						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.ContentServer.config'),
 						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.config'),
+						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.Content.Security.Policy.config'),
 						# add these to your site if you want to use Mail or Analytics
 						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.smtp'),
 						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.analytics'),
