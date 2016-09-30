@@ -25,16 +25,16 @@ class Report
 	 */
 	public static function handleViolationReport($data)
 	{
-		trigger_error(json_encode($data, JSON_PRETTY_PRINT));
+
 		self::addToReport($data['csp-report']);
-	}
+			}
 
 	/**
 	 * @return string
 	 */
 	public static function getReportFile()
 	{
-		return \Foomo\Site\Module::getVarDir() . DIRECTORY_SEPARATOR . 'content-security-policy.serialized';
+		return \Foomo\Site\Module::getVarDir() . DIRECTORY_SEPARATOR . date('Y-m-d') . '-content-security-policy.serialized';
 	}
 
 	/**
@@ -56,11 +56,12 @@ class Report
 	 */
 	public static function addToReport($item)
 	{
+		$item = (array)$item;
 		$report = self::loadReport();
 		if (array_key_exists($item['blocked-uri'], $report)) {
 			$report[$item['blocked-uri']]['lastNotified'] = time();
 		} else {
-			$report[$item['blocked-uri']] = array_merge (
+			$report[$item['blocked-uri']] = array_merge(
 				$item,
 				[
 					'firstNotified' => time(),
@@ -70,17 +71,6 @@ class Report
 			);
 		}
 		return file_put_contents(self::getReportFile(), serialize($report));
-	}
-
-	public static function notifyAdmin() {
-		$mailData = [];
-		$report = self::loadReport();
-		foreach ($report as $blockedUri => $item) {
-			if ($item['adminNotified'] == 0) {
-				$mailData[$item['blocked-uri']] = $item;
-			}
-		}
-
 	}
 
 

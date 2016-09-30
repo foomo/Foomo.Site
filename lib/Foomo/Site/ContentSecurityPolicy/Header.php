@@ -25,7 +25,11 @@ class Header
 			}
 
 			if (!empty($headerVal)) {
-				header('Content-Security-Policy: ' . $headerVal);
+				if ($config->notifyOnly) {
+					header('Content-Security-Policy-Report-Only: ' . $headerVal);
+				} else {
+					header('Content-Security-Policy: ' . $headerVal);
+				}
 			}
 		}
 	}

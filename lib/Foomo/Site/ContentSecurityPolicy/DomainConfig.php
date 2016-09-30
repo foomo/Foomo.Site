@@ -13,7 +13,14 @@ class DomainConfig extends AbstractConfig
 
 	public $enabled = false;
 
-	public $reportUri = 'https://schild-local-test.bestbytes.net/content-security-policy-violation';
+	/**
+	 * do not block content, just report
+	 *
+	 * @var bool
+	 */
+	public $notifyOnly = true;
+
+	public $reportUri = '/content-security-policy-violation';
 
 	public $defaultSrc = [
 		"'self'",
