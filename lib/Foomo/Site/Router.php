@@ -62,10 +62,13 @@ class Router extends \Foomo\Router
 			array_merge(
 				[
 					'/robots.txt' => 'robots',
+					'/content-security-policy-violation' => 'cspViolation'
 				],
 				$routes,
 				[
-					'/*'  => 'site'
+
+					'/*'  => 'site',
+
 				]
 			)
 		);
@@ -99,4 +102,15 @@ class Router extends \Foomo\Router
 		}
 		exit;
 	}
-}
+
+	public function cspViolation() {
+		$data = (array) json_decode(file_get_contents('php://input'));
+		$reports = \Foomo\Site\ContentSecurityPolicy\Report::handleViolationReport($data);
+
+
+
+	}
+
+
+
+ }

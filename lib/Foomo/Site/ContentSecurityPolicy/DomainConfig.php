@@ -13,6 +13,8 @@ class DomainConfig extends AbstractConfig
 
 	public $enabled = false;
 
+	public $reportUri = 'https://schild-local-test.bestbytes.net/content-security-policy-violation';
+
 	public $defaultSrc = [
 		"'self'",
 		"'unsafe-inline'",

@@ -19,6 +19,11 @@ class Header
 					$headerVal .= $attr . ' ' . implode(' ', $config->$prop) . ';';
 				}
 			}
+
+			if (!empty($config->reportUri)) {
+				$headerVal .= 'report-uri ' . $config->reportUri . ';';
+			}
+
 			if (!empty($headerVal)) {
 				header('Content-Security-Policy: ' . $headerVal);
 			}
