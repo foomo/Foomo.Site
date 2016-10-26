@@ -64,7 +64,11 @@ class Model
 			} else {
 				$this->dimension = $dimension;
 			}
-			$this->repoNode = $this->repoNodes->{$this->dimension};
+			if(!is_null($this->dimension)) {
+				$this->repoNode = $this->repoNodes->{$this->dimension};
+
+			}
+
 		}
 		return $this;
 	}
