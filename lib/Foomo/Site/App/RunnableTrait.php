@@ -43,6 +43,16 @@ trait RunnableTrait
 		return MVC::run($app, $baseUrl, true, true);
 	}
 
+	public static function runAndReturnInstance($data, $baseUrl = null)
+	{
+		$app = new static;
+		$app->setAppData($data);
+		return [
+			"instance" => $app,
+			"html" => MVC::run($app, $baseUrl, true, true)
+		];
+	}
+
 	/**
 	 * @param array  $data
 	 * @param string $action
