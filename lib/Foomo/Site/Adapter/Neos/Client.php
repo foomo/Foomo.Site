@@ -183,6 +183,9 @@ class Client extends AbstractClient implements ClientInterface
 		foreach ($doc->getElementsByTagName("img") as $image) {
 			# get media server type
 			$type = $image->getAttribute('data-type');
+			if(empty($type)) {
+				$type = 'default';
+			}
 			$image->removeAttribute('data-type');
 			# get last modified timestamp
 			$time = $image->getAttribute('data-time');
