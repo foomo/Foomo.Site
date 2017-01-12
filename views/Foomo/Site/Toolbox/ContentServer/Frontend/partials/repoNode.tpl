@@ -10,6 +10,10 @@ $nodeId = $repoNode->id;
 $dimension = $model->dimension;
 $action = $view->currentAction;
 
+if(!isset($count)) {
+	$count == 0;
+}
+
 # check visibility
 if ($repoNode->hidden) {
 	$styles[] = 'opacity:0.5';
@@ -24,8 +28,15 @@ $mimeTypes = [
 	'application/neos+directory'   => 'fa-folder-o',
 	'application/shop+category'    => 'fa-shopping-cart',
 	'application/shop+placeholder' => 'fa-external-link-square',
-	'application/shop+product'		 => 'fa-female',
+	'application/shop+product'     => 'fa-female',
 ];
+
+if(!$model->listAll && $count > 300) {
+	return;
+}
+
+$count ++;
+
 ?>
 
 <tr style="<?= implode(';', $styles); ?>">
@@ -95,12 +106,14 @@ $mimeTypes = [
 	if (count($repoNode->index) > 0) {
 		$level++;
 		foreach ($repoNode->index as $index) {
+			$count ++;
 			echo $view->partial(
 				'repoNode',
 				[
 					'level'      => $level,
 					'parentNode' => $repoNode,
 					'repoNode'   => $repoNode->nodes->$index,
+					'count'      => $count
 				]
 			);
 		}

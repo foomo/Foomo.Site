@@ -57,8 +57,9 @@ class Controller
 	/**
 	 * @param string $dimension
 	 */
-	public function actionViewList($dimension = null)
+	public function actionViewList($dimension = null, $all = "nope")
 	{
+		$this->model->listAll = $all == "all";
 		$this->model->setDimension($dimension);
 	}
 
