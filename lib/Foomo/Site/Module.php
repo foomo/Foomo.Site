@@ -84,9 +84,10 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.ContentServer.config'),
 						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.config'),
 						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.Content.Security.Policy.config'),
-						# add these to your site if you want to use Mail or Analytics
+						# add these to your site if you want to use Mail, Tag Manager or Analytics
 						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.smtp'),
 						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.analytics'),
+						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.tagManager'),
 					],
 					$resources
 				);
@@ -141,6 +142,14 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	public static function getAnalyticsConfig()
 	{
 		return self::getRootModuleConfig(\Foomo\Site\Analytics\DomainConfig::NAME);
+	}
+
+	/**
+	 * @return \Foomo\Site\TagManager\DomainConfig
+	 */
+	public static function getTagManagerConfig()
+	{
+		return self::getRootModuleConfig(\Foomo\Site\TagManager\DomainConfig::NAME);
 	}
 
 	/**
