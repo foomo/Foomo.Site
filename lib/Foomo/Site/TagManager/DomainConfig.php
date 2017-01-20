@@ -44,4 +44,16 @@ class DomainConfig extends AbstractConfig
 	 * @var string
 	 */
 	public $containerId = 'GTM-XXXX';
+	/**
+	 * Optional GTM Environment auth
+	 *
+	 * @var string
+	 */
+	public $auth = '';
+	/**
+	 * Optional GTM Environment preview
+	 *
+	 * @var string
+	 */
+	public $preview = '';
 }
