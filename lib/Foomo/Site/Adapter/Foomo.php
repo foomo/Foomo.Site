@@ -20,9 +20,6 @@
 namespace Foomo\Site\Adapter;
 
 use Foomo\ContentServer\Vo;
-use Foomo\MVC;
-use Foomo\Router\MVC\URLHandler;
-use Foomo\Site;
 
 /**
  * @link    www.foomo.org
