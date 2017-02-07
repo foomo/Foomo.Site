@@ -139,6 +139,8 @@ class Model
 		# get content
 		try {
 			$rendering = $adapter::getContent($this->getContent());
+		} catch(Site\Exception\HTTPException $e) {
+			throw $e;
 		} catch(\Exception $e) {
 			trigger_error(
 				'Could not retrieve content:' . $e->getMessage() . PHP_EOL . $e->getTraceAsString(),
