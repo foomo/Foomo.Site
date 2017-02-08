@@ -107,6 +107,11 @@ $count ++;
 		$level++;
 		foreach ($repoNode->index as $index) {
 			$count ++;
+			$childRepoNode = null;
+			if(empty($repoNode->nodes->$index)) {
+				echo "<code>this node (" . $view->escape($repoNode->id) . ") is fucked - index has a reference to \"" . $view->escape($index) . "\" which does not exist in</code>";
+				continue;
+			}
 			echo $view->partial(
 				'repoNode',
 				[
