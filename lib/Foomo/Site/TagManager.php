@@ -77,23 +77,46 @@ class TagManager
 		}
 
 		$config = Module::getTagManagerConfig();
-		$data = json_encode((object) $this->data);
-		$containerId = $config->containerId;
-		$environment = "";
-		if (!empty($config->auth)) {
-			$auth = $config->auth;
-			$preview = $config->preview;
-			$environment = "+'&gtm_auth=${auth}&gtm_preview=${preview}&gtm_cookies_win=x'";
+
+		if (!empty($config->optimizeId)) {
+			$optimizeId = $config->optimizeId;
+			$HTMLDoc->addStylesheet('.async-hide {opacity:0 !important}');
+			$HTMLDoc->addJavascript("
+				(function(a,s,y,n,c,h,i,d,e){s.className+=' '+y;
+				h.end=i=function(){s.className=s.className.replace(RegExp(' ?'+y),'')};
+				(a[n]=a[n]||[]).hide=h;setTimeout(function(){i();h.end=null},c);
+				})(window,document.documentElement,'async-hide','dataLayer',2000,{'${optimizeId}':true});
+			");
 		}
 
-		$HTMLDoc->addJavascript("dataLayer = [${data}];");
-		$HTMLDoc->addJavascript("
-			(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-			new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-			j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-			'https://www.googletagmanager.com/gtm.js?id='+i+dl${environment};f.parentNode.insertBefore(j,f);
-			})(window,document,'script','dataLayer','${containerId}');");
-		$HTMLDoc->addBody("<noscript><iframe src=\"https://www.googletagmanager.com/ns.html?id=${containerId}\" height=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe></noscript>");
+		if (!empty($config->containers)) {
+			$data = json_encode((object) $this->data);
+			$HTMLDoc->addJavascript("dataLayer = [${data}];");
+			$noScript = '';
+			foreach ($config->containers as $container) {
+				$containerId = $container['id'];
+				$environment = "";
+				if (
+					isset($container['auth']) && !empty($container['auth']) &&
+					isset($container['preview']) && !empty($container['preview'])
+				) {
+					$environment = "+'&gtm_auth=${container['auth']}&gtm_preview=${container['preview']}&gtm_cookies_win=x'";
+				}
+				$HTMLDoc->addJavascript("
+					(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+					new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+					j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+					'https://www.googletagmanager.com/gtm.js?id='+i+dl${environment};f.parentNode.insertBefore(j,f);
+					})(window,document,'script','dataLayer','${containerId}');"
+				);
+				$noScript .= "<iframe src=\"https://www.googletagmanager.com/ns.html?id=${containerId}\" height=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe>" . PHP_EOL;
+			}
+			$HTMLDoc->addBody("
+				<noscript>
+					${noScript}
+				</noscript>
+			");
+		}
 		return $this;
 	}
 

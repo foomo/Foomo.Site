@@ -39,21 +39,19 @@ class DomainConfig extends AbstractConfig
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * GTM Container ID
+	 * Google Optimize 360 id
 	 *
 	 * @var string
 	 */
-	public $containerId = 'GTM-XXXX';
+	public $optimizeId = 'GTM-XXXX';
 	/**
-	 * Optional GTM Environment auth
+	 * GTM Container IDs
 	 *
-	 * @var string
+	 * @var string[]
 	 */
-	public $auth = '';
-	/**
-	 * Optional GTM Environment preview
-	 *
-	 * @var string
-	 */
-	public $preview = '';
+	public $containers = [
+		'id' => 'GTM-XXXX',
+		'auth' => '',
+		'preview' => ''
+	];
 }
