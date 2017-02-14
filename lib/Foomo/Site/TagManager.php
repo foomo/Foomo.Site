@@ -45,7 +45,7 @@ class TagManager
 	 * @internal
 	 * @var array
 	 */
-	public $data = [];
+	public $dataLayer = [];
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
@@ -90,8 +90,12 @@ class TagManager
 		}
 
 		if (!empty($config->containers)) {
-			$data = json_encode((object) $this->data);
-			$HTMLDoc->addJavascript("dataLayer = [${data}];");
+			$HTMLDoc->addJavascript("var dataLayer = dataLayer || [];" . PHP_EOL);
+			foreach ($this->dataLayer as $data) {
+				if (empty($data)) continue;
+				$jsonData = json_encode((object) $data);
+				$HTMLDoc->addJavascript("dataLayer.push(${jsonData});" . PHP_EOL);
+			}
 			$noScript = '';
 			foreach ($config->containers as $container) {
 				$containerId = $container['id'];
@@ -121,12 +125,26 @@ class TagManager
 	}
 
 	/**
+	 * @param $id string
 	 * @param $key string
 	 * @param $value mixed
 	 * @return $this
 	 */
-	public function addData($key, $value) {
-		$this->data[$key] = $value;
+	public function add($id, $key, $value) {
+		if (!isset($this->dataLayer[$id])) {
+			$this->dataLayer[$id] = [];
+		}
+		$this->dataLayer[$id][$key] = $value;
+		return $this;
+	}
+
+	/**
+	 * @param $id string
+	 * @param $value mixed
+	 * @return $this
+	 */
+	public function push($id, $value) {
+		$this->dataLayer[$id] = $value;
 		return $this;
 	}
 }
