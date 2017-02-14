@@ -45,7 +45,12 @@ class TagManager
 	 * @internal
 	 * @var array
 	 */
-	public $dataLayer = [];
+	public $pageData = [];
+	/**
+	 * @internal
+	 * @var array
+	 */
+	public $eventData = [];
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
@@ -91,8 +96,9 @@ class TagManager
 
 		if (!empty($config->containers)) {
 			$HTMLDoc->addJavascript("var dataLayer = dataLayer || [];" . PHP_EOL);
-			sort($this->dataLayer);
-			foreach ($this->dataLayer as $data) {
+			# page data
+			sort($this->pageData);
+			foreach ($this->pageData as $data) {
 				if (empty($data)) continue;
 				$jsonData = json_encode((object) $data);
 				$HTMLDoc->addJavascript("dataLayer.push(${jsonData});" . PHP_EOL);
@@ -116,6 +122,13 @@ class TagManager
 				);
 				$noScript .= "<iframe src=\"https://www.googletagmanager.com/ns.html?id=${containerId}\" height=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe>" . PHP_EOL;
 			}
+			# event data
+			sort($this->eventData);
+			foreach ($this->eventData as $data) {
+				if (empty($data)) continue;
+				$jsonData = json_encode((object) $data);
+				$HTMLDoc->addJavascript("dataLayer.push(${jsonData});" . PHP_EOL);
+			}
 			$HTMLDoc->addBody("
 				<noscript>
 					${noScript}
@@ -131,21 +144,45 @@ class TagManager
 	 * @param $value mixed
 	 * @return $this
 	 */
-	public function add($id, $key, $value) {
-		if (!isset($this->dataLayer[$id])) {
-			$this->dataLayer[$id] = [];
+	public function addToPage($id, $key, $value) {
+		if (!isset($this->pageData[$id])) {
+			$this->pageData[$id] = [];
 		}
-		$this->dataLayer[$id][$key] = $value;
+		$this->pageData[$id][$key] = $value;
 		return $this;
 	}
 
 	/**
-	 * @param $id string
+	 * @param $id mixed
 	 * @param $value mixed
 	 * @return $this
 	 */
-	public function push($id, $value) {
-		$this->dataLayer[$id] = $value;
+	public function pushToPage($id, $value) {
+		$this->pageData[$id] = $value;
+		return $this;
+	}
+
+	/**
+	 * @param $id mixed
+	 * @param $key string
+	 * @param $value mixed
+	 * @return $this
+	 */
+	public function addToEvent($id, $key, $value) {
+		if (!isset($this->eventData[$id])) {
+			$this->eventData[$id] = [];
+		}
+		$this->eventData[$id][$key] = $value;
+		return $this;
+	}
+
+	/**
+	 * @param $id mixed
+	 * @param $value mixed
+	 * @return $this
+	 */
+	public function pushToEvent($id, $value) {
+		$this->eventData[$id] = $value;
 		return $this;
 	}
 }
