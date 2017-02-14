@@ -91,6 +91,7 @@ class TagManager
 
 		if (!empty($config->containers)) {
 			$HTMLDoc->addJavascript("var dataLayer = dataLayer || [];" . PHP_EOL);
+			sort($this->dataLayer);
 			foreach ($this->dataLayer as $data) {
 				if (empty($data)) continue;
 				$jsonData = json_encode((object) $data);
@@ -125,7 +126,7 @@ class TagManager
 	}
 
 	/**
-	 * @param $id string
+	 * @param $id mixed
 	 * @param $key string
 	 * @param $value mixed
 	 * @return $this
