@@ -49,7 +49,7 @@ trait RunnableTrait
 		$app->setAppData($data);
 		return [
 			"instance" => $app,
-			"html" => MVC::run($app, $baseUrl, true, true)
+			"html" => MVC::run($app, $baseUrl, true, true, 'Foomo\\MVC\\URLHandler', false)
 		];
 	}
 
