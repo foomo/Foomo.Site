@@ -142,13 +142,16 @@ class TagManager
 	 * @param $id mixed
 	 * @param $key string
 	 * @param $value mixed
+	 * @param $override bool
 	 * @return $this
 	 */
-	public function addToPage($id, $key, $value) {
+	public function addToPage($id, $key, $value, $override=true) {
 		if (!isset($this->pageData[$id])) {
 			$this->pageData[$id] = [];
 		}
-		$this->pageData[$id][$key] = $value;
+		if (!isset($this->pageData[$id][$key]) || $override) {
+			$this->pageData[$id][$key] = $value;
+		}
 		return $this;
 	}
 
