@@ -94,9 +94,15 @@ class Env implements EnvInterface
 	 */
 	protected static function getInstance($write = false)
 	{
-		if ($write) {
-			\Foomo\Session::lockAndLoad();
+		if(\Foomo\Session::getEnabled()) {
+			if ($write) {
+				\Foomo\Session::lockAndLoad();
+			}
+			return \Foomo\Session::getClassInstance(get_called_class());
+		} else {
+			$className = get_called_class();
+			return new $className;
 		}
-		return \Foomo\Session::getClassInstance(get_called_class());
+
 	}
 }
