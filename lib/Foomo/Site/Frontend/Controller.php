@@ -73,6 +73,7 @@ class Controller
 	 * @param string $url
 	 * @param string[] $dimensions
 	 * @throws Site\Exception\HTTPException
+	 * @throws Site\Exception\ContentServerException
 	 */
 	protected function loadSiteContent($url, $dimensions = null)
 	{
@@ -87,6 +88,11 @@ class Controller
 		# retrieve the content
 		$content = Site\ContentServer\Client::getContent($url['path'], array_reverse($dimensions));
 		Timer::addMarker('retrieved content from content server');
+
+		# validate content
+		if(empty($content) || empty($content->status) || empty($content->dimension) || empty($content->item)) {
+			throw new Site\Exception\ContentServerException(503, Site\Exception\ContentServerException::MSG_CONTENT_SERVER_UNAVAILABLE);
+		}
 
 		# set content
 		$this->model->setContent($content);

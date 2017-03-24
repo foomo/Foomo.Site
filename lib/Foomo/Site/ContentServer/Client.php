@@ -112,7 +112,7 @@ class Client
 	 *
 	 * @return \Foomo\ContentServer\ProxyInterface
 	 *
-	 * @throws Site\Exception\HTTPException
+	 * @throws Site\Exception\ContentServerException
 	 */
 	protected static function getContentServerProxy()
 	{
@@ -121,7 +121,7 @@ class Client
 			try {
 				$inst = Site\Module::getSiteContentServerProxyConfig()->getProxy();
 			} catch (\Exception $e) {
-				throw new Site\Exception\HTTPException(503, Site\Exception\HTTPException::MSG_CONTENT_SERVER_UNAVAILABLE, $e);
+				throw new Site\Exception\ContentServerException(503, Site\Exception\ContentServerException::MSG_CONTENT_SERVER_UNAVAILABLE, $e);
 			}
 		}
 		return $inst;
