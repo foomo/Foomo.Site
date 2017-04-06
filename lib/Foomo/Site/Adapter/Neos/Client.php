@@ -71,10 +71,7 @@ class Client extends AbstractClient implements ClientInterface
 	public static function load($dimension, $nodeId, $domain=null, array $data)
 	{
 		Timer::start($topic = __METHOD__);
-		if(is_null($domain)) {
-			$domain = Neos::getName();
-		}
-		$adapterConfig = AbstractBase::getAdapterConfig($domain);
+		$adapterConfig = Neos::getAdapterConfig($domain);
 		$url = $adapterConfig->getPathUrl('content') . '/' . $dimension . '/' . $nodeId . '?workspace=' . $data['workspace'];
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
