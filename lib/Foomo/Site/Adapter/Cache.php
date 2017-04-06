@@ -19,6 +19,7 @@
 
 namespace Foomo\Site\Adapter;
 
+use Foomo\Config;
 use Foomo\Site\Module;
 
 /**
@@ -114,7 +115,14 @@ class Cache
 	 */
 	private static function loadRemoteFile($url, $filename)
 	{
-		$content = file_get_contents($url);
+		$context = [
+			"ssl" => [
+				"verify_peer" => Config::isProductionMode(),
+				"verify_peer_name" => Config::isProductionMode(),
+				"allow_self_signed" => !Config::isProductionMode(),
+			],
+		];
+		$content = file_get_contents($url, false, stream_context_create($context));
 		if ($content) {
 			file_put_contents($filename, $content);
 			//manipulate the file mtime
