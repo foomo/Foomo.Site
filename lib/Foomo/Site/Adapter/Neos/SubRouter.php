@@ -168,7 +168,6 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
 
-
 		$cacheFilename = Cache::getFilename($nodeId, $url, static::$prefix, (int) $time);
 		\Foomo\Timer::stop($topic);
 

@@ -19,7 +19,6 @@
 
 namespace Foomo\Site\Adapter\Neos;
 
-use Foomo\Cache;
 use Foomo\Config;
 use Foomo\Site\Adapter\AbstractBase;
 use Foomo\Site\Adapter\AbstractClient;
@@ -43,10 +42,10 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function get($dimension, $nodeId, $baseURL, $domain=null)
+	public static function get($dimension, $nodeId, $baseURL, $domain=null, array $data)
 	{
-		\Foomo\Timer::addMarker('service neos content');
-		\Foomo\Timer::start($topic = __METHOD__);
+		Timer::addMarker('service neos content');
+		Timer::start($topic = __METHOD__);
 
 		$html = static::cachedLoad($dimension, $nodeId, $domain);
 		if (!empty($html)) {
@@ -59,7 +58,7 @@ class Client extends AbstractClient implements ClientInterface
 			$item = $doc->getElementsByTagName('div')->item(0);
 			if(!is_null($item)) {
 				$html = $doc->saveHTML($item);
-				\Foomo\Timer::stop($topic);
+				Timer::stop($topic);
 				return $html;
 			}
 		}
@@ -69,14 +68,14 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function load($dimension, $nodeId, $domain=null)
+	public static function load($dimension, $nodeId, $domain=null, array $data)
 	{
-		\Foomo\Timer::start($topic = __METHOD__);
+		Timer::start($topic = __METHOD__);
 		if(is_null($domain)) {
 			$domain = Neos::getName();
 		}
 		$adapterConfig = AbstractBase::getAdapterConfig($domain);
-		$url = $adapterConfig->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
+		$url = $adapterConfig->getPathUrl('content') . '/' . $dimension . '/' . $nodeId . '?workspace=' . $data['workspace'];
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -99,7 +98,7 @@ class Client extends AbstractClient implements ClientInterface
 			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
 		}
 
-		\Foomo\Timer::stop($topic);
+		Timer::stop($topic);
 		return $html;
 	}
 

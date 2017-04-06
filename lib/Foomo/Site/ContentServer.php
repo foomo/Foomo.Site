@@ -21,6 +21,7 @@ namespace Foomo\Site;
 
 use Foomo\Site\ContentServer\NodeIterator;
 use Foomo\Site;
+use Foomo\Timer;
 
 /**
  * @link    www.foomo.org
@@ -41,26 +42,32 @@ class ContentServer implements ContentServerInterface
 		try {
 			$siteRepoNodes = (object) [];
 			foreach (Site::getConfig()->adapters as $adapter) {
-				\Foomo\Timer::start(__METHOD__ . '_Adapter_' . $adapter);
-				$adapterConfig = $adapter::getAdapterConfig();
-				if ($adapterConfig && $adapterConfig->getPathUrl('repository')) {
+				Timer::start(__METHOD__ . '_Adapter_' . $adapter);
+				if (is_subclass_of($adapter, '\\Foomo\\Site\\ContentServerInterface')) {
+					/* @var $adapter \Foomo\Site\ContentServerInterface */
+					# export adapter's repo nodes
+					Timer::start(__METHOD__ . '_AdapterExport_' . $adapter);
+					$adapterRepoNodes = $adapter::export();
+					Timer::stop(__METHOD__ . '_AdapterExport_' . $adapter);
 
-					\Foomo\Timer::start(__METHOD__ . '_AdapterGetRepoNode_' . $adapter);
-					$adapterRepoNodes = static::getRepoNode($adapterConfig->getPathUrl('repository'));
-					\Foomo\Timer::stop(__METHOD__ . '_AdapterGetRepoNode_' . $adapter);
-					\Foomo\Timer::start(__METHOD__ . '_AdapterValidateRepoNodes_' . $adapter);
+					# validate adapter's repo nodes
+					Timer::start(__METHOD__ . '_AdapterValidateRepoNodes_' . $adapter);
 					$adapterRepoNodes = static::validateRepoNodes($adapterRepoNodes);
-					\Foomo\Timer::stop(__METHOD__ . '_AdapterValidateRepoNodes_' . $adapter);
-					\Foomo\Timer::start(__METHOD__ . '_AdapterIterateNodes_' . $adapter);
+					Timer::stop(__METHOD__ . '_AdapterValidateRepoNodes_' . $adapter);
+
+					# iterate adapter's repo nodes
+					Timer::start(__METHOD__ . '_AdapterIterateNodes_' . $adapter);
 					foreach ($adapterRepoNodes as $dimension => $repoNode) {
 						static::iterateNode($dimension, $repoNode);
 					}
-					\Foomo\Timer::stop(__METHOD__ . '_AdapterIterateNodes_' . $adapter);
-					\Foomo\Timer::start(__METHOD__ . '_AdapterMergeNodes_' . $adapter);
+					Timer::stop(__METHOD__ . '_AdapterIterateNodes_' . $adapter);
+
+					# merge adapter's repo nodes
+					Timer::start(__METHOD__ . '_AdapterMergeNodes_' . $adapter);
 					$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes, $adapter);
-					\Foomo\Timer::stop(__METHOD__ . '_AdapterMergeNodes_' . $adapter);
+					Timer::stop(__METHOD__ . '_AdapterMergeNodes_' . $adapter);
 				}
-				\Foomo\Timer::stop(__METHOD__ . '_Adapter_' . $adapter);
+				Timer::stop(__METHOD__ . '_Adapter_' . $adapter);
 			}
 			return $siteRepoNodes;
 		} catch (\Exception $e) {
@@ -72,17 +79,6 @@ class ContentServer implements ContentServerInterface
 	// --------------------------------------------------------------------------------------------
 	// ~ Protected static methods
 	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * Return the repo node from a remote server
-	 *
-	 * @param string $url
-	 * @return mixed
-	 */
-	protected static function getRepoNode($url)
-	{
-		return json_decode(file_get_contents($url));
-	}
 
 	/**
 	 * Iterates over the repo node

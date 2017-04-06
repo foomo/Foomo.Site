@@ -114,7 +114,7 @@ class Cache
 	 */
 	private static function loadRemoteFile($url, $filename)
 	{
-		$content = @file_get_contents($url);
+		$content = file_get_contents($url);
 		if ($content) {
 			file_put_contents($filename, $content);
 			//manipulate the file mtime

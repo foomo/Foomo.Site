@@ -20,7 +20,6 @@
 namespace Foomo\Site\Adapter;
 
 use Foomo\Cache\Proxy;
-use Foomo\Site\Adapter\Neos;
 use Foomo\Site\Exception\HTTPException;
 
 /**
@@ -40,9 +39,10 @@ abstract class AbstractClient
 	 * @param string $dimension
 	 * @param string $nodeId
 	 * @param string $domain
+	 * @param array  $data
 	 * @return string
 	 */
-	protected static function cachedLoad($dimension, $nodeId, $domain=null)
+	protected static function cachedLoad($dimension, $nodeId, $domain=null, array $data)
 	{
 		return Proxy::call(
 			'Foomo\Site\Adapter',
@@ -51,7 +51,8 @@ abstract class AbstractClient
 				get_called_class(),
 				$dimension,
 				$nodeId,
-				$domain
+				$domain,
+				$data
 			]
 		);
 	}

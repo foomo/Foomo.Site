@@ -17,41 +17,30 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Adapter;
+namespace Foomo\Site\Adapter\Neos;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-interface ClientInterface
+class DomainConfig extends \Foomo\Site\Adapter\DomainConfig
 {
+
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Constants
+	// --------------------------------------------------------------------------------------------
+
+	const NAME = 'Foomo.Site.Neos.adapter';
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Variables
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Return the content from the remote server
+	 * Content server base url
 	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @param string $baseURL
-	 * @param string $domain configuration domain name
-	 * @param array  $data   additional request data
-	 * @return string
+	 * @var string
 	 */
-	static function get($dimension, $nodeId, $baseURL, $domain, array $data);
-
-	/**
-	 * Load the content from remote server
-	 *
-	 * @internal
-	 *
-	 * @param string $dimension
-	 * @param string $nodeId
-	 * @param string $domain configuration domain name
-	 * @param array  $data   additional request data
-	 * @return string
-	 */
-	static function load($dimension, $nodeId, $domain, array $data);
+	public $workspace = 'live';
 }

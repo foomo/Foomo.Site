@@ -20,8 +20,6 @@
 namespace Foomo\Site;
 
 use Foomo\Cache;
-use Foomo\CSV\Jobs\Manager;
-use Foomo\Site\Adapter\Neos;
 
 /**
  * @link    www.foomo.org
@@ -48,11 +46,12 @@ class Adapter
 	 * @param string $dimension
 	 * @param string $nodeId
 	 * @param string $domain
+	 * @param array $data
 	 * @return string
 	 */
-	public static function cachedLoadClientContent($clientClass, $dimension, $nodeId, $domain)
+	public static function cachedLoadClientContent($clientClass, $dimension, $nodeId, $domain, array $data)
 	{
-		return $clientClass::load($dimension, $nodeId, $domain);
+		return $clientClass::load($dimension, $nodeId, $domain, $data);
 	}
 
 	/**
