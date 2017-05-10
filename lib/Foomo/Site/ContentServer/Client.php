@@ -38,15 +38,15 @@ class Client
 	 *
 	 * @param string   $uri
 	 * @param string[] $dimensions
+	 * @param string[] $groups
 	 * @return Vo\Content\SiteContent
 	 */
-	public static function getContent($uri, array $dimensions)
+	public static function getContent($uri, array $dimensions, array $groups)
 	{
-		$env = Site::getEnv();
 		$config = Site::getConfig();
 
 		# create request env
-		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups());
+		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $groups);
 
 		# create request
 		$request = Vo\Requests\Content::create($uri, $contentEnv);

@@ -31,6 +31,7 @@ class HTTPException extends \Exception
 	// --------------------------------------------------------------------------------------------
 
 	const MSG_CONTENT_SERVER_UNAVAILABLE = 'CONTENT_SERVER_UNAVAILABLE';
+	const MSG_CONTENT_SERVER_NAVIGATION_MISSING = 'CONTENT_SERVER_NAVIGATION_MISSING';
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Constructor
