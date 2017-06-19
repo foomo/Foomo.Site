@@ -72,10 +72,11 @@ class Controller
 	/**
 	 * @param string $url
 	 * @param string[] $dimensions
+	 * @param string[] $groups
 	 * @throws Site\Exception\HTTPException
 	 * @throws Site\Exception\ContentServerException
 	 */
-	protected function loadSiteContent($url, $dimensions = null)
+	protected function loadSiteContent($url, $dimensions = null, $groups = null)
 	{
 		\Foomo\Timer::start($topic = __METHOD__);
 		$url = parse_url($url);
@@ -85,8 +86,13 @@ class Controller
 			$dimensions = $config->getDimensionIds();
 		}
 
+		if (empty($groups)) {
+			$env = Site::getEnv();
+			$groups = $env::getGroups();
+		}
+
 		# retrieve the content
-		$content = Site\ContentServer\Client::getContent($url['path'], array_reverse($dimensions));
+		$content = Site\ContentServer\Client::getContent($url['path'], array_reverse($dimensions), $groups);
 		Timer::addMarker('retrieved content from content server');
 
 		# validate content
@@ -102,7 +108,9 @@ class Controller
 		}
 
 		# validate status
-		if ($content->status != Vo\Content\SiteContent::STATUS_OK) {
+		if ($content->status == Vo\Content\SiteContent::STATUS_FORBIDDEN) {
+			throw new Site\Exception\HTTPException($content->status, 'Content server client forbids access!');
+		} elseif ($content->status != Vo\Content\SiteContent::STATUS_OK) {
 			throw new Site\Exception\HTTPException($content->status, 'Content server client result not OK!');
 		}
 		\Foomo\Timer::stop($topic);
