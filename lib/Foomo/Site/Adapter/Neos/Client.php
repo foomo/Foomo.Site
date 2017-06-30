@@ -42,12 +42,12 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function get($dimension, $nodeId, $baseURL, $domain=null, array $data)
+	public static function get($dimension, $nodeId, $baseURL, $domain=null, array $data=[])
 	{
 		Timer::addMarker('service neos content');
 		Timer::start($topic = __METHOD__);
 
-		$html = static::cachedLoad($dimension, $nodeId, $domain);
+		$html = static::cachedLoad($dimension, $nodeId, $domain, $data);
 		if (!empty($html)) {
 			$doc = static::getDOMDocument($html);
 
@@ -68,11 +68,14 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function load($dimension, $nodeId, $domain=null, array $data)
+	public static function load($dimension, $nodeId, $domain=null, array $data=[])
 	{
 		Timer::start($topic = __METHOD__);
 		$adapterConfig = Neos::getAdapterConfig($domain);
-		$url = $adapterConfig->getPathUrl('content') . '/' . $dimension . '/' . $nodeId . '?workspace=' . $data['workspace'];
+		$url = $adapterConfig->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
+		if(!empty($data['workspace'])) {
+			$url .= '?workspace=' . $data['workspace'];
+		}
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);

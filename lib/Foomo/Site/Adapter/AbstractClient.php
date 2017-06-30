@@ -42,7 +42,7 @@ abstract class AbstractClient
 	 * @param array  $data
 	 * @return string
 	 */
-	protected static function cachedLoad($dimension, $nodeId, $domain=null, array $data)
+	protected static function cachedLoad($dimension, $nodeId, $domain=null, array $data=[])
 	{
 		return Proxy::call(
 			'Foomo\Site\Adapter',
