@@ -88,6 +88,7 @@ class Client extends AbstractClient implements ClientInterface
 		# replace images & links
 		static::replaceImages($doc);
 		static::replaceLinks($dimension, $doc);
+		static::replaceStyleUrls($doc);
 
 		# grep first div in body (if exists)
 		$item = $doc->getElementsByTagName('div')->item(0);
@@ -215,7 +216,6 @@ class Client extends AbstractClient implements ClientInterface
 		$ids = [];
 		$elements = [];
 
-
 		# collect all ids
 		foreach ($doc->getElementsByTagName('a') as $element) {
 			/* @var $element \DOMElement */
@@ -242,6 +242,52 @@ class Client extends AbstractClient implements ClientInterface
 			foreach ($elements as $element) {
 				$href = $element->getAttribute('href');
 				$element->setAttribute('href', $uris->{substr($href, 7)});
+			}
+		}
+	}
+
+
+	/**
+	 * Seems like this also gets cached in static::load() ...
+	 *
+	 * @param \DOMDocument $doc
+	 *
+	 * @return string
+	 */
+	protected static function replaceStyleUrls(\DOMDocument $doc)
+	{
+		$xpath = new \DOMXPath($doc);
+		$nodes = $xpath->query("//div[contains(@style, 'url(')]");
+
+		$editUri = function ($element, $style, $position)
+		{
+			# length node id is always exactly 36
+			# length "node://", "neos://", "nodeid:" = 7
+
+			$neosShortcut = substr($style, $position, 36 + 7);
+			$nodeId = substr($style, $position + 7, 36);
+
+			$uri = Neos\SubRouter::getImageUri('default', $nodeId);
+
+			$element->setAttribute('style', str_replace($neosShortcut, $uri, $style));
+		};
+
+		foreach ($nodes as $element) {
+			/* @var $element \DOMElement */
+			$style = $element->getAttribute('style');
+			switch (true) {
+				case (strpos($style, 'node://') !== false):
+					$pos = strpos($style, 'node://');
+					$editUri($element, $style, $pos);
+					break;
+				case (strpos($style, 'neos://') !== false):
+					$pos = strpos($style, 'neos://');
+					$editUri($element, $style, $pos);
+					break;
+				case (strpos($style, 'nodeid:') !== false):
+					$pos = strpos($style, 'nodeid:');
+					$editUri($element, $style, $pos);
+					break;
 			}
 		}
 	}
