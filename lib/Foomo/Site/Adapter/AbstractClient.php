@@ -78,7 +78,8 @@ abstract class AbstractClient
 					[
 						801, // XML_HTML_UNKNOWN_TAG
 						68,  // XML_HTML_UNKNOWN_TAG
-						513, //  XML_DTD_ID_REDEFINED
+						513, //  XML_DTD_ID_REDEFINED,
+						23 // XML_FROM_VALID = 23 : The XML DTD validation with valid context
 					]
 				)
 			) {

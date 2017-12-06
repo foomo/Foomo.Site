@@ -53,12 +53,13 @@ class Client
 
 		# append request nodes
 		foreach ($config->navigations as $id => $navigation) {
+
 			$request->addNode(
 				$id,
 				$navigation['id'],
 				$navigation['mimeTypes'],
 				$navigation['expand'],
-				$navigation['dataFields']
+				isset($navigation['dataFields']) ? $navigation['dataFields'] : []
 			);
 		}
 
