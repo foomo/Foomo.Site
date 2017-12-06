@@ -59,7 +59,8 @@ class Client
 				$navigation['id'],
 				$navigation['mimeTypes'],
 				$navigation['expand'],
-				$navigation['dataFields']
+				isset($navigation['dataFields']) ? $navigation['dataFields'] : []
+
 			);
 		}
 
