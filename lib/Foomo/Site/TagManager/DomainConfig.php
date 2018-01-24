@@ -39,11 +39,26 @@ class DomainConfig extends AbstractConfig
 	// --------------------------------------------------------------------------------------------
 
 	/**
+	 * Google Analytics id
+	 *
+	 * @var string
+	 */
+	public $analyticsId = 'UA-XXXXXXX-XX';
+
+	/**
 	 * Google Optimize 360 id
 	 *
 	 * @var string
 	 */
 	public $optimizeId = 'GTM-XXXX';
+
+	/**
+	 * time Google Optimize will wait in milliseconds before showing the page
+	 * 
+	 * @var int
+	 */
+	public $optimizeWaitTime = 2000;
+
 	/**
 	 * GTM Container IDs
 	 *
