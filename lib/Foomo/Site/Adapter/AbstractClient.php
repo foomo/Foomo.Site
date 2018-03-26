@@ -79,6 +79,7 @@ abstract class AbstractClient
 						801, // XML_HTML_UNKNOWN_TAG
 						68,  // XML_HTML_UNKNOWN_TAG
 						513, //  XML_DTD_ID_REDEFINED
+						23, //htmlParseEntityRef: expecting \';\'
 					]
 				)
 			) {
