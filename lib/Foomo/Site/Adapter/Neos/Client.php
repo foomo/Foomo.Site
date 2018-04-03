@@ -81,7 +81,7 @@ class Client extends AbstractClient implements ClientInterface
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (Config::isProductionMode()));
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 		$json = json_decode(curl_exec($ch));
 		curl_close($ch);
 		$doc = static::getDOMDocument($json->html);
