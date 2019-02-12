@@ -86,7 +86,8 @@ abstract class AbstractClient
 					case LIBXML_ERR_FATAL:
 					case LIBXML_ERR_ERROR:
 						trigger_error('badly invalid XML: ' . var_export($xmlError, true), E_USER_WARNING);
-						throw new HTTPException(500, $xmlError->message);
+						//throw new HTTPException(500, $xmlError->message);
+						break;
 					default:
 						trigger_error('invalid XML: ' . var_export($xmlError, true), E_USER_WARNING);
 				}
