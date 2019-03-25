@@ -40,7 +40,17 @@ trait RunnableTrait
 	{
 		$app = new static;
 		$app->setAppData($data);
-		return MVC::run($app, $baseUrl, true, true);
+		return MVC::run($app, $baseUrl, true, true, 'Foomo\\MVC\\URLHandler', false);
+	}
+
+	public static function runAndReturnInstance($data, $baseUrl = null)
+	{
+		$app = new static;
+		$app->setAppData($data);
+		return [
+			"instance" => $app,
+			"html" => MVC::run($app, $baseUrl, true, true, 'Foomo\\MVC\\URLHandler', false)
+		];
 	}
 
 	/**

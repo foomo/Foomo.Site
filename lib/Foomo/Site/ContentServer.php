@@ -19,7 +19,6 @@
 
 namespace Foomo\Site;
 
-use Foomo\ContentServer\Vo\Content\RepoNode;
 use Foomo\Site\ContentServer\NodeIterator;
 use Foomo\Site;
 
@@ -31,7 +30,7 @@ use Foomo\Site;
 class ContentServer implements ContentServerInterface
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+	// ~ Overriden public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
@@ -42,15 +41,26 @@ class ContentServer implements ContentServerInterface
 		try {
 			$siteRepoNodes = (object) [];
 			foreach (Site::getConfig()->adapters as $adapter) {
+				\Foomo\Timer::start(__METHOD__ . '_Adapter_' . $adapter);
 				$adapterConfig = $adapter::getAdapterConfig();
 				if ($adapterConfig && $adapterConfig->getPathUrl('repository')) {
+
+					\Foomo\Timer::start(__METHOD__ . '_AdapterGetRepoNode_' . $adapter);
 					$adapterRepoNodes = static::getRepoNode($adapterConfig->getPathUrl('repository'));
+					\Foomo\Timer::stop(__METHOD__ . '_AdapterGetRepoNode_' . $adapter);
+					\Foomo\Timer::start(__METHOD__ . '_AdapterValidateRepoNodes_' . $adapter);
 					$adapterRepoNodes = static::validateRepoNodes($adapterRepoNodes);
+					\Foomo\Timer::stop(__METHOD__ . '_AdapterValidateRepoNodes_' . $adapter);
+					\Foomo\Timer::start(__METHOD__ . '_AdapterIterateNodes_' . $adapter);
 					foreach ($adapterRepoNodes as $dimension => $repoNode) {
 						static::iterateNode($dimension, $repoNode);
 					}
-					$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes);
+					\Foomo\Timer::stop(__METHOD__ . '_AdapterIterateNodes_' . $adapter);
+					\Foomo\Timer::start(__METHOD__ . '_AdapterMergeNodes_' . $adapter);
+					$siteRepoNodes = static::mergeRepoNodes($siteRepoNodes, $adapterRepoNodes, $adapter);
+					\Foomo\Timer::stop(__METHOD__ . '_AdapterMergeNodes_' . $adapter);
 				}
+				\Foomo\Timer::stop(__METHOD__ . '_Adapter_' . $adapter);
 			}
 			return $siteRepoNodes;
 		} catch (\Exception $e) {
@@ -116,9 +126,10 @@ class ContentServer implements ContentServerInterface
 	 *
 	 * @param mixed $siteRepoNode
 	 * @param mixed $adapterRepoNode
+	 * @param mixed $adapter
 	 * @return mixed
 	 */
-	protected static function mergeRepoNodes($siteRepoNode, $adapterRepoNode)
+	protected static function mergeRepoNodes($siteRepoNode, $adapterRepoNode, $adapter)
 	{
 		foreach ($adapterRepoNode as $adapterDimension => $repoNode) {
 			$siteRepoNode->$adapterDimension = $repoNode;

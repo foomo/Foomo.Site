@@ -20,9 +20,6 @@
 namespace Foomo\Site\Adapter;
 
 use Foomo\ContentServer\Vo;
-use Foomo\MVC;
-use Foomo\Router\MVC\URLHandler;
-use Foomo\Site;
 
 /**
  * @link    www.foomo.org
@@ -62,7 +59,7 @@ class Foomo extends AbstractBase
 	/**
 	 * @inheritdoc
 	 */
-	public static function getAdapterConfig()
+	public static function getAdapterConfig($domain=null)
 	{
 		return null;
 	}

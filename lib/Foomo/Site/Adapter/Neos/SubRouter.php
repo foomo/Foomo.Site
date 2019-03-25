@@ -51,7 +51,9 @@ class SubRouter extends \Foomo\Site\SubRouter
 		$this->addRoutes(
 			[
 				'/asset/:nodeId/:filename'   => 'asset',
-				'/image/:type/:nodeId/:time' => 'image',
+				'/image/:type/:nodeId/:time/:timestamp' => 'imageWithTimestamp',
+
+				'/image/:type/:nodeId/:time' => 'imageWithTimestamp',
 				'/image/:type/:nodeId'       => 'image',
 				'/*'                         => 'error',
 			]
@@ -81,9 +83,12 @@ class SubRouter extends \Foomo\Site\SubRouter
 	 * @param string $nodeId
 	 * @return string
 	 */
-	public static function getImageUri($type, $nodeId)
+	public static function getImageUri($type, $nodeId, $timestamp = null)
 	{
-		return static::getUri('/image/' . $type . '/' . $nodeId);
+		if (empty($timestamp)) {
+			return static::getUri('/image/' . $type . '/' . $nodeId);
+		}
+		return static::getUri('/image/' . $type . '/' . $nodeId .'/time/' . $timestamp);
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -101,7 +106,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 		\Foomo\Session::saveAndRelease();
 
 		\Foomo\Timer::addMarker('serving asset');
-		$config = Neos::getAdapterConfig();
+		$config = static::getAdapterConfig();
 		$url = $config->getPathUrl('asset') . '/' . $nodeId;
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
 		$cacheFilename = Cache::getFilename($nodeId, $url);
@@ -119,6 +124,33 @@ class SubRouter extends \Foomo\Site\SubRouter
 		}
 	}
 
+	public function imageWithTimestamp($type, $nodeId, $time = null, $timestamp = 0) {
+		//restructure uri segments for backward compatibility reasons
+		if (is_numeric($time) && $timestamp == 0) {
+			$timestamp = $time;
+			$time = 'time';
+		}
+
+		if ($time == 'time' && is_numeric($timestamp)) {
+			$sourceFile = Cache::getSourceFilename($nodeId, static::$prefix);
+			if (file_exists($sourceFile)) {
+
+				$cachedTimestamp = filemtime($sourceFile);
+
+				//redirect
+				if ($cachedTimestamp != $timestamp) {
+					$this->redirect(self::getImageUri($type, $nodeId, $cachedTimestamp));
+				}
+			}
+		} else {
+			//error
+			$this->error();
+		}
+		$this->image($type, $nodeId, $timestamp);
+
+	}
+
+
 	/**
 	 * Serve responsive images
 	 *
@@ -131,11 +163,13 @@ class SubRouter extends \Foomo\Site\SubRouter
 		\Foomo\Timer::addMarker('serving neos image');
 		\Foomo\Session::saveAndRelease();
 
-		$config = Neos::getAdapterConfig();
+		$config = static::getAdapterConfig();
 		$url = $config->getPathUrl('image') . '/' . $nodeId;
 
 		\Foomo\Timer::start($topic = 'Foomo\Site\Adapter\Cache::getFilename');
-		$cacheFilename = Cache::getFilename($nodeId, $url, 'neos', (int) $time);
+
+
+		$cacheFilename = Cache::getFilename($nodeId, $url, static::$prefix, (int) $time);
 		\Foomo\Timer::stop($topic);
 
 
@@ -160,5 +194,17 @@ class SubRouter extends \Foomo\Site\SubRouter
 		} else {
 			$this->error();
 		}
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Public static methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * @return \Foomo\Config\AbstractConfig|\Foomo\Site\Adapter\DomainConfig
+	 */
+	public static function getAdapterConfig()
+	{
+		return Neos::getAdapterConfig();
 	}
 }

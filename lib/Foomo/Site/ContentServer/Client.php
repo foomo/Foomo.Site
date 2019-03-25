@@ -38,16 +38,15 @@ class Client
 	 *
 	 * @param string   $uri
 	 * @param string[] $dimensions
-	 * @param array    $data
+	 * @param string[] $groups
 	 * @return Vo\Content\SiteContent
 	 */
-	public static function getContent($uri, array $dimensions, array $data = [])
+	public static function getContent($uri, array $dimensions, array $groups)
 	{
-		$env = Site::getEnv();
 		$config = Site::getConfig();
 
 		# create request env
-		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups(), $data);
+		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $groups);
 
 		# create request
 		$request = Vo\Requests\Content::create($uri, $contentEnv);
@@ -59,8 +58,7 @@ class Client
 				$navigation['id'],
 				$navigation['mimeTypes'],
 				$navigation['expand'],
-				isset($navigation['dataFields']) ? $navigation['dataFields'] : []
-
+				(isset($navigation['dataFields'])) ? $navigation['dataFields'] : []
 			);
 		}
 
@@ -71,14 +69,13 @@ class Client
 	/**
 	 * @param array    $nodes
 	 * @param string[] $dimensions
-	 * @param array    $data
 	 * @return Vo\Content\Node[]
 	 */
-	public static function getNodes(array $nodes, array $dimensions, array $data = [])
+	public static function getNodes(array $nodes, array $dimensions)
 	{
 		$env = Site::getEnv();
 
-		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups(), $data);
+		$contentEnv = Vo\Requests\Content\Env::create($dimensions, $env::getGroups());
 		$request = Vo\Requests\Nodes::create($contentEnv);
 
 		# append request nodes
@@ -115,7 +112,7 @@ class Client
 	 *
 	 * @return \Foomo\ContentServer\ProxyInterface
 	 *
-	 * @throws Site\Exception\HTTPException
+	 * @throws Site\Exception\ContentServerException
 	 */
 	protected static function getContentServerProxy()
 	{
@@ -124,7 +121,7 @@ class Client
 			try {
 				$inst = Site\Module::getSiteContentServerProxyConfig()->getProxy();
 			} catch (\Exception $e) {
-				throw new Site\Exception\HTTPException(503, Site\Exception\HTTPException::MSG_CONTENT_SERVER_UNAVAILABLE, $e);
+				throw new Site\Exception\ContentServerException(503, Site\Exception\ContentServerException::MSG_CONTENT_SERVER_UNAVAILABLE, $e);
 			}
 		}
 		return $inst;

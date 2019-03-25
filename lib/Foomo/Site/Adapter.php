@@ -47,11 +47,12 @@ class Adapter
 	 * @param string $clientClass
 	 * @param string $dimension
 	 * @param string $nodeId
+	 * @param string $domain
 	 * @return string
 	 */
-	public static function cachedLoadClientContent($clientClass, $dimension, $nodeId)
+	public static function cachedLoadClientContent($clientClass, $dimension, $nodeId, $domain)
 	{
-		return $clientClass::load($dimension, $nodeId);
+		return $clientClass::load($dimension, $nodeId, $domain);
 	}
 
 	/**

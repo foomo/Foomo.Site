@@ -21,6 +21,7 @@ namespace Foomo\Site\Adapter\Neos;
 
 use Foomo\Cache;
 use Foomo\Config;
+use Foomo\Site\Adapter\AbstractBase;
 use Foomo\Site\Adapter\AbstractClient;
 use Foomo\Site\Adapter\ClientInterface;
 use Foomo\Site\Adapter\Neos;
@@ -42,12 +43,12 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function get($dimension, $nodeId, $baseURL)
+	public static function get($dimension, $nodeId, $baseURL, $domain=null)
 	{
 		\Foomo\Timer::addMarker('service neos content');
 		\Foomo\Timer::start($topic = __METHOD__);
 
-		$html = static::cachedLoad($dimension, $nodeId);
+		$html = static::cachedLoad($dimension, $nodeId, $domain);
 		if (!empty($html)) {
 			$doc = static::getDOMDocument($html);
 
@@ -68,10 +69,14 @@ class Client extends AbstractClient implements ClientInterface
 	/**
 	 * @inheritdoc
 	 */
-	public static function load($dimension, $nodeId)
+	public static function load($dimension, $nodeId, $domain=null)
 	{
 		\Foomo\Timer::start($topic = __METHOD__);
-		$url = Neos::getAdapterConfig()->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
+		if(is_null($domain)) {
+			$domain = Neos::getName();
+		}
+		$adapterConfig = AbstractBase::getAdapterConfig($domain);
+		$url = $adapterConfig->getPathUrl('content') . '/' . $dimension . '/' . $nodeId;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -90,7 +95,7 @@ class Client extends AbstractClient implements ClientInterface
 		if(!is_null($item)) {
 			$html = $doc->saveHTML($item);
 		} else {
-			trigger_error('unable to fetch first div in body on node '.$nodeId.' in dimension '.$dimension.', maybe the cms response is empty in ' . __METHOD__, E_USER_WARNING);
+			trigger_error('unable to fetch first div in body on node "' . $nodeId . '" in dimension "'.$dimension.'" from "'. $url . '" - maybe the cms response is empty in ' . __METHOD__, E_USER_WARNING);
 			throw new HTTPException(500, 'The content could not be loaded from the remote server!');
 		}
 
@@ -178,6 +183,9 @@ class Client extends AbstractClient implements ClientInterface
 		foreach ($doc->getElementsByTagName("img") as $image) {
 			# get media server type
 			$type = $image->getAttribute('data-type');
+			if(empty($type)) {
+				$type = 'default';
+			}
 			$image->removeAttribute('data-type');
 			# get last modified timestamp
 			$time = $image->getAttribute('data-time');
@@ -189,15 +197,15 @@ class Client extends AbstractClient implements ClientInterface
 			$image->removeAttribute('height');
 			$image->removeAttribute('width');
 			# get local uri
-			$uri = Neos\SubRouter::getImageUri($type, $nodeId);
-			if ($time) {
-				$uri .= '/' . $time;
-			}
+			$uri = Neos\SubRouter::getImageUri($type, $nodeId, $time);
+
 			$image->setAttribute('src', $uri);
 		}
 	}
 
 	/**
+	 * Seems like this gets cached in static::load() ...
+	 *
 	 * @param string       $dimension
 	 * @param \DOMDocument $doc
 	 *

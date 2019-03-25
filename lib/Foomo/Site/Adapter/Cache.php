@@ -36,26 +36,19 @@ class Cache
 	 * Returns the local filename for the given source node id and url
 	 *
 	 * @param string $nodeId Source node id
-	 * @param string $url    Source url
-	 * @param string $type   Source type
-	 * @param int    $time   Last modification timestamp
+	 * @param string $url Source url
+	 * @param string $type Source type
+	 * @param int $time Last modification timestamp
 	 * @return bool|string
 	 */
 	public static function getFilename($nodeId, $url, $type = 'files', $time = 0)
 	{
-		$module = Module::getRootModuleClass();
-
-		$filename = $module::getCacheDir($type) . DIRECTORY_SEPARATOR . $nodeId;
+		$filename = self::getSourceFilename($nodeId, $type);
 
 		if (file_exists($filename)) {
 
 			if ($time == 0) {
-				# get file headers
-				$headers = get_headers($url, 1);
-				if ($headers && strstr($headers[0], '200') !== false && isset($headers['Last-Modified'])) {
-					$dt = new \DateTime($headers['Last-Modified']);
-					$time = $dt->getTimestamp();
-				}
+				$time = filemtime($filename);
 			}
 
 			# check if file exists on the source
@@ -69,9 +62,48 @@ class Cache
 		}
 	}
 
+
+	public static function getSourceFilename($nodeId, $type = 'files') {
+		$module = Module::getRootModuleClass();
+		if(substr($type, 0, 1) == "/") {
+			$type = substr($type, 1);
+		}
+		return $module::getCacheDir($type) . DIRECTORY_SEPARATOR . $nodeId;
+	}
+
 	// --------------------------------------------------------------------------------------------
 	// ~ Private static methods
 	// --------------------------------------------------------------------------------------------
+
+
+	/**
+	 * @param array $headers see $http_response_header
+	 * @return int
+	 */
+	public static function extractLastModifiedFromHeader($headers)
+	{
+		if ($headers && strstr($headers[0], '200') !== false) {
+			$lastModified = false;
+			if(isset($headers['Last-Modified'])) {
+				$lastModified = $headers['Last-Modified'];
+			} else {
+				foreach($headers as $header) {
+					if(substr($header, 0, 14) == "Last-Modified:") {
+						$lastModified = substr($header, 15);
+					}
+				}
+			}
+			if($lastModified) {
+				$dt = new \DateTime($lastModified);
+				$timestamp = $dt->getTimestamp();
+				if($timestamp > time()) {
+					$timestamp = time();
+				}
+				return $timestamp;
+			}
+		}
+		return time();
+	}
 
 	/**
 	 * Loads a remote file and returns it's local file name
@@ -85,6 +117,9 @@ class Cache
 		$content = @file_get_contents($url);
 		if ($content) {
 			file_put_contents($filename, $content);
+			//manipulate the file mtime
+			$timestamp = self::extractLastModifiedFromHeader($http_response_header);
+			touch($filename, $timestamp);
 			return $filename;
 		} else {
 			return false;

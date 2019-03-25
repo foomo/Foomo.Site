@@ -36,7 +36,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	//---------------------------------------------------------------------------------------------
 
 	const NAME    = 'Foomo.Site';
-	const VERSION = '1.0.1';
+	const VERSION = '1.5.4';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
@@ -70,7 +70,7 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 		$resources = array(
 			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.4.*'),
 			\Foomo\Modules\Resource\Module::getResource('Foomo.Media', '0.3.*'),
-			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '0.3.*'),
+			\Foomo\Modules\Resource\Module::getResource('Foomo.ContentServer', '1.3.*'),
 		);
 
 		# resources when enabled
@@ -83,9 +83,11 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 						# site module configs
 						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.ContentServer.config'),
 						$siteConfigResource = \Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.config'),
-						# add these to your site if you want to use Mail or Analytics
+						\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.Content.Security.Policy.config'),
+						# add these to your site if you want to use Mail, Tag Manager or Analytics
 						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.smtp'),
 						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.analytics'),
+						//\Foomo\Modules\Resource\Config::getResource(self::getRootModule(), 'Foomo.Site.tagManager'),
 					],
 					$resources
 				);
@@ -140,6 +142,22 @@ class Module extends \Foomo\Modules\ModuleBase implements \Foomo\Frontend\Toolbo
 	public static function getAnalyticsConfig()
 	{
 		return self::getRootModuleConfig(\Foomo\Site\Analytics\DomainConfig::NAME);
+	}
+
+	/**
+	 * @return \Foomo\Site\TagManager\DomainConfig
+	 */
+	public static function getTagManagerConfig()
+	{
+		return self::getRootModuleConfig(\Foomo\Site\TagManager\DomainConfig::NAME);
+	}
+
+	/**
+	 * @return \Foomo\Site\Recaptcha\DomainConfig
+	 */
+	public static function getRecaptchaConfig()
+	{
+		return self::getRootModuleConfig(\Foomo\Site\Recaptcha\DomainConfig::NAME);
 	}
 
 	/**

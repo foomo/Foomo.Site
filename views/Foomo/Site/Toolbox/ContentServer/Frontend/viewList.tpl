@@ -37,8 +37,14 @@
 					'level'      => 0,
 					'parentNode' => null,
 					'repoNode'   => $model->repoNode,
+					'count'      => 0
 				]
 			); ?>
+			<? if(!$model->listAll): ?>
+				<tr>
+					<td colspan="7"><?= $view->link("more", 'viewList', [$model->dimension, "all"]) ?></td>
+				</tr>
+			<? endif; ?>
 		</tbody>
 	</table>
 </div>

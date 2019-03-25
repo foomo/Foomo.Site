@@ -38,4 +38,11 @@ class Frontend extends \Foomo\MVC\AbstractApp
 	 * @var Frontend\Controller
 	 */
 	public $controller;
+	public function __construct($appClassName = null)
+	{
+		ini_set("memory_limit", "2048M");
+		parent::__construct($appClassName);
+	}
+
 }
+

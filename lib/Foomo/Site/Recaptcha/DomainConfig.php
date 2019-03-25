@@ -5,60 +5,49 @@
  *
  * The foomo Opensource Framework is free software: you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public License as
- * published  by the Free Software Foundation, either version 3 of the
+ * published  by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
  * The foomo Opensource Framework is distributed in the hope that it will
  * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Exception;
+namespace Foomo\Site\Recaptcha;
+
+use Foomo\Config\AbstractConfig;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
- * @author  franklin
+ * @author  nicola
  */
-class HTTPException extends \Exception
+class DomainConfig extends AbstractConfig
 {
 	// --------------------------------------------------------------------------------------------
 	// ~ Constants
 	// --------------------------------------------------------------------------------------------
 
-	const MSG_CONTENT_SERVER_UNAVAILABLE = 'CONTENT_SERVER_UNAVAILABLE';
-	const MSG_CONTENT_SERVER_NAVIGATION_MISSING = 'CONTENT_SERVER_NAVIGATION_MISSING';
+	const NAME = 'Foomo.Site.recaptcha';
 
 	// --------------------------------------------------------------------------------------------
-	// ~ Constructor
+	// ~ Variables
 	// --------------------------------------------------------------------------------------------
 
-	/**
-	 * @param int        $code HTTP status code, such as 404, 500, etc.
-	 * @param string     $message
-	 * @param \Exception $previous
-	 */
-	public function __construct($code, $message = '', $previous = null)
-	{
-		parent::__construct($message, $code, $previous);
-	}
-
-	// --------------------------------------------------------------------------------------------
-	// ~ Public methods
-	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Set the HTTP response code
-	 *
-	 * @return $this
+	 * Site Key
+	 * @var string
 	 */
-	public function setResponseCode()
-	{
-		http_response_code($this->getCode());
-		return $this;
-	}
+	public $siteKey;
+
+	/**
+	 * Secret Key
+	 * @var string
+	 */
+	public $secretKey;
 }

@@ -39,9 +39,10 @@ abstract class AbstractClient
 	 *
 	 * @param string $dimension
 	 * @param string $nodeId
+	 * @param string $domain
 	 * @return string
 	 */
-	protected static function cachedLoad($dimension, $nodeId)
+	protected static function cachedLoad($dimension, $nodeId, $domain=null)
 	{
 		return Proxy::call(
 			'Foomo\Site\Adapter',
@@ -49,7 +50,8 @@ abstract class AbstractClient
 			[
 				get_called_class(),
 				$dimension,
-				$nodeId
+				$nodeId,
+				$domain
 			]
 		);
 	}
@@ -78,6 +80,8 @@ abstract class AbstractClient
 						68,  // XML_HTML_UNKNOWN_TAG
 						513, //  XML_DTD_ID_REDEFINED
 						23 // XML_FROM_VALID = 23 : The XML DTD validation with valid context
+						23, // htmlParseEntityRef: expecting \';\'
+						76
 					]
 				)
 			) {

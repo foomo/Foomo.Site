@@ -17,45 +17,14 @@
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Adapter;
-
-use Foomo\ContentServer\Vo;
-use Foomo\Site;
+namespace Foomo\Site\Exception;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
- * @author  franklin
+ * @author  frederik
  */
-abstract class AbstractBase implements Site\AdapterInterface
+class ContentServerException extends HTTPException
 {
-	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function getModuleResources()
-	{
-		return [
-			\Foomo\Modules\Resource\Config::getResource(
-				Site\Module::getRootModule(),
-				DomainConfig::NAME,
-				static::getName()
-			),
-		];
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public static function getAdapterConfig($domain=null)
-	{
-		if(is_null($domain)) {
-			$domain = static::getName();
-		}
-		return Site\Module::getRootModuleConfig(DomainConfig::NAME, $domain);
-	}
 
 }

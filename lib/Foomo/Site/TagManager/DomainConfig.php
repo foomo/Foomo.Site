@@ -5,57 +5,53 @@
  *
  * The foomo Opensource Framework is free software: you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public License as
- * published  by the Free Software Foundation, either version 3 of the
+ * published  by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
  * The foomo Opensource Framework is distributed in the hope that it will
  * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
  * the foomo Opensource Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Foomo\Site\Adapter;
+namespace Foomo\Site\TagManager;
 
-use Foomo\ContentServer\Vo;
-use Foomo\Site;
+use Foomo\Config\AbstractConfig;
 
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
  * @author  franklin
  */
-abstract class AbstractBase implements Site\AdapterInterface
+class DomainConfig extends AbstractConfig
 {
+	// ------------------------------------------------------------------------------------------------
+	// ~ Constants
 	// --------------------------------------------------------------------------------------------
-	// ~ Public static methods
+
+	const NAME = 'Foomo.Site.tagManager';
+
+	// --------------------------------------------------------------------------------------------
+	// ~ Variables
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @inheritdoc
+	 * Google Optimize 360 id
+	 *
+	 * @var string
 	 */
-	public static function getModuleResources()
-	{
-		return [
-			\Foomo\Modules\Resource\Config::getResource(
-				Site\Module::getRootModule(),
-				DomainConfig::NAME,
-				static::getName()
-			),
-		];
-	}
-
+	public $optimizeId = 'GTM-XXXX';
 	/**
-	 * @inheritdoc
+	 * GTM Container IDs
+	 *
+	 * @var string[]
 	 */
-	public static function getAdapterConfig($domain=null)
-	{
-		if(is_null($domain)) {
-			$domain = static::getName();
-		}
-		return Site\Module::getRootModuleConfig(DomainConfig::NAME, $domain);
-	}
-
+	public $containers = [
+		'id' => 'GTM-XXXX',
+		'auth' => '',
+		'preview' => ''
+	];
 }

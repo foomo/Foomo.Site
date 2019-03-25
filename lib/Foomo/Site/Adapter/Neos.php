@@ -70,8 +70,10 @@ class Neos extends AbstractBase
 			exit;
 		}
 
+		$domain = Site::getAdapterDomainName($siteContent);
+		$adapterConfig = static::getAdapterConfig($domain);
 		/* @var $client ClientInterface */
-		$client = static::getAdapterConfig()->getClass('client');
-		return $client::get($siteContent->dimension, $siteContent->item->id, $siteContent->URI);
+		$client = $adapterConfig->getClass('client');
+		return $client::get($siteContent->dimension, $siteContent->item->id, $siteContent->URI, $domain);
 	}
 }

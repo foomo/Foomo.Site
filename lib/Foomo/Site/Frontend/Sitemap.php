@@ -21,7 +21,6 @@ namespace Foomo\Site\Frontend;
 
 use Foomo\ContentServer\Vo\Content\RepoNode;
 use Foomo\Site;
-use Foomo\Utils;
 
 /**
  * Simple sitemap implementation
@@ -101,7 +100,7 @@ class Sitemap
 		header('Content-Type: text/xml; charset=utf-8;');
 		$xml = '<sitemapindex>';
 		foreach ($uris as $uri) {
-			$xml .= '<sitemap><loc>' . Utils::getServerUrl() . $uri . '</loc></sitemap>';
+			$xml .= '<sitemap><loc>' . Site::getConfig()->domain . $uri . '</loc></sitemap>';
 		}
 		$xml .= '</sitemapindex>';
 		echo $xml;

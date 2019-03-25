@@ -19,90 +19,80 @@
 
 namespace Foomo\Site;
 
+use Foomo\HTMLDocument;
+
 /**
  * @link    www.foomo.org
  * @license www.gnu.org/licenses/lgpl.txt
- * @author  franklin
+ * @author  nicola
  */
-class Env implements EnvInterface
+class Recaptcha
 {
 	// --------------------------------------------------------------------------------------------
-	// ~ Variables
+	// ~ Static variables
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @var string[]
+	 * @var self
 	 */
-	private $groups = [];
-
-	// --------------------------------------------------------------------------------------------
-	// ~ Constructor
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 *
-	 */
-	public function __construct()
-	{
-	}
+	protected static $inst;
 
 	// --------------------------------------------------------------------------------------------
 	// ~ Public static methods
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * @inheritdoc
-	 */
-	public static function boot()
-	{
-		static::getInstance();
-//		static::updateLocaleChain();
-	}
-
-	/**
-	 * @inheritdoc
-	 *
-	 * @return string[]
-	 */
-	public static function getGroups()
-	{
-		return static::getInstance()->groups;
-	}
-
-	/**
-	 * @param string[] $groups
-	 */
-	public static function setGroups($groups)
-	{
-		if (count(array_diff($groups, static::getGroups())) > 0) {
-			$config = Module::getSiteConfig();
-			if ($config->areValidGroups($groups)) {
-				static::getInstance(true)->groups = array_unique($groups);
-			} else {
-				trigger_error("Invalid groups: " . join(', ', $groups), E_USER_WARNING);
-			}
-		}
-	}
-
-	// --------------------------------------------------------------------------------------------
-	// ~ Private static methods
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 * @param bool $write return env in write mode
 	 * @return static
 	 */
-	protected static function getInstance($write = false)
+	public static function getInstance()
 	{
-		if(\Foomo\Session::getEnabled()) {
-			if ($write) {
-				\Foomo\Session::lockAndLoad();
-			}
-			return \Foomo\Session::getClassInstance(get_called_class());
-		} else {
-			$className = get_called_class();
-			return new $className;
+		if (is_null(static::$inst)) {
+			static::$inst = new static();
 		}
+		return static::$inst;
+	}
 
+	// --------------------------------------------------------------------------------------------
+	// ~ Public methods
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * Initialize reCAPTCHA by adding the API JS
+	 * @param HTMLDocument $HTMLDoc
+	 * @return self
+	 */
+	public function init($HTMLDoc = null)
+	{
+		if (is_null($HTMLDoc)) {
+			$HTMLDoc = HTMLDocument::getInstance();
+		}
+		$env = \Foomo\Site::getEnv();
+		$HTMLDoc->addJavascripts(["https://www.google.com/recaptcha/api.js?hl=" . $env::getLanguage() ]);
+		return $this;
+	}
+
+	/**
+	 * Get HTML widget for reCAPTCHA
+	 * @return string HTML
+	 */
+	public function getWidget()
+	{
+		$config = Module::getRecaptchaConfig();
+		return '<div class="g-recaptcha" data-sitekey="' . $config->siteKey . '"></div>';
+	}
+
+	/**
+	 * Verify captcha input
+	 * @param string $captchaResponseCode
+	 * @return bool
+	 */
+	public static function verifyCaptcha($captchaResponseCode)
+	{
+		$config = Module::getRecaptchaConfig();
+
+		$response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $config->secretKey . "&response=" . $captchaResponseCode . "&remoteip=" . $_SERVER['REMOTE_ADDR'] );
+		$response = json_decode($response, true);
+
+		return ($response["success"] === true) ? true : false;
 	}
 }
