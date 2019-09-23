@@ -103,7 +103,7 @@ $count ++;
 	</td>
 	<?
 	//and now some recursion for all the child nodes
-	if (count($repoNode->index) > 0) {
+	if (is_array($repoNode->index) && count($repoNode->index) > 0) {
 		$level++;
 		foreach ($repoNode->index as $index) {
 			$count ++;
