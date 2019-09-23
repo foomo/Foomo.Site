@@ -113,7 +113,7 @@ class NodeIterator implements \Iterator, \Countable
 	 */
 	public function valid()
 	{
-		if ($this->cursor < count($this->node->index)) {
+		if ($this->node->index && $this->cursor < count($this->node->index)) {
 			if ($this->isArray) {
 				return isset($this->node->nodes[$this->key()]);
 			} else {
