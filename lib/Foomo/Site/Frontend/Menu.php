@@ -99,7 +99,7 @@ class Menu
 				$ret .= static::renderMenuItemOpen($childNode, $path, $level);
 				$ret .= static::renderMenuItem($childNode, $path, $level);
 				if (
-					count((array)$childNode->nodes) > 0 &&
+					Site\ContentServer\NodeIterator::getIterator($childNode)->count() > 0 &&
 					(static::$expandAll || $active) &&
 					($depth == 0 || $depth > $level + 1)
 				) {

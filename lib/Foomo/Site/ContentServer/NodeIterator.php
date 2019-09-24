@@ -159,12 +159,18 @@ class NodeIterator implements \Iterator, \Countable
 	 * @param mixed $node
 	 * @return static|Content\Node
 	 */
-	public static function getIterator($node)
+	public static function  getIterator($node)
 	{
+
 		if ($node instanceof Content\Node) {
 			return $node;
 		} else {
 			return new static($node);
 		}
 	}
+
 }
+
+
+
+
