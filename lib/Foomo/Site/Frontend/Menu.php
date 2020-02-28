@@ -58,10 +58,10 @@ class Menu
 	//---------------------------------------------------------------------------------------------
 
 	/**
-	 * @param Node   $node
+	 * @param Node $node
 	 * @param Item[] $path
-	 * @param int    $depth
-	 * @param int    $level
+	 * @param int $depth
+	 * @param int $level
 	 * @return string
 	 */
 	public static function render($node, $path = [], $depth = 0, $level = 0)
@@ -75,10 +75,10 @@ class Menu
 
 	/**
 	 *
-	 * @param Node   $node
+	 * @param Node $node
 	 * @param Item[] $path
-	 * @param int    $depth
-	 * @param int    $level
+	 * @param int $depth
+	 * @param int $level
 	 * @return string
 	 */
 	protected static function renderNode($node, array $path, $depth, $level)
@@ -99,7 +99,7 @@ class Menu
 				$ret .= static::renderMenuItemOpen($childNode, $path, $level);
 				$ret .= static::renderMenuItem($childNode, $path, $level);
 				if (
-					count($childNode) > 0 &&
+					Site\ContentServer\NodeIterator::getIterator($childNode)->count() > 0 &&
 					(static::$expandAll || $active) &&
 					($depth == 0 || $depth > $level + 1)
 				) {
@@ -127,8 +127,8 @@ class Menu
 	}
 
 	/**
-	 * @param Node    $node
-	 * @param Item[]  $path
+	 * @param Node $node
+	 * @param Item[] $path
 	 * @param integer $level
 	 * @return string
 	 */
@@ -138,8 +138,8 @@ class Menu
 	}
 
 	/**
-	 * @param Node    $node
-	 * @param Item[]  $path
+	 * @param Node $node
+	 * @param Item[] $path
 	 * @param integer $level
 	 * @return string
 	 */
@@ -150,8 +150,8 @@ class Menu
 	}
 
 	/**
-	 * @param Node    $node
-	 * @param Item[]  $path
+	 * @param Node $node
+	 * @param Item[] $path
 	 * @param integer $level
 	 * @return string
 	 */
@@ -172,8 +172,8 @@ class Menu
 	}
 
 	/**
-	 * @param Node    $node
-	 * @param Item[]  $path
+	 * @param Node $node
+	 * @param Item[] $path
 	 * @param integer $level
 	 * @return string
 	 */
@@ -185,9 +185,10 @@ class Menu
 			return $node->item->URI;
 		}
 	}
+
 	/**
-	 * @param Node    $node
-	 * @param Item[]  $path
+	 * @param Node $node
+	 * @param Item[] $path
 	 * @param integer $level
 	 * @return string
 	 */
@@ -201,8 +202,8 @@ class Menu
 	}
 
 	/**
-	 * @param Node    $node
-	 * @param Item[]  $path
+	 * @param Node $node
+	 * @param Item[] $path
 	 * @param integer $level
 	 * @return string
 	 */
@@ -212,8 +213,8 @@ class Menu
 	}
 
 	/**
-	 * @param Node    $node
-	 * @param Item[]  $path
+	 * @param Node $node
+	 * @param Item[] $path
 	 * @param integer $level
 	 * @return string
 	 */

@@ -53,16 +53,27 @@ class Client
 
 		# append request nodes
 		foreach ($config->navigations as $id => $navigation) {
+
 			$request->addNode(
 				$id,
 				$navigation['id'],
 				$navigation['mimeTypes'],
 				$navigation['expand'],
-				$navigation['dataFields']
+				isset($navigation['dataFields']) ? $navigation['dataFields'] : []
 			);
 		}
 
 		# retrieve and return content
+
+		/*\Foomo\Utils::appendToPhpErrorLog('content request: ' . $uri . json_encode($dimensions) . ' -- ' . json_encode($groups) . PHP_EOL);
+		register_shutdown_function(function()  {
+			$error = error_get_last();
+			if ($error['type'] === \E_ERROR) {
+				\Foomo\Utils::appendToPhpErrorLog(json_encode($error) . PHP_EOL);
+			}
+		});
+		*/
+
 		return static::getContentServerProxy()->getContent($request);
 	}
 

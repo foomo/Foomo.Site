@@ -181,7 +181,7 @@ class SubRouter extends \Foomo\Site\SubRouter
 
 			Image\Processor::allowResizeAboveSource(false);
 
-			Image\Server::serve($cacheFilename, Neos::getName(), $type, null, (microtime() + 30 * 24 * 3600));
+			Image\Server::serve($cacheFilename, Neos::getName(), $type, null, (((int)microtime()) + 30 * 24 * 3600));
 
 			//set back to what it was - as we disabled it for neos
 			Image\Processor::allowResizeAboveSource($allowResizeAboveSourceSetting);

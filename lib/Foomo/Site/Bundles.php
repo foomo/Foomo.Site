@@ -178,14 +178,14 @@ class Bundles
 
 			# get template dir
 			$templatesDir = dirname($resolvedFilename) . '/templates';
-			$templatesRenderer = new TypeScript\TemplateRenderer(
+			$templatesRenderer = new \Foomo\TypeScript\TemplateRenderer(
 				$templatesDir . '.ts',
 				Module::getBaseDir('templates') . '/BackboneTemplates.tpl',
 				(object) ['module' => $moduleName . '.Apps.' . ucfirst($name)]
 			);
 
 			# build bundle
-			$bundle = TypeScript\Bundle::create("$name-ts-$type", dirname($resolvedFilename))
+			$bundle = \Foomo\TypeScript\Bundle::create("$name-ts-$type", dirname($resolvedFilename))
 				->writeTypeDefinition(static::isDebug())
 				->target(TypeScript::TARGET_ES5)
 				->preProcessWithData($data)
