@@ -136,8 +136,7 @@ class View extends \Foomo\MVC\View
 		if ($isFrontend) {
 			static::$rendering = true;
 			$this->renderHead(
-				HTMLDocument::getInstance(),
-				(!\Foomo\Config::isProductionMode())
+				HTMLDocument::getInstance()
 			);
 		}
 
