@@ -22,6 +22,7 @@ namespace Foomo\Site\Service;
 use Foomo\Cache\Invalidator;
 use Foomo\Cache\Manager;
 use Foomo\Cache\Persistence\Expr;
+use Foomo\Site\Jobs\UpdateContentServerJob;
 
 /**
  * @link    www.foomo.org
@@ -76,6 +77,12 @@ class Adapter
 			Manager::invalidateWithQuery(
 				'Foomo\\Site\\Adapter::cachedLoadClientContent', $expr, true, Invalidator::POLICY_DELETE
 			);
+
+			if (\Foomo\Site\Module::getSiteConfig()->updateContentServerAfterContentAdapterUpdate) {
+				UpdateContentServerJob::setUpdateFlag(true);
+			}
+
+
 			return true;
 		} catch (\Exception $e) {
 			trigger_error("Cache invalidation failed for $nodeId with message " . $e->getMessage(), E_USER_WARNING);

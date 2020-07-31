@@ -131,6 +131,12 @@ class DomainConfig extends AbstractConfig
 	 */
 	public $subRouters = [];
 
+	/**
+	 * if true it will set a flag (file) that indicates a cronjob should update the contentserver
+	 *
+	 * @var bool
+	 */
+	public $updateContentServerAfterContentAdapterUpdate = false;
 	// --------------------------------------------------------------------------------------------
 	// ~ Public methods
 	// --------------------------------------------------------------------------------------------
