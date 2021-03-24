@@ -153,9 +153,10 @@ class Menu
 	 * @param Node $node
 	 * @param Item[] $path
 	 * @param integer $level
+	 * @param integer $index
 	 * @return string
 	 */
-	protected static function renderMenuItem($node, array $path, $level, $index)
+	protected static function renderMenuItem($node, array $path, $level, $index = 0)
 	{
 		$classes = [];
 
